@@ -1,6 +1,6 @@
-import {Container, Nav, Navbar} from 'react-bootstrap';
+import {Container, Nav, Navbar, Offcanvas} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
-import './Navbar.scss';
+import './NavBar.scss';
 
 const NavBar = () => {
     return (
@@ -9,7 +9,7 @@ const NavBar = () => {
             expand="lg"
             className="shadow-sm"
         >
-            <Container fluid={"xxl"}>
+            <Container fluid="xxl">
                 <Navbar.Brand
                     as={Link}
                     to="/"
@@ -18,13 +18,30 @@ const NavBar = () => {
                     CampSpot
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="ms-auto">
-                        <Nav.Link as={Link} to="/">Home</Nav.Link>
-                        <Nav.Link as={Link} to="/bookings">My Bookings</Nav.Link>
-                        <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
-                    </Nav>
-                </Navbar.Collapse>
+                {/* This Nav shows in expanded mode */}
+                <Nav className="ms-auto d-none d-lg-flex">
+                    <Nav.Link as={Link} to="/">Home</Nav.Link>
+                    <Nav.Link as={Link} to="/bookings">My Bookings</Nav.Link>
+                    <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
+                </Nav>
+                {/* This Offcanvas shows in collapsed mode */}
+                <Navbar.Offcanvas
+                    id="basic-navbar-nav"
+                    placement="end"
+                    aria-labelledby="offcanvasNavbarLabel"
+                    className="sidebar d-lg-none"
+                >
+                    <Offcanvas.Header closeButton>
+                        <Offcanvas.Title id="offcanvasNavbarLabel">Menu</Offcanvas.Title>
+                    </Offcanvas.Header>
+                    <Offcanvas.Body>
+                        <Nav className="justify-content-end flex-grow-1 pe-3">
+                            <Nav.Link as={Link} to="/">Home</Nav.Link>
+                            <Nav.Link as={Link} to="/bookings">My Bookings</Nav.Link>
+                            <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
+                        </Nav>
+                    </Offcanvas.Body>
+                </Navbar.Offcanvas>
             </Container>
         </Navbar>
     );
