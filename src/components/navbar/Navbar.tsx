@@ -9,7 +9,7 @@ const NavBar = () => {
             expand="lg"
             className="shadow-sm"
         >
-            <Container fluid="xxl">
+            <Container fluid>
                 <Navbar.Brand
                     as={Link}
                     to="/"
