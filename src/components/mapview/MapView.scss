@@ -1,0 +1,14 @@
+// src/components/MapView/MapView.scss
+.map-container {
+  width: 100%;
+  height: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+
+
+  .mapboxgl-canvas-container {
+    &.mapboxgl-interactive {
+      cursor: default !important;
+    }
+  }
+}

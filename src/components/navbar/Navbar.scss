@@ -1,7 +1,7 @@
-@import '../../utils/theme';
+@use '../../util/theme' as theme;
 
 .navbar {
-  background-color: $primary;
+  background-color: theme.$primary;
 
   .navbar-toggler {
     border: none !important;
@@ -22,7 +22,7 @@
   }
 
   .offcanvas-header {
-    background-color: $primary;
+    background-color: theme.$primary;
     color: white;
 
     .btn-close {
