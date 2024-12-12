@@ -1,15 +1,14 @@
-// src/components/MapView/index.tsx
-import { useEffect, useRef } from 'react';
+import {useEffect, useRef} from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { PropertyResponse } from '../../models/Property.ts';
+import {PropertyResponse} from '../../models/Property.ts';
 import './MapView.scss';
 
 interface MapViewProps {
     properties: PropertyResponse[];
 }
 
-const MapView = ({ properties }: MapViewProps) => {
+const MapView = ({properties}: MapViewProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
 
@@ -27,8 +26,20 @@ const MapView = ({ properties }: MapViewProps) => {
         map.current.addControl(new mapboxgl.NavigationControl());
 
         map.current.on('load', () => {
-            properties.forEach((property) => {
-                if (property.address.latitude && property.address.longitude) {
+            // Calculate and set bounds immediately
+            const bounds = new mapboxgl.LngLatBounds();
+            properties.forEach(property => {
+                const {latitude, longitude} = property.address;
+                if (typeof latitude === 'number' && typeof longitude === 'number') {
+                    bounds.extend([longitude, latitude]);
+                }
+            });
+            map.current!.fitBounds(bounds, {padding: 50});
+
+            // After bounds are set, start dropping markers with animation
+            properties.forEach((property, index) => {
+                const {latitude, longitude} = property.address;
+                if (typeof latitude === 'number' && typeof longitude === 'number') {
                     const testImage = "https://media.istockphoto.com/id/1377841262/photo/the-beautiful-scenery-of-a-tent-in-a-pine-tree-forest-at-pang-oung-mae-hong-son-province.jpg?s=612x612&w=0&k=20&c=1JvDx-16zTIeytdcC-Fa27nVJ_8SveP-omNKKlUJ-lQ=";
 
                     const popup = new mapboxgl.Popup({
@@ -36,33 +47,29 @@ const MapView = ({ properties }: MapViewProps) => {
                         maxWidth: '300px'
                     }).setHTML(
                         `<div class="map-popup">
-                            <h5>${property.name}</h5>
-                            <div class="image-gallery">
-                                <img src="${testImage}" alt="${property.name}" />
-                                <img src="${testImage}" alt="${property.name}" />
-                                <img src="${testImage}" alt="${property.name}" />
-                            </div>
-                            <p class="description">${property.description}</p>
-                            <p class="price">€${property.pricePerNight}/night</p>
-                        </div>`
+                    <h5>${property.name}</h5>
+                    <div class="image-gallery">
+                        <img src="${testImage}" alt="${property.name}" />
+                        <img src="${testImage}" alt="${property.name}" />
+                        <img src="${testImage}" alt="${property.name}" />
+                    </div>
+                    <p class="description">${property.description}</p>
+                    <p class="price">€${property.pricePerNight} per night</p>
+                </div>`
                     );
 
-                    new mapboxgl.Marker({
-                        color: "#2C5530",
-                    })
-                        .setLngLat([property.address.longitude, property.address.latitude])
-                        .setPopup(popup)
-                        .addTo(map.current!);
-                }
-            });
+                    setTimeout(() => {
+                        const marker = new mapboxgl.Marker({
+                            color: "#2C5530",
+                        });
 
-            const bounds = new mapboxgl.LngLatBounds();
-            properties.forEach(property => {
-                if (property.address.latitude && property.address.longitude) {
-                    bounds.extend([property.address.longitude, property.address.latitude]);
+                        marker
+                            .setLngLat([longitude, latitude])
+                            .setPopup(popup)
+                            .addTo(map.current!);
+                    }, index * 150);
                 }
             });
-            map.current!.fitBounds(bounds, { padding: 50 });
         });
 
         return () => {
@@ -71,7 +78,7 @@ const MapView = ({ properties }: MapViewProps) => {
     }, [properties]);
 
     return (
-        <div className="map-container" ref={mapContainer} />
+        <div className="map-container" ref={mapContainer}/>
     );
 };
 

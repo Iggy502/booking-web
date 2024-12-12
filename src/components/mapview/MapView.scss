@@ -73,3 +73,23 @@
   }
 }
 
+@keyframes dropIn {
+  0% {
+    margin-top: -200px;
+    opacity: 0;
+  }
+  60% {
+    margin-top: 20px;
+    opacity: 1;
+  }
+  80% {
+    margin-top: -10px;
+  }
+  100% {
+    margin-top: 0;
+  }
+}
+
+.mapboxgl-marker {
+  animation: dropIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
