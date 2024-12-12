@@ -5,10 +5,71 @@
   border-radius: 8px;
   overflow: hidden;
 
-
   .mapboxgl-canvas-container {
     &.mapboxgl-interactive {
       cursor: default !important;
     }
   }
 }
+
+// Popup styling
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+
+
+  .map-popup {
+    h5 {
+      padding: 12px;
+      margin: 0;
+      background-color: #2C5530;
+      color: white;
+      font-size: 16px;
+    }
+
+    .image-gallery {
+      display: flex;
+      padding: 8px;
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box; // Ensure padding is included in width calculation
+
+      img {
+        width: calc((100% - 16px) / 3); // Calculate width accounting for gaps
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        flex-shrink: 0; // Prevent images from shrinking
+      }
+    }
+
+    .description {
+      padding: 0 12px;
+      margin: 8px 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .price {
+      padding: 0 12px 12px;
+      margin: 0;
+      font-weight: bold;
+      color: #2C5530;
+    }
+  }
+
+  .mapboxgl-popup-close-button {
+    color: white;
+    font-size: 24px; // Increased from 18px
+    padding: 8px 12px; // Increased padding for larger click area
+    border: none;
+    background: none;
+    height: 43.19px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
