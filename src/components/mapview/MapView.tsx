@@ -6,11 +6,25 @@ import './MapView.scss';
 
 interface MapViewProps {
     properties: PropertyResponse[];
+    selectedLocation: { longitude: number, latitude: number } | null;
 }
 
-const MapView = ({properties}: MapViewProps) => {
+const MapView = ({properties, selectedLocation}: MapViewProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
+
+
+    // Add effect to handle selected location changes
+    useEffect(() => {
+        if (map.current && selectedLocation) {
+            map.current.flyTo({
+                center: [selectedLocation.longitude, selectedLocation.latitude],
+                zoom: 18,
+                duration: 2000  // Animation duration in milliseconds
+            });
+        }
+    }, [selectedLocation]);
+
 
     useEffect(() => {
         if (!mapContainer.current) return;

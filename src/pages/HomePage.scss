@@ -4,45 +4,66 @@
     min-height: calc(100vh - 56px);
   }
 
+  .responsive-heading {
+    font-size: 2rem;
+    transition: font-size 0.3s ease-in-out;
+
+
+    @media (max-width: 1200px) {
+      font-size: 1.75rem;
+    }
+
+    @media (max-width: 992px) {
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 1.25rem;
+    }
+  }
+
   .date-picker-container {
-    max-width: 400px;
 
-    .input-wrapper {
-      position: relative;
+    width: 400px;
 
-      .calendar-icon {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 2;
+    @media (max-width: 500px) {
+      width: 100%; // Full width on smaller screens
+    }
+
+    .react-datepicker-wrapper {
+      width: 100%;
+
+      .react-datepicker__calendar-icon {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
         color: #2C5530;
-        width: 20px;
-        height: 20px;
-      }
-
-      .react-datepicker-wrapper {
-        width: 100%;
-      }
-
-      input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border-radius: 0.5rem;
-        border: 1px solid #ced4da;
-        font-size: 1rem;
-
-        &:focus {
-          border-color: #2C5530;
-          box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
-          outline: none;
-        }
-
-        &::placeholder {
-          color: #6c757d;
-        }
+        justify-content: center;
+        width: 2.5rem;
+        font-size: large;
       }
     }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+
+      &:focus {
+        border-color: #2C5530;
+        box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+        outline: none;
+      }
+
+      &::placeholder {
+        color: #6c757d;
+      }
+    }
+
   }
 
   // Calendar styling

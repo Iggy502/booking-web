@@ -1,0 +1,56 @@
+// src/components/AutoComplete/AutoComplete.scss
+.autocomplete-container {
+  position: relative;
+  width: 400px;
+
+  @media (max-width: 500px) {
+    width: 100%;
+  }
+
+  .fa-map {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    color: #2C5530;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+
+    &:focus {
+      border-color: #2C5530;
+      box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+      outline: none;
+    }
+  }
+
+  .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+
+    li {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
