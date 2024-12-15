@@ -51,7 +51,9 @@
         &:hover {
           cursor: pointer;
           transform: scale(1.5);
-          position: relative; // Add this
+          position: relative;
+          transition: transform 0.3s ease-in-out;
+          backface-visibility: hidden;
         }
 
 
