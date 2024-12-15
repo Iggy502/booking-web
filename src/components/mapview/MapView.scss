@@ -15,12 +15,15 @@
 // Popup styling
 .mapboxgl-popup-content {
   padding: 0 !important;
-  border-radius: 8px !important;
-  overflow: hidden;
+  border-radius: 10px !important;
+
+
 
 
   .map-popup {
     h5 {
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
       padding: 12px;
       margin: 0;
       background-color: #2C5530;
@@ -30,18 +33,31 @@
 
     .image-gallery {
       display: flex;
-      padding: 5px;
-      gap: 8px;
+      padding-top: 10px;
+      padding-bottom: 5px;
+      justify-content: space-evenly;
       width: 100%;
       box-sizing: border-box; // Ensure padding is included in width calculation
 
       img {
-        width: calc((100% - 16px) / 3); // Calculate width accounting for gaps
-        height: 80px;
+        // Calculate width accounting for gaps
+        height: 85px;
+        aspect-ratio: 1/1; // Maintain aspect ratio
         object-fit: cover;
         border-radius: 4px;
         flex-shrink: 0; // Prevent images from shrinking
+
+
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.5);
+          position: relative; // Add this
+        }
+
+
       }
+
+
     }
 
     .description {
@@ -62,10 +78,10 @@
   .mapboxgl-popup-close-button {
     color: white;
     font-size: 24px; // Increased from 18px
-    padding: 8px 12px; // Increased padding for larger click area
+    padding: 0.5rem 0.75rem; // Increased padding for larger click area
     border: none;
     background: none;
-    height: 43.19px;
+    height: 2.699rem;
     outline: none !important;
 
     &:hover {

@@ -1,9 +1,9 @@
-// Test Properties
 import {AmenityType, PropertyResponse} from "../models/Property.ts";
 import {IBookingBase} from "../models/Booking.ts";
 
 export const properties: PropertyResponse[] = [
     {
+        id: "60d21b4667d0d8992e610c85",
         name: "Ardennes Wilderness Camp",
         owner: "owner_123",
         description: "Secluded camping spot in the heart of the Ardennes forest, perfect for nature lovers.",
@@ -29,6 +29,7 @@ export const properties: PropertyResponse[] = [
         ]
     },
     {
+        id: "60d21b4667d0d8992e610c86",
         name: "Coastal Dunes Camp",
         owner: "owner_456",
         description: "Beachside camping with stunning North Sea views.",
@@ -53,6 +54,7 @@ export const properties: PropertyResponse[] = [
         ]
     },
     {
+        id: "60d21b4667d0d8992e610c87",
         name: "Flanders Fields Campsite",
         owner: "owner_789",
         description: "Historical camping location with World War I monuments nearby.",
@@ -77,6 +79,7 @@ export const properties: PropertyResponse[] = [
         ]
     },
     {
+        id: "60d21b4667d0d8992e610c88",
         name: "Meuse Valley Resort",
         owner: "owner_101",
         description: "Riverside camping with water sports activities.",
@@ -101,6 +104,7 @@ export const properties: PropertyResponse[] = [
         ]
     },
     {
+        id: "60d21b4667d0d8992e610c89",
         name: "Brussels Forest Retreat",
         owner: "owner_112",
         description: "Urban camping experience near the capital.",
@@ -125,11 +129,11 @@ export const properties: PropertyResponse[] = [
         ]
     }
 ];
-
 export const bookings: IBookingBase[] = [
     // Ardennes Wilderness Camp bookings
     {
-        property: "Ardennes Wilderness Camp",
+        id: "booking_001",
+        property: "60d21b4667d0d8992e610c85",
         guest: "guest_123",
         checkIn: new Date("2024-06-15"),
         checkOut: new Date("2024-06-20"),
@@ -138,7 +142,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 4
     },
     {
-        property: "Ardennes Wilderness Camp",
+        id: "booking_002",
+        property: "60d21b4667d0d8992e610c85",
         guest: "guest_124",
         checkIn: new Date("2024-07-01"),
         checkOut: new Date("2024-07-05"),
@@ -147,7 +152,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 2
     },
     {
-        property: "Ardennes Wilderness Camp",
+        id: "booking_003",
+        property: "60d21b4667d0d8992e610c85",
         guest: "guest_125",
         checkIn: new Date("2024-08-10"),
         checkOut: new Date("2024-08-15"),
@@ -157,7 +163,8 @@ export const bookings: IBookingBase[] = [
     },
     // Coastal Dunes Camp bookings
     {
-        property: "Coastal Dunes Camp",
+        id: "booking_004",
+        property: "60d21b4667d0d8992e610c86",
         guest: "guest_126",
         checkIn: new Date("2024-07-15"),
         checkOut: new Date("2024-07-20"),
@@ -166,7 +173,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 4
     },
     {
-        property: "Coastal Dunes Camp",
+        id: "booking_005",
+        property: "60d21b4667d0d8992e610c86",
         guest: "guest_127",
         checkIn: new Date("2024-08-01"),
         checkOut: new Date("2024-08-03"),
@@ -175,7 +183,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 2
     },
     {
-        property: "Coastal Dunes Camp",
+        id: "booking_006",
+        property: "60d21b4667d0d8992e610c86",
         guest: "guest_128",
         checkIn: new Date("2024-06-20"),
         checkOut: new Date("2024-06-25"),
@@ -185,7 +194,8 @@ export const bookings: IBookingBase[] = [
     },
     // Flanders Fields Campsite bookings
     {
-        property: "Flanders Fields Campsite",
+        id: "booking_007",
+        property: "60d21b4667d0d8992e610c87",
         guest: "guest_129",
         checkIn: new Date("2024-06-01"),
         checkOut: new Date("2024-06-07"),
@@ -194,7 +204,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 6
     },
     {
-        property: "Flanders Fields Campsite",
+        id: "booking_008",
+        property: "60d21b4667d0d8992e610c87",
         guest: "guest_130",
         checkIn: new Date("2024-07-20"),
         checkOut: new Date("2024-07-25"),
@@ -203,7 +214,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 4
     },
     {
-        property: "Flanders Fields Campsite",
+        id: "booking_009",
+        property: "60d21b4667d0d8992e610c87",
         guest: "guest_131",
         checkIn: new Date("2024-08-15"),
         checkOut: new Date("2024-08-20"),
@@ -213,7 +225,8 @@ export const bookings: IBookingBase[] = [
     },
     // Meuse Valley Resort bookings
     {
-        property: "Meuse Valley Resort",
+        id: "booking_010",
+        property: "60d21b4667d0d8992e610c88",
         guest: "guest_132",
         checkIn: new Date("2024-06-10"),
         checkOut: new Date("2024-06-15"),
@@ -222,7 +235,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 4
     },
     {
-        property: "Meuse Valley Resort",
+        id: "booking_011",
+        property: "60d21b4667d0d8992e610c88",
         guest: "guest_133",
         checkIn: new Date("2024-07-05"),
         checkOut: new Date("2024-07-10"),
@@ -231,7 +245,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 3
     },
     {
-        property: "Meuse Valley Resort",
+        id: "booking_012",
+        property: "60d21b4667d0d8992e610c88",
         guest: "guest_134",
         checkIn: new Date("2024-08-20"),
         checkOut: new Date("2024-08-25"),
@@ -241,7 +256,8 @@ export const bookings: IBookingBase[] = [
     },
     // Brussels Forest Retreat bookings
     {
-        property: "Brussels Forest Retreat",
+        id: "booking_013",
+        property: "60d21b4667d0d8992e610c89",
         guest: "guest_135",
         checkIn: new Date("2024-06-25"),
         checkOut: new Date("2024-06-30"),
@@ -250,7 +266,18 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 3
     },
     {
-        property: "Brussels Forest Retreat",
+        id: "booking_014",
+        property: "60d21b4667d0d8992e610c89",
+        guest: "guest_135",
+        checkIn: new Date("2024-12-25"),
+        checkOut: new Date("2024-12-30"),
+        totalPrice: 350,
+        status: "confirmed",
+        numberOfGuests: 3
+    },
+    {
+        id: "booking_015",
+        property: "60d21b4667d0d8992e610c89",
         guest: "guest_136",
         checkIn: new Date("2024-07-15"),
         checkOut: new Date("2024-07-20"),
@@ -259,7 +286,8 @@ export const bookings: IBookingBase[] = [
         numberOfGuests: 2
     },
     {
-        property: "Brussels Forest Retreat",
+        id: "booking_016",
+        property: "60d21b4667d0d8992e610c89",
         guest: "guest_137",
         checkIn: new Date("2024-08-05"),
         checkOut: new Date("2024-08-10"),

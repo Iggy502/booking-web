@@ -2,7 +2,7 @@
 import {Container} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import MapView from '../components/mapview/MapView.tsx';
-import {properties} from '../util/TestData.ts';
+import {bookings, properties} from '../util/TestData.ts';
 import {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import './HomePage.scss';
@@ -13,7 +13,9 @@ import {SearchBox} from "../components/SearchBox/SearchBox.tsx";
 const HomePage = () => {
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-    const [selectedLocation, setSelectedLocation] = useState<{longitude: number, latitude: number} | null>(null);
+    const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null);
+    const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
+    const [dateError, setDateError] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -28,14 +30,37 @@ const HomePage = () => {
         });
     };
 
+    const handlePropertySelect = (propertyId: string) => {
+        setSelectedProperty(propertyId);
+    }
+
+    const isDateRangeValid = (start: Date | null, end: Date | null) => {
+        if (!start || !end || !selectedProperty) return true;
+
+        const existingBookings = bookings.filter(booking =>
+            booking.property === selectedProperty &&
+            (booking.status === 'confirmed' || booking.status === 'pending')
+        );
+
+        return !existingBookings.some(booking => {
+            const bookingStart = new Date(booking.checkIn);
+            const bookingEnd = new Date(booking.checkOut);
+
+            return (
+                (start <= bookingEnd && start >= bookingStart) ||
+                (end <= bookingEnd && end >= bookingStart) ||
+                (start <= bookingStart && end >= bookingEnd)
+            );
+        });
+    };
+
     return (
         <div className="home-page">
             <Container fluid="xxl" className="py-4">
                 <h1 className="text-center responsive-heading mb-4">Find your next camping spot</h1>
-                <div className="d-flex mb-4 justify-content-center align-items-center gap-4 w-100 flex-wrap">
+                <div className="d-flex mb-5 justify-content-center align-items-center gap-4 w-100 flex-wrap">
                     <SearchBox onAddressSelect={handleAddressSelect}/>
                     <div className="date-picker-container">
-
                         <DatePicker
                             showIcon={true}
                             icon="fa fa-calendar-alt"
@@ -44,19 +69,36 @@ const HomePage = () => {
                             endDate={endDate}
                             onChange={(dates: [Date | null, Date | null]) => {
                                 const [start, end] = dates;
-                                setStartDate(start ?? undefined);
-                                setEndDate(end ?? undefined);
+                                if (isDateRangeValid(start, end)) {
+                                    console.log("Selected dates are valid");
+                                    setStartDate(start ?? undefined);
+                                    setEndDate(end ?? undefined);
+                                    setDateError(null);
+                                } else {
+                                    console.log("Selected dates overlap with an existing booking");
+                                    setDateError("Selected dates overlap with an existing booking");
+                                    setStartDate(undefined);
+                                    setEndDate(undefined);
+                                }
                             }}
                             dateFormat="dd/MM/yyyy"
                             minDate={new Date()}
                             placeholderText="Select check-in and check-out dates"
-                            className="form-control"
+                            className={`form-control ${dateError ? 'is-invalid' : ''}`}
                             monthsShown={2}
+                            excludeDateIntervals={(selectedProperty && bookings.filter(booking => booking.property == selectedProperty).map(booking => {
+                                return {start: new Date(booking.checkIn), end: new Date(booking.checkOut)};
+                            })) || []}
                         />
-
+                        {dateError && (
+                            <div className="invalid-feedback d-block">
+                                {dateError}
+                            </div>
+                        )}
                     </div>
                 </div>
-                <MapView properties={properties} selectedLocation={selectedLocation} />
+                <MapView properties={properties} selectedLocation={selectedLocation}
+                         handlePropertySelect={handlePropertySelect}/>
             </Container>
         </div>
     );

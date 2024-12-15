@@ -27,6 +27,7 @@ export interface IAmenity {
 
 
 export interface PropertyResponse {
+    id: string;
     name: string;
     owner: string;
     description: string;

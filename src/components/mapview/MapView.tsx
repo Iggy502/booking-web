@@ -7,9 +7,10 @@ import './MapView.scss';
 interface MapViewProps {
     properties: PropertyResponse[];
     selectedLocation: { longitude: number, latitude: number } | null;
+    handlePropertySelect: (propertyId: string) => void;
 }
 
-const MapView = ({properties, selectedLocation}: MapViewProps) => {
+const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
 
@@ -76,6 +77,13 @@ const MapView = ({properties, selectedLocation}: MapViewProps) => {
                         const marker = new mapboxgl.Marker({
                             color: "#2C5530",
                         });
+
+                        marker.getElement().addEventListener('click', () => {
+                            console.log("Marker clicked:", property.name);
+                            // Call handlePropertySelect with property ID
+                            handlePropertySelect(property.id);
+                        });
+
 
                         marker
                             .setLngLat([longitude, latitude])
