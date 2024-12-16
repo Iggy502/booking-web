@@ -74,9 +74,9 @@ const HomePage = () => {
 
     return (
         <div className="home-page">
-            <Container fluid className="py-4">
-                <h1 className="text-center responsive-heading mb-4 ">Find your next camping spot</h1>
-                <div className="selected-property-banner mb-4 position-relative ">
+            <Container fluid className="px-5 py-5">
+                <h1 className="text-center responsive-heading mb-2">Find your next camping spot</h1>
+                <div className="selected-property-banner mb-2 position-relative ">
                     {selectedProperty && (
                         <div className="">
                             <div className="banner-content">
@@ -93,7 +93,7 @@ const HomePage = () => {
                     )}
 
                 </div>
-                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap py-2">
+                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap pb-2">
                     <SearchBox onAddressSelect={handleAddressSelect}/>
                     <div className="date-picker-container">
                         <DatePicker

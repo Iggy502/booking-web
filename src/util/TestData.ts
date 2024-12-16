@@ -166,8 +166,8 @@ export const bookings: IBookingBase[] = [
         id: "booking_004",
         property: "60d21b4667d0d8992e610c86",
         guest: "guest_126",
-        checkIn: new Date("2024-07-15"),
-        checkOut: new Date("2024-07-20"),
+        checkIn: new Date("2025-01-15"),
+        checkOut: new Date("2025-01-20"),
         totalPrice: 475,
         status: "confirmed",
         numberOfGuests: 4
