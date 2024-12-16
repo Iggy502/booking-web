@@ -74,9 +74,26 @@ const HomePage = () => {
 
     return (
         <div className="home-page">
-            <Container fluid="xxl" className="py-4">
-                <h1 className="text-center responsive-heading mb-4">Find your next camping spot</h1>
-                <div className="d-flex mb-5 justify-content-center align-items-center gap-4 w-100 flex-wrap">
+            <Container fluid className="py-4">
+                <h1 className="text-center responsive-heading mb-4 ">Find your next camping spot</h1>
+                <div className="selected-property-banner mb-4 position-relative ">
+                    {selectedProperty && (
+                        <div className="">
+                            <div className="banner-content">
+                                <i className="fas fa-map-marker-alt me-2"></i>
+                                <span>{properties.find(p => p.id === selectedProperty)?.name}</span>
+                                <button
+                                    className="clear-selection ms-3"
+                                    onClick={() => handlePropertySelect('')}
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap py-2">
                     <SearchBox onAddressSelect={handleAddressSelect}/>
                     <div className="date-picker-container">
                         <DatePicker
@@ -128,6 +145,7 @@ const HomePage = () => {
                         )}
                     </div>
                 </div>
+
                 <MapView
                     properties={filteredProperties}
                     selectedLocation={selectedLocation}
