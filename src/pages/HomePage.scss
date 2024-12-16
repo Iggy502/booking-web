@@ -118,10 +118,13 @@
     &__day {
       color: #495057;
       font-weight: 500;
-
-
       margin: 0.2rem;
       width: 2rem;
+
+      &--disabled {
+        color: red;
+        text-decoration: line-through;
+      }
 
       &:hover {
         background-color: #f8f9fa;

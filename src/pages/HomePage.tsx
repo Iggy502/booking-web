@@ -9,6 +9,7 @@ import './HomePage.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import {Address} from "../services/Mapbox.ts";
 import {SearchBox} from "../components/SearchBox/SearchBox.tsx";
+import {PropertyResponse} from "../models/Property.ts";
 
 const HomePage = () => {
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -16,11 +17,28 @@ const HomePage = () => {
     const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null);
     const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
     const [dateError, setDateError] = useState<string | null>(null);
+    const [filteredProperties, setFilteredProperties] = useState<PropertyResponse[]>(properties);
 
 
     useEffect(() => {
         console.log(startDate, endDate);
     });
+
+    const filterPropertiesOverlappingBookingsStartDateEndDate = (properties: PropertyResponse[], startDate: Date, endDate: Date): PropertyResponse[] => {
+        // Return the filtered array instead of just filtering
+        return properties.filter(property => {
+            const existingBookings = bookings.filter(booking => booking.property === property.id);
+            return !existingBookings.some(booking => {
+                const bookingStart = new Date(booking.checkIn);
+                const bookingEnd = new Date(booking.checkOut);
+                return (
+                    (startDate <= bookingEnd && startDate >= bookingStart) ||
+                    (endDate <= bookingEnd && endDate >= bookingStart) ||
+                    (startDate <= bookingStart && endDate >= bookingEnd)
+                );
+            });
+        });
+    }
 
 
     const handleAddressSelect = (address: Address) => {
@@ -74,6 +92,13 @@ const HomePage = () => {
                                     setStartDate(start ?? undefined);
                                     setEndDate(end ?? undefined);
                                     setDateError(null);
+
+                                    if (start && end && !selectedProperty) {
+                                        setFilteredProperties(filterPropertiesOverlappingBookingsStartDateEndDate(properties, start, end));
+                                    } else if (!start && !end) {
+                                        setFilteredProperties(properties);
+                                    }
+
                                 } else {
                                     console.log("Selected dates overlap with an existing booking");
                                     setDateError("Selected dates overlap with an existing booking");
@@ -86,9 +111,15 @@ const HomePage = () => {
                             placeholderText="Select check-in and check-out dates"
                             className={`form-control ${dateError ? 'is-invalid' : ''}`}
                             monthsShown={2}
-                            excludeDateIntervals={(selectedProperty && bookings.filter(booking => booking.property == selectedProperty).map(booking => {
-                                return {start: new Date(booking.checkIn), end: new Date(booking.checkOut)};
-                            })) || []}
+                            excludeDateIntervals={
+                                (selectedProperty &&
+                                    bookings
+                                        .filter(booking => booking.property == selectedProperty)
+                                        .map(booking => {
+                                            return {start: new Date(booking.checkIn), end: new Date(booking.checkOut)};
+                                        })
+                                ) || []
+                            }
                         />
                         {dateError && (
                             <div className="invalid-feedback d-block">
@@ -97,8 +128,11 @@ const HomePage = () => {
                         )}
                     </div>
                 </div>
-                <MapView properties={properties} selectedLocation={selectedLocation}
-                         handlePropertySelect={handlePropertySelect}/>
+                <MapView
+                    properties={filteredProperties}
+                    selectedLocation={selectedLocation}
+                    handlePropertySelect={handlePropertySelect}
+                />
             </Container>
         </div>
     );
