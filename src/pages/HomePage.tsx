@@ -1,15 +1,16 @@
 // src/pages/HomePage/index.tsx
-import {Container} from 'react-bootstrap';
+import {Container, Dropdown, Nav, Form} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import MapView from '../components/mapview/MapView.tsx';
 import {bookings, properties} from '../util/TestData.ts';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import './HomePage.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import {Address} from "../services/Mapbox.ts";
 import {SearchBox} from "../components/SearchBox/SearchBox.tsx";
-import {PropertyResponse} from "../models/Property.ts";
+import {AmenityType, PropertyResponse} from "../models/Property.ts";
+import PropertyOverview from "../components/properties/properties-overview/properties-overview.tsx";
 
 const HomePage = () => {
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -17,7 +18,45 @@ const HomePage = () => {
     const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null);
     const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
     const [dateError, setDateError] = useState<string | null>(null);
+    const [activeView, setActiveView] = useState<'map' | 'grid'>('map');
     const [filteredProperties, setFilteredProperties] = useState<PropertyResponse[]>(properties);
+    const [selectedAmenities, setSelectedAmenities] = useState<Set<AmenityType>>(new Set());
+
+
+    interface CustomToggleProps {
+        onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    }
+
+    const CustomToggle = React.forwardRef<HTMLButtonElement, CustomToggleProps>(
+        ({onClick}, ref) => (
+            <button
+                ref={ref}
+                onClick={(e) => {
+                    e.preventDefault();
+                    onClick(e);
+                }}
+                className="btn btn-outline-secondary"
+            >
+                <i className="fas fa-filter me-2"></i>
+                Amenities
+            </button>
+        )
+    );
+
+    CustomToggle.displayName = 'CustomToggle';
+
+
+    const handleAmenityChange = (amenity: AmenityType) => {
+        setSelectedAmenities(prev => {
+            const updated = new Set(prev);
+            if (updated.has(amenity)) {
+                updated.delete(amenity);
+            } else {
+                updated.add(amenity);
+            }
+            return updated;
+        });
+    };
 
 
     useEffect(() => {
@@ -75,10 +114,34 @@ const HomePage = () => {
     return (
         <div className="home-page">
             <Container fluid className="px-5 py-5">
-                <h1 className="text-center responsive-heading mb-2">Find your next camping spot</h1>
-                <div className="selected-property-banner mb-2 position-relative ">
-                    {selectedProperty && (
-                        <div className="">
+                <div className="d-flex mb-2 justify-content-center">
+                    <Nav
+                        variant="tabs"
+                        activeKey={activeView}
+                        onSelect={(k) => setActiveView(k as 'map' | 'grid')}
+                        className="view-toggle"
+                    >
+                        <Nav.Item>
+                            <Nav.Link eventKey="map">
+                                <i className="fas fa-map-marked-alt me-2"></i>
+                                Map View
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link eventKey="grid">
+                                <i className="fas fa-th-large me-2"></i>
+                                Grid View
+                            </Nav.Link>
+                        </Nav.Item>
+                    </Nav>
+                </div>
+
+
+                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap pb-2">
+
+                    {/* Selected property banner */}
+                    <div className="selected-property-banner mb-2 position-relative mt-2">
+                        {selectedProperty && (
                             <div className="banner-content">
                                 <i className="fas fa-map-marker-alt me-2"></i>
                                 <span>{properties.find(p => p.id === selectedProperty)?.name}</span>
@@ -89,11 +152,8 @@ const HomePage = () => {
                                     <i className="fas fa-times"></i>
                                 </button>
                             </div>
-                        </div>
-                    )}
-
-                </div>
-                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap pb-2">
+                        )}
+                    </div>
                     <SearchBox onAddressSelect={handleAddressSelect}/>
                     <div className="date-picker-container">
                         <DatePicker
@@ -144,13 +204,40 @@ const HomePage = () => {
                             </div>
                         )}
                     </div>
+                    <Dropdown>
+                        <Dropdown.Toggle as={CustomToggle} id="amenities-dropdown">
+                            {/* Toggle is handled by CustomToggle */}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="p-3" style={{minWidth: '250px'}}>
+                            <h6 className="mb-3">Filter by Amenities</h6>
+                            {Object.values(AmenityType).map((amenity) => (
+                                <Form.Check
+                                    key={amenity}
+                                    type="checkbox"
+                                    id={`amenity-${amenity}`}
+                                    label={amenity.replace(/([A-Z])/g, ' $1').trim()}
+                                    checked={selectedAmenities.has(amenity)}
+                                    onChange={() => handleAmenityChange(amenity)}
+                                    className="mb-2"
+                                />
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
 
-                <MapView
-                    properties={filteredProperties}
-                    selectedLocation={selectedLocation}
-                    handlePropertySelect={handlePropertySelect}
-                />
+                {activeView === 'map' ? (
+                    <MapView
+                        properties={filteredProperties}
+                        selectedLocation={selectedLocation}
+                        handlePropertySelect={handlePropertySelect}
+                    />
+                ) : (
+                    <PropertyOverview
+                        properties={filteredProperties}
+                        propertiesPerPage={5}
+                    />
+                )}
             </Container>
         </div>
     );

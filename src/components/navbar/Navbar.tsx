@@ -38,6 +38,7 @@ const NavBar = () => {
                         <Nav className="justify-content-end flex-grow-1 pe-3">
                             <Nav.Link as={Link} to="/">Home</Nav.Link>
                             <Nav.Link as={Link} to="/bookings">My Bookings</Nav.Link>
+                            <Nav.Link as={Link} to="/properties">My Bookings</Nav.Link>
                             <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
                         </Nav>
                     </Offcanvas.Body>

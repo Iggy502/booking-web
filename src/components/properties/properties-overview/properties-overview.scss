@@ -1,0 +1,40 @@
+.property-overview {
+  .pagination {
+    .page-item {
+      .page-link {
+        color: #2C5530;
+        border-color: #dee2e6;
+        padding: 0.5rem 1rem;
+
+        &:hover {
+          background-color: #f8f9fa;
+          border-color: #dee2e6;
+          color: #1a3b1d;
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+        }
+      }
+
+      &.active .page-link {
+        background-color: #2C5530;
+        border-color: #2C5530;
+        color: white;
+      }
+
+      &.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+      }
+    }
+  }
+
+  // Add responsive gap between rows
+  .row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 1.5rem;
+  }
+}

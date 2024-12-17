@@ -1,5 +1,89 @@
 // src/pages/HomePage/HomePage.scss
+
+
+.filters-section {
+  .amenity-filters {
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    h6 {
+      color: #2C5530;
+      font-weight: 600;
+    }
+
+    .form-check {
+      .form-check-input {
+        &:checked {
+          background-color: #2C5530;
+          border-color: #2C5530;
+        }
+
+        &:focus {
+          border-color: #2C5530;
+          box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+        }
+      }
+
+      .form-check-label {
+        font-size: 0.9rem;
+        color: #495057;
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .filters-section {
+    .amenity-filters {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+
 .home-page {
+
+
+  .view-toggle {
+    .nav-link {
+      color: #2C5530;
+      border: none;
+      padding: 0.5rem 1rem;
+
+      &:hover {
+        border-color: transparent;
+        background-color: rgba(44, 85, 48, 0.1);
+      }
+
+      &.active {
+        color: white;
+        background-color: #2C5530;
+        border-color: #2C5530;
+      }
+
+      i {
+        font-size: 0.9em;
+      }
+    }
+  }
+
+  // Adjust header layout for smaller screens
+  @media (max-width: 768px) {
+    .d-flex.justify-content-between {
+      flex-direction: column;
+      align-items: center !important;
+      gap: 1rem;
+
+      .responsive-heading {
+        margin-bottom: 0 !important;
+      }
+
+      .view-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
 
   .container-xxl {
     min-height: 100vh;
@@ -7,6 +91,7 @@
     display: flex;
     flex-direction: column;
   }
+
   .selected-property-banner {
     height: 2.5rem; // Slightly reduced height
     z-index: 1;
@@ -82,7 +167,7 @@
     .invalid-feedback {
       position: absolute;
       left: 0;
-      bottom: -1.5rem;
+      top: -1.5rem;
       color: #dc3545;
       font-size: 0.875em;
       width: 100%;
