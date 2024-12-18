@@ -1,36 +1,14 @@
 // src/pages/HomePage/HomePage.scss
 
 
-.filters-section {
-  .amenity-filters {
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.filters-dropdown-menu {
+  min-width: 500px;
 
-    h6 {
-      color: #2C5530;
-      font-weight: 600;
-    }
-
-    .form-check {
-      .form-check-input {
-        &:checked {
-          background-color: #2C5530;
-          border-color: #2C5530;
-        }
-
-        &:focus {
-          border-color: #2C5530;
-          box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
-        }
-      }
-
-      .form-check-label {
-        font-size: 0.9rem;
-        color: #495057;
-      }
-    }
+  @media (max-width: 576px) {
+    min-width: 300px;
   }
 }
+
 
 @media (max-width: 992px) {
   .filters-section {
@@ -164,15 +142,38 @@
     position: relative;
     width: 400px;
 
+
+
+    &.date-picker-success {
+      input {
+        border: 1px solid #2C5530;
+        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.35);
+        &:focus {
+          border-color: #2C5530;
+          box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.4);
+        }
+      }
+    }
+
     .invalid-feedback {
       position: absolute;
       left: 0;
-      top: -1.5rem;
-      color: #dc3545;
-      font-size: 0.875em;
-      width: 100%;
-      margin-top: 0.25rem;
+      bottom: -1.3rem;
+      display: block; // Ensure the error message is displayed
+
     }
+
+    &.date-picker-error {
+      input {
+        border-color: #dc3545;
+
+        &:focus {
+          border-color: #dc3545;
+          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+      }
+    }
+
 
     // Add this for the red border on error
     .form-control.is-invalid {

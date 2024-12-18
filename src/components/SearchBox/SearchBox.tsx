@@ -4,7 +4,7 @@ import {getPlaces, Address, MapboxFeature} from "../../services/Mapbox";
 import "./SearchBox.scss";
 
 interface SearchBoxProps {
-    onAddressSelect: (address: Address) => void;
+    onAddressSelect: (address: Address | null) => void;
 }
 
 
@@ -37,6 +37,7 @@ export const SearchBox = ({onAddressSelect}: SearchBoxProps) => {
             setSuggestions(suggestions);
         } else {
             setSuggestions([]);
+            onAddressSelect(null);
         }
     };
 
@@ -44,12 +45,8 @@ export const SearchBox = ({onAddressSelect}: SearchBoxProps) => {
         const streetAndNumber = suggestion.place_name.split(",")[0];
         const [longitude, latitude] = suggestion.center;
 
-        const address: Address = {
+        const address: Partial<Address> = {
             streetAndNumber,
-            place: "",
-            region: "",
-            postcode: "",
-            country: "",
             latitude,
             longitude,
         };
@@ -83,8 +80,9 @@ export const SearchBox = ({onAddressSelect}: SearchBoxProps) => {
 
         });
 
-        onAddressSelect(address);
-        setQuery(streetAndNumber);
+        onAddressSelect(address as Address);
+        const location = streetAndNumber + ", " + address.place + ", " + address.region + ", " + address.country;
+        setQuery(location);
         setSuggestions([]);
     };
 

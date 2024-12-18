@@ -1,50 +1,129 @@
-// src/pages/HomePage/index.tsx
-import {Container, Dropdown, Nav, Form} from 'react-bootstrap';
+import {Container, Nav, Dropdown, Form} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import MapView from '../components/mapview/MapView.tsx';
-import {bookings, properties} from '../util/TestData.ts';
+import PropertyOverview from '../components/properties/properties-overview/properties-overview.tsx';
+import {bookings, properties} from '../util/TestData';
 import React, {useEffect, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import './HomePage.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import {Address} from "../services/Mapbox.ts";
-import {SearchBox} from "../components/SearchBox/SearchBox.tsx";
-import {AmenityType, PropertyResponse} from "../models/Property.ts";
-import PropertyOverview from "../components/properties/properties-overview/properties-overview.tsx";
+import {Address} from "../services/Mapbox";
+import {SearchBox} from "../components/SearchBox/SearchBox";
+import {PropertyResponse, AmenityType} from "../models/Property";
+
+interface FilterDropdownProps {
+    title: string;
+    icon: string;
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const FilterDropdown = React.forwardRef<HTMLButtonElement, FilterDropdownProps>(
+    ({onClick, title, icon}, ref) => (
+        <button
+            ref={ref}
+            onClick={(e) => {
+                e.preventDefault();
+                onClick(e);
+            }}
+            className="btn btn-outline-secondary d-flex align-items-center gap-2"
+        >
+            <i className={`fas ${icon}`}></i>
+            {title}
+        </button>
+    )
+);
+
+FilterDropdown.displayName = 'FilterDropdown';
 
 const HomePage = () => {
+    const [activeView, setActiveView] = useState<'map' | 'grid'>('map');
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-    const [selectedLocation, setSelectedLocation] = useState<{ longitude: number, latitude: number } | null>(null);
+    const [selectedLocation, setSelectedLocation] = useState<{
+        longitude: number | null,
+        latitude: number | null
+    } | null>(null);
     const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
     const [dateError, setDateError] = useState<string | null>(null);
-    const [activeView, setActiveView] = useState<'map' | 'grid'>('map');
-    const [filteredProperties, setFilteredProperties] = useState<PropertyResponse[]>(properties);
     const [selectedAmenities, setSelectedAmenities] = useState<Set<AmenityType>>(new Set());
+    const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
+    const [filteredProperties, setFilteredProperties] = useState<PropertyResponse[]>(properties);
 
+    const priceRanges = [
+        {id: 'price-0-50', label: '€0 - €50'},
+        {id: 'price-50-100', label: '€50 - €100'},
+        {id: 'price-100-150', label: '€100 - €150'},
+        {id: 'price-150-plus', label: '€150+'}
+    ];
 
-    interface CustomToggleProps {
-        onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    }
+    const filterProperties = (
+        properties: PropertyResponse[],
+        startDate?: Date,
+        endDate?: Date,
+        amenities?: Set<AmenityType>,
+        priceRange?: string | null
+    ): PropertyResponse[] => {
+        let filtered = [...properties];
 
-    const CustomToggle = React.forwardRef<HTMLButtonElement, CustomToggleProps>(
-        ({onClick}, ref) => (
-            <button
-                ref={ref}
-                onClick={(e) => {
-                    e.preventDefault();
-                    onClick(e);
-                }}
-                className="btn btn-outline-secondary"
-            >
-                <i className="fas fa-filter me-2"></i>
-                Amenities
-            </button>
-        )
-    );
+        // Only filter by dates if no property is selected
+        if (!selectedProperty && startDate && endDate) {
+            filtered = filterPropertiesOverlappingBookingsStartDateEndDate(filtered, startDate, endDate);
+        }
 
-    CustomToggle.displayName = 'CustomToggle';
+        if (amenities && amenities.size > 0) {
+            filtered = filtered.filter(property =>
+                Array.from(amenities).every(amenity =>
+                    property.amenities?.find(a => a.type === amenity) !== undefined));
 
+        }
+
+        if (priceRange) {
+            switch (priceRange) {
+                case 'price-0-50':
+                    filtered = filtered.filter(property => property.pricePerNight <= 50);
+                    break;
+                case 'price-50-100':
+                    filtered = filtered.filter(property => property.pricePerNight > 50 && property.pricePerNight <= 100);
+                    break;
+                case 'price-100-150':
+                    filtered = filtered.filter(property => property.pricePerNight > 100 && property.pricePerNight <= 150);
+                    break;
+                case 'price-150-plus':
+                    filtered = filtered.filter(property => property.pricePerNight > 150);
+                    break;
+            }
+        }
+
+        return filtered;
+    };
+
+    const filterPropertiesOverlappingBookingsStartDateEndDate = (
+        properties: PropertyResponse[],
+        startDate: Date,
+        endDate: Date
+    ): PropertyResponse[] => {
+        return properties.filter(property => isDateRangeValid(startDate, endDate, property.id));
+    };
+
+    const isDateRangeValid = (start: Date | null, end: Date | null, property: string | null) => {
+        if (!start || !end || !property) return true;
+
+        const existingBookings = bookings.filter(booking =>
+            booking.property === property &&
+            (booking.status === 'confirmed' || booking.status === 'pending')
+        );
+
+        return !existingBookings.some(booking => {
+            const bookingStart = new Date(booking.checkIn);
+            const bookingEnd = new Date(booking.checkOut);
+
+            const result = (start <= bookingEnd && start >= bookingStart) ||
+                (end <= bookingEnd && end >= bookingStart) ||
+                (start <= bookingStart && end >= bookingEnd);
+            console.log("isDateRangeValid", result);
+            return result;
+        });
+    };
 
     const handleAmenityChange = (amenity: AmenityType) => {
         setSelectedAmenities(prev => {
@@ -58,135 +137,158 @@ const HomePage = () => {
         });
     };
 
+    const handlePriceRangeChange = (rangeId: string) => {
+        setSelectedPriceRange(selectedPriceRange === rangeId ? null : rangeId);
+    };
 
-    useEffect(() => {
-        console.log(startDate, endDate);
-    });
-
-    const filterPropertiesOverlappingBookingsStartDateEndDate = (properties: PropertyResponse[], startDate: Date, endDate: Date): PropertyResponse[] => {
-        // Return the filtered array instead of just filtering
-        return properties.filter(property => {
-            const existingBookings = bookings.filter(booking => booking.property === property.id);
-            return !existingBookings.some(booking => {
-                const bookingStart = new Date(booking.checkIn);
-                const bookingEnd = new Date(booking.checkOut);
-                return (
-                    (startDate <= bookingEnd && startDate >= bookingStart) ||
-                    (endDate <= bookingEnd && endDate >= bookingStart) ||
-                    (startDate <= bookingStart && endDate >= bookingEnd)
-                );
-            });
-        });
-    }
-
-
-    const handleAddressSelect = (address: Address) => {
-        setSelectedLocation({
+    const handleAddressSelect = (address: Address | null) => {
+        setSelectedLocation(address ? {
             longitude: address.longitude,
             latitude: address.latitude
-        });
+        } : null);
     };
 
     const handlePropertySelect = (propertyId: string) => {
+        if (!propertyId) {
+            setDateError(null);
+
+        }
+        if (propertyId !== selectedProperty) {
+            setDateError(!isDateRangeValid(startDate || null, endDate || null, propertyId)
+                ? "Selected dates overlap with an existing booking" : null);
+        }
+
+
         setSelectedProperty(propertyId);
-    }
-
-    const isDateRangeValid = (start: Date | null, end: Date | null) => {
-        if (!start || !end || !selectedProperty) return true;
-
-        const existingBookings = bookings.filter(booking =>
-            booking.property === selectedProperty &&
-            (booking.status === 'confirmed' || booking.status === 'pending')
-        );
-
-        return !existingBookings.some(booking => {
-            const bookingStart = new Date(booking.checkIn);
-            const bookingEnd = new Date(booking.checkOut);
-
-            return (
-                (start <= bookingEnd && start >= bookingStart) ||
-                (end <= bookingEnd && end >= bookingStart) ||
-                (start <= bookingStart && end >= bookingEnd)
-            );
-        });
     };
+
+    const clearAllFilters = () => {
+        setSelectedPriceRange(null);
+        setSelectedAmenities(new Set());
+    };
+
+    useEffect(() => {
+        setFilteredProperties(filterProperties(
+            properties,
+            startDate,
+            endDate,
+            selectedAmenities,
+            selectedPriceRange
+        ));
+    }, [selectedAmenities, selectedPriceRange, startDate, endDate]);
 
     return (
         <div className="home-page">
             <Container fluid className="px-5 py-5">
-                <div className="d-flex mb-2 justify-content-center">
-                    <Nav
-                        variant="tabs"
-                        activeKey={activeView}
-                        onSelect={(k) => setActiveView(k as 'map' | 'grid')}
-                        className="view-toggle"
-                    >
-                        <Nav.Item>
-                            <Nav.Link eventKey="map">
-                                <i className="fas fa-map-marked-alt me-2"></i>
-                                Map View
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="grid">
-                                <i className="fas fa-th-large me-2"></i>
-                                Grid View
-                            </Nav.Link>
-                        </Nav.Item>
-                    </Nav>
+                <div className="position-relative mb-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <div className="selected-property-banner">
+                            {selectedProperty && (
+                                <div className="banner-content">
+                                    <i className="fas fa-map-marker-alt me-2"></i>
+                                    <span>{properties.find(p => p.id === selectedProperty)?.name}</span>
+                                    <button
+                                        className="clear-selection ms-3"
+                                        onClick={() => handlePropertySelect('')}
+                                    >
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <Nav
+                            variant="tabs"
+                            activeKey={activeView}
+                            onSelect={(k) => setActiveView(k as 'map' | 'grid')}
+                            className="view-toggle"
+                        >
+                            <Nav.Item>
+                                <Nav.Link eventKey="map">
+                                    <i className="fas fa-map-marked-alt me-2"></i>
+                                    Map View
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="grid">
+                                    <i className="fas fa-th-large me-2"></i>
+                                    Grid View
+                                </Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </div>
+
+                    {selectedProperty && startDate && endDate && !dateError && (
+                        <div className="position-absolute top-50 start-50 translate-middle">
+                            <button
+                                className="btn btn-primary d-flex align-items-center gap-2"
+                                onClick={() => {/* Add your action here */
+                                }}
+                            >
+                                <i className="fas fa-calendar-check"></i>
+                                Book Now
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-
-                <div className="d-flex my-2 justify-content-center align-items-center gap-4 w-100 flex-wrap pb-2">
-
-                    {/* Selected property banner */}
-                    <div className="selected-property-banner mb-2 position-relative mt-2">
-                        {selectedProperty && (
-                            <div className="banner-content">
-                                <i className="fas fa-map-marker-alt me-2"></i>
-                                <span>{properties.find(p => p.id === selectedProperty)?.name}</span>
-                                <button
-                                    className="clear-selection ms-3"
-                                    onClick={() => handlePropertySelect('')}
-                                >
-                                    <i className="fas fa-times"></i>
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap pb-4">
                     <SearchBox onAddressSelect={handleAddressSelect}/>
-                    <div className="date-picker-container">
+                    <div className={`date-picker-container ${
+                        dateError ? 'date-picker-error' :
+                            selectedProperty ? 'date-picker-success' : ''
+                    }`}>
                         <DatePicker
-                            showIcon={true}
+                            showIcon
                             icon="fa fa-calendar-alt"
-                            selectsRange={true}
+                            selectsRange
                             startDate={startDate}
                             endDate={endDate}
                             onChange={(dates: [Date | null, Date | null]) => {
                                 const [start, end] = dates;
-                                if (isDateRangeValid(start, end)) {
-                                    console.log("Selected dates are valid");
-                                    setStartDate(start ?? undefined);
-                                    setEndDate(end ?? undefined);
-                                    setDateError(null);
 
-                                    if (start && end && !selectedProperty) {
-                                        setFilteredProperties(filterPropertiesOverlappingBookingsStartDateEndDate(properties, start, end));
-                                    } else if (!start && !end) {
-                                        setFilteredProperties(properties);
+                                // Always update the dates
+                                setStartDate(start ?? undefined);
+                                setEndDate(end ?? undefined);
+
+                                // If a property is selected, only handle validation
+                                if (selectedProperty) {
+                                    if (!start || !end) {
+                                        setDateError(null); // Clear error when dates are cleared
+                                        return;
                                     }
+                                    if (isDateRangeValid(start, end, selectedProperty)) {
+                                        setDateError(null);
+                                    } else {
+                                        setDateError("Selected dates overlap with an existing booking");
+                                    }
+                                    return;
+                                }
 
+                                // If no property is selected, handle filtering
+                                // This includes resetting to all properties when dates are cleared
+                                if (!start || !end) {
+                                    setFilteredProperties(filterProperties(
+                                        properties,
+                                        undefined,
+                                        undefined,
+                                        selectedAmenities,
+                                        selectedPriceRange
+                                    ));
                                 } else {
-                                    console.log("Selected dates overlap with an existing booking");
-                                    setDateError("Selected dates overlap with an existing booking");
-                                    setStartDate(undefined);
-                                    setEndDate(undefined);
+                                    setFilteredProperties(filterProperties(
+                                        properties,
+                                        start,
+                                        end,
+                                        selectedAmenities,
+                                        selectedPriceRange
+                                    ));
                                 }
                             }}
                             dateFormat="dd/MM/yyyy"
                             minDate={new Date()}
-                            placeholderText="Select check-in and check-out dates"
-                            className={`form-control ${dateError ? 'is-invalid' : ''}`}
+                            placeholderText="Select dates"
+                            className="form-control"
                             monthsShown={2}
                             excludeDateIntervals={
                                 (selectedProperty &&
@@ -199,32 +301,96 @@ const HomePage = () => {
                             }
                         />
                         {dateError && (
-                            <div className="invalid-feedback d-block">
+                            <div className="invalid-feedback position-absolute">
                                 {dateError}
                             </div>
                         )}
                     </div>
-                    <Dropdown>
-                        <Dropdown.Toggle as={CustomToggle} id="amenities-dropdown">
-                            {/* Toggle is handled by CustomToggle */}
-                        </Dropdown.Toggle>
 
-                        <Dropdown.Menu className="p-3" style={{minWidth: '250px'}}>
-                            <h6 className="mb-3">Filter by Amenities</h6>
-                            {Object.values(AmenityType).map((amenity) => (
-                                <Form.Check
-                                    key={amenity}
-                                    type="checkbox"
-                                    id={`amenity-${amenity}`}
-                                    label={amenity.replace(/([A-Z])/g, ' $1').trim()}
-                                    checked={selectedAmenities.has(amenity)}
-                                    onChange={() => handleAmenityChange(amenity)}
-                                    className="mb-2"
-                                />
-                            ))}
+                    <Dropdown>
+                        <Dropdown.Toggle
+                            as={FilterDropdown}
+                            id="filters-dropdown"
+                            title="Filters"
+                            icon="fa-sliders-h"
+                        />
+
+                        <Dropdown.Menu className="filters-dropdown-menu p-3">
+                            <div className="d-flex flex-column flex-sm-row">
+                                <div className="flex-grow-1 mb-3 mb-sm-0 pe-sm-3 border-sm-end">
+                                    <div className="fw-semibold text-dark mb-3">Price per night</div>
+                                    {priceRanges.map(range => (
+                                        <Form.Check
+                                            key={range.id}
+                                            type="radio"
+                                            name="priceRange"
+                                            id={range.id}
+                                            label={range.label}
+                                            checked={selectedPriceRange === range.id}
+                                            onChange={() => handlePriceRangeChange(range.id)}
+                                            className="mb-2"
+                                        />
+                                    ))}
+                                </div>
+
+                                <div className="flex-grow-1 ps-sm-3">
+                                    <div className="fw-semibold text-dark mb-3">Amenities</div>
+                                    {Object.values(AmenityType).map((amenity) => (
+                                        <Form.Check
+                                            key={amenity}
+                                            type="checkbox"
+                                            id={`amenity-${amenity}`}
+                                            label={amenity.replace(/([A-Z])/g, ' $1').trim()}
+                                            checked={selectedAmenities.has(amenity)}
+                                            onChange={() => handleAmenityChange(amenity)}
+                                            className="mb-2"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
+
+                {(selectedPriceRange || selectedAmenities.size > 0) && (
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                        <span className="text-secondary small">Active filters:</span>
+
+                        {selectedPriceRange && (
+                            <span className="badge bg-light text-dark d-flex align-items-center gap-2 py-2 px-3">
+                            {priceRanges.find(r => r.id === selectedPriceRange)?.label}
+                                <button
+                                    className="btn btn-link btn-sm p-0 text-dark border-0"
+                                    onClick={() => setSelectedPriceRange(null)}
+                                >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </span>
+                        )}
+
+                        {Array.from(selectedAmenities).map(amenity => (
+                            <span
+                                key={amenity}
+                                className="badge bg-light text-dark d-flex align-items-center gap-2 py-2 px-3"
+                            >
+                            {amenity.replace(/([A-Z])/g, ' $1').trim()}
+                                <button
+                                    className="btn btn-link btn-sm p-0 text-dark border-0"
+                                    onClick={() => handleAmenityChange(amenity)}
+                                >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </span>
+                        ))}
+
+                        <button
+                            className="btn btn-link btn-sm text-secondary p-0"
+                            onClick={clearAllFilters}
+                        >
+                            Clear all
+                        </button>
+                    </div>
+                )}
 
                 {activeView === 'map' ? (
                     <MapView
@@ -235,12 +401,13 @@ const HomePage = () => {
                 ) : (
                     <PropertyOverview
                         properties={filteredProperties}
-                        propertiesPerPage={5}
+                        propertiesPerPage={4}
                     />
                 )}
             </Container>
         </div>
     );
+
 };
 
 export default HomePage;

@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Container, Row, Col, Pagination } from 'react-bootstrap';
-import { PropertyResponse } from '../../../models/Property';
+import React, {useState, useMemo} from 'react';
+import {Container, Row, Col, Pagination} from 'react-bootstrap';
+import {PropertyResponse} from '../../../models/Property';
 import PropertyCard from '../property-card/property-card.tsx';
 import './properties-overview.scss';
 
@@ -17,120 +17,120 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                                            }) => {
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Validate and constrain propertiesPerPage
-    const validatedPropertiesPerPage = useMemo(() => {
-        const MIN_PROPERTIES = 3;
-        const MAX_PROPERTIES = 12;
-        return Math.min(Math.max(propertiesPerPage, MIN_PROPERTIES), MAX_PROPERTIES);
-    }, [propertiesPerPage]);
+    const PAGINATION_CONFIG = {
+        MIN_PER_PAGE: 3,
+        MAX_PER_PAGE: 12,
+        VISIBLE_PAGE_NUMBERS: 3  // Number of page numbers to show between first and last
+    };
+
+    // Validate properties per page
+    const validatedPropertiesPerPage = useMemo(() => (
+        Math.min(Math.max(propertiesPerPage, PAGINATION_CONFIG.MIN_PER_PAGE), PAGINATION_CONFIG.MAX_PER_PAGE)
+    ), [propertiesPerPage]);
 
     // Calculate total pages
     const totalPages = Math.ceil(properties.length / validatedPropertiesPerPage);
 
-    // Get current properties
+    // Get current page's properties
     const currentProperties = useMemo(() => {
-        const indexOfLastProperty = currentPage * validatedPropertiesPerPage;
-        const indexOfFirstProperty = indexOfLastProperty - validatedPropertiesPerPage;
-        return properties.slice(indexOfFirstProperty, indexOfLastProperty);
+        const startIndex = (currentPage - 1) * validatedPropertiesPerPage;
+        const endIndex = startIndex + validatedPropertiesPerPage;
+        return properties.slice(startIndex, endIndex);
     }, [properties, currentPage, validatedPropertiesPerPage]);
 
-    // Handle page change
+    // Handle page navigation
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
-        // Scroll to top of container
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    // Generate pagination items
-    const renderPaginationItems = () => {
-        const items = [];
-        const MAX_VISIBLE_PAGES = 5;
-
-        // Always show first page
-        items.push(
-            <Pagination.Item
-                key={1}
-                active={currentPage === 1}
-                onClick={() => handlePageChange(1)}
-            >
-                1
-            </Pagination.Item>
-        );
-
-        // Calculate range of pages to show
-        let startPage = Math.max(2, currentPage - Math.floor(MAX_VISIBLE_PAGES / 2));
-        const endPage = Math.min(totalPages - 1, startPage + MAX_VISIBLE_PAGES - 3);
-
-        // Adjust start if we're near the end
-        if (totalPages - 1 - endPage < 1) {
-            startPage = Math.max(2, totalPages - MAX_VISIBLE_PAGES + 1);
+    // Generate array of page numbers to display
+    const getVisiblePageNumbers = () => {
+        if (totalPages <= PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS + 2) {
+            // If few pages, show all
+            return Array.from({length: totalPages}, (_, i) => i + 1);
         }
 
-        // Add ellipsis after first page if needed
-        if (startPage > 2) {
-            items.push(<Pagination.Ellipsis key="ellipsis1" disabled />);
+        const pageNumbers: (number | 'ellipsis')[] = [1];
+        const middleStart = Math.max(2, Math.min(
+            currentPage - 1,
+            totalPages - PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS
+        ));
+        const middleEnd = Math.min(
+            middleStart + PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS - 1,
+            totalPages - 1
+        );
+
+        // Add first ellipsis if needed
+        if (middleStart > 2) {
+            pageNumbers.push('ellipsis');
         }
 
         // Add middle pages
-        for (let i = startPage; i <= endPage; i++) {
-            items.push(
+        for (let i = middleStart; i <= middleEnd; i++) {
+            pageNumbers.push(i);
+        }
+
+        // Add last ellipsis if needed
+        if (middleEnd < totalPages - 1) {
+            pageNumbers.push('ellipsis');
+        }
+
+        // Add last page
+        pageNumbers.push(totalPages);
+
+        return pageNumbers;
+    };
+
+    const renderPaginationItems = () => {
+        return getVisiblePageNumbers().map((pageNumber, index) => {
+            if (pageNumber === 'ellipsis') {
+                return <Pagination.Ellipsis key={`ellipsis-${index}`} disabled/>;
+            }
+
+            return (
                 <Pagination.Item
-                    key={i}
-                    active={currentPage === i}
-                    onClick={() => handlePageChange(i)}
+                    key={pageNumber}
+                    active={currentPage === pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
                 >
-                    {i}
+                    {pageNumber}
                 </Pagination.Item>
             );
-        }
-
-        // Add ellipsis before last page if needed
-        if (endPage < totalPages - 1) {
-            items.push(<Pagination.Ellipsis key="ellipsis2" disabled />);
-        }
-
-        // Always show last page if there's more than one page
-        if (totalPages > 1) {
-            items.push(
-                <Pagination.Item
-                    key={totalPages}
-                    active={currentPage === totalPages}
-                    onClick={() => handlePageChange(totalPages)}
-                >
-                    {totalPages}
-                </Pagination.Item>
-            );
-        }
-
-        return items;
+        });
     };
 
     return (
         <Container fluid className={`property-overview ${className}`}>
-            <Row className="g-4">
-                {currentProperties.map((property) => (
-                    <Col key={property.id} xs={12} md={6} lg={4} xxl={3}>
-                        <PropertyCard property={property} />
-                    </Col>
-                ))}
-            </Row>
-
-            {totalPages > 1 && (
-                <Row className="mt-4 mb-3">
-                    <Col className="d-flex justify-content-center">
-                        <Pagination>
-                            <Pagination.Prev
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            />
-                            {renderPaginationItems()}
-                            <Pagination.Next
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            />
-                        </Pagination>
-                    </Col>
-                </Row>
+            {properties.length ? (
+                <>
+                    <Row className="g-4">
+                        {currentProperties.map((property) => (
+                            <Col key={property.id} xs={12} md={6} lg={4} xxl={3}>
+                                <PropertyCard property={property}/>
+                            </Col>
+                        ))}
+                    </Row>
+                    {totalPages > 1 && (
+                        <Row className="mt-4 mb-3">
+                            <Col className="d-flex justify-content-center">
+                                <Pagination>
+                                    <Pagination.Prev
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    />
+                                    {renderPaginationItems()}
+                                    <Pagination.Next
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    />
+                                </Pagination>
+                            </Col>
+                        </Row>
+                    )}
+                </>
+            ) : (
+                <h1 className="text-center">No properties found</h1>
             )}
         </Container>
     );

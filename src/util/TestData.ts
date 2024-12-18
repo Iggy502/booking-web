@@ -2,6 +2,111 @@ import {AmenityType, PropertyResponse} from "../models/Property.ts";
 import {IBookingBase} from "../models/Booking.ts";
 
 export const properties: PropertyResponse[] = [
+    // Add these to the properties array
+    {
+        id: "60d21b4667d0d8992e610c90",
+        name: "Antwerp Harbor Glamping",
+        owner: "owner_113",
+        description: "Unique glamping experience with views of the Antwerp harbor and the Scheldt river.",
+        address: {
+            street: "Scheldelaan 405",
+            city: "Antwerp",
+            country: "Belgium",
+            postalCode: "2040",
+            latitude: 51.2867,
+            longitude: 4.3229
+        },
+        pricePerNight: 120,
+        maxGuests: 4,
+        available: true,
+        imagePaths: [
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
+        ],
+        amenities: [
+            {type: AmenityType.Wifi, description: "High-speed harbor WiFi"},
+            {type: AmenityType.RoomService, description: "Local seafood delivery"},
+            {type: AmenityType.Parking, description: "Secure parking area", amount: 2}
+        ]
+    },
+    {
+        id: "60d21b4667d0d8992e610c91",
+        name: "Ghent Canal Camping",
+        owner: "owner_114",
+        description: "Peaceful camping site along Ghent's historic waterways, walking distance to medieval city center.",
+        address: {
+            street: "Voorhoutkaai 43",
+            city: "Ghent",
+            country: "Belgium",
+            postalCode: "9000",
+            latitude: 51.0543,
+            longitude: 3.7174
+        },
+        pricePerNight: 85,
+        maxGuests: 6,
+        available: true,
+        imagePaths: [
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
+        ],
+        amenities: [
+            {type: AmenityType.Wifi, description: "City WiFi access"},
+            {type: AmenityType.PetFriendly, description: "Pet-friendly environment"},
+            {type: AmenityType.Restaurant, description: "Belgian cuisine restaurant"}
+        ]
+    },
+    {
+        id: "60d21b4667d0d8992e610c92",
+        name: "Spa Forest Haven",
+        owner: "owner_115",
+        description: "Luxury camping in the woods near the famous thermal city of Spa.",
+        address: {
+            street: "Route des Sources 67",
+            city: "Spa",
+            country: "Belgium",
+            postalCode: "4900",
+            latitude: 50.4851,
+            longitude: 5.8638
+        },
+        pricePerNight: 110,
+        maxGuests: 4,
+        available: true,
+        imagePaths: [
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
+        ],
+        amenities: [
+            {type: AmenityType.Wifi, description: "Forest WiFi coverage"},
+            {type: AmenityType.RoomService, description: "Spa treatment services"},
+            {type: AmenityType.Parking, description: "Forest parking area", amount: 2}
+        ]
+    },
+    {
+        id: "60d21b4667d0d8992e610c93",
+        name: "Bastogne Historical Camp",
+        owner: "owner_116",
+        description: "Historical camping site near the Battle of the Bulge memorials and museums.",
+        address: {
+            street: "Route de Martelange 21",
+            city: "Bastogne",
+            country: "Belgium",
+            postalCode: "6600",
+            latitude: 50.0046,
+            longitude: 5.7167
+        },
+        pricePerNight: 70,
+        maxGuests: 8,
+        available: true,
+        imagePaths: [
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
+        ],
+        amenities: [
+            {type: AmenityType.Parking, description: "Historical site parking", amount: 4},
+            {type: AmenityType.Restaurant, description: "World War II themed restaurant"},
+            {type: AmenityType.PetFriendly, description: "Pet-friendly grounds"}
+        ]
+    },
     {
         id: "60d21b4667d0d8992e610c85",
         name: "Ardennes Wilderness Camp",
@@ -19,8 +124,8 @@ export const properties: PropertyResponse[] = [
         maxGuests: 6,
         available: true,
         imagePaths: [
-            "/api/placeholder/800/600",
-            "/api/placeholder/800/600"
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
         ],
         amenities: [
             {type: AmenityType.Wifi, description: "Forest-wide WiFi coverage"},
@@ -45,8 +150,8 @@ export const properties: PropertyResponse[] = [
         maxGuests: 4,
         available: true,
         imagePaths: [
-            "/api/placeholder/800/600",
-            "/api/placeholder/800/600"
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
         ],
         amenities: [
             {type: AmenityType.Parking, description: "Beachfront parking", amount: 1},
@@ -70,37 +175,12 @@ export const properties: PropertyResponse[] = [
         maxGuests: 8,
         available: true,
         imagePaths: [
-            "/api/placeholder/800/600",
-            "/api/placeholder/800/600"
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
         ],
         amenities: [
             {type: AmenityType.Parking, description: "Large parking area", amount: 4},
             {type: AmenityType.Restaurant, description: "On-site food service"}
-        ]
-    },
-    {
-        id: "60d21b4667d0d8992e610c88",
-        name: "Meuse Valley Resort",
-        owner: "owner_101",
-        description: "Riverside camping with water sports activities.",
-        address: {
-            street: "Rue de la Meuse 123",
-            city: "Namur",
-            country: "Belgium",
-            postalCode: "5000",
-            latitude: 50.4649,
-            longitude: 4.8657
-        },
-        pricePerNight: 85,
-        maxGuests: 5,
-        available: true,
-        imagePaths: [
-            "/api/placeholder/800/600",
-            "/api/placeholder/800/600"
-        ],
-        amenities: [
-            {type: AmenityType.Pool, description: "Natural swimming area"},
-            {type: AmenityType.PetFriendly, description: "Pet friendly environment"}
         ]
     },
     {
@@ -120,8 +200,8 @@ export const properties: PropertyResponse[] = [
         maxGuests: 4,
         available: true,
         imagePaths: [
-            "/api/placeholder/800/600",
-            "/api/placeholder/800/600"
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg",
+            "https://t3.ftcdn.net/jpg/05/39/76/28/360_F_539762817_90lTAPZAQwcS9nMzlfpGW0GW1JIttMTE.jpg"
         ],
         amenities: [
             {type: AmenityType.Wifi, description: "City-wide WiFi access"},
