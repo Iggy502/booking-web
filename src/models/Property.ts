@@ -25,8 +25,7 @@ export interface IAmenity {
     amount?: number;
 }
 
-
-export interface PropertyResponse {
+export interface Property{
     id: string;
     name: string;
     owner: string;
@@ -35,7 +34,11 @@ export interface PropertyResponse {
     pricePerNight: number;
     maxGuests: number;
     available: boolean;
-    imagePaths?: string[];
+    imagePaths: string[];
     amenities?: IAmenity[];
+}
+
+
+export interface PropertyCreate extends Omit<Property, 'id' | 'imagePaths'> {
 
 }

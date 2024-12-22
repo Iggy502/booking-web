@@ -1,13 +1,13 @@
 import {useEffect, useRef} from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import {PropertyResponse} from '../../models/Property.ts';
+import {Property} from '../../models/Property.ts';
 import './MapView.scss';
 
 interface MapViewProps {
-    properties: PropertyResponse[];
+    properties: Property[];
     selectedLocation: { longitude: number | null, latitude: number | null } | null;
-    handlePropertySelect: (propertyId: string) => void;
+    handlePropertySelect: (propertyId: string | null) => void;
 }
 
 const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewProps) => {
@@ -40,7 +40,10 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             zoom: 8
         };
 
+        console.log("properties.length: ", properties.length);
+
         if (properties.length > 0) {
+            console.log("properties.length > 0");
             // Calculate center from bounds
             const center = [
                 (bounds.getWest() + bounds.getEast()) / 2,
@@ -62,7 +65,7 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             const target = e.originalEvent.target as HTMLElement;
             const clickedMarker = target.closest('.mapboxgl-marker');
             if (!clickedMarker) {
-                handlePropertySelect('');
+                handlePropertySelect(null);
             }
         });
 
@@ -76,34 +79,45 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
         };
     }, []);
 
-    const createMarker = (property: PropertyResponse) => {
+    const createMarker = (property: Property) => {
         const testImage = "https://media.istockphoto.com/id/1377841262/photo/the-beautiful-scenery-of-a-tent-in-a-pine-tree-forest-at-pang-oung-mae-hong-son-province.jpg?s=612x612&w=0&k=20&c=1JvDx-16zTIeytdcC-Fa27nVJ_8SveP-omNKKlUJ-lQ=";
+
+        if (!property?.address?.latitude || !property?.address?.longitude) {
+            return null;
+        }
 
         const popup = new mapboxgl.Popup({
             offset: 25,
-            maxWidth: '300px'
+            maxWidth: '300px',
         }).setHTML(
             `<div class="map-popup">
-               <h5>${property.name}</h5>
-               <div class="image-gallery">
-                   <img src="${testImage}" alt="${property.name}" />
-                   <img src="${testImage}" alt="${property.name}" />
-                   <img src="${testImage}" alt="${property.name}" />
-               </div>
-               <p class="description">${property.description}</p>
-               <p class="price">€${property.pricePerNight} per night</p>
-           </div>`
+           <h5>${property.name}</h5>
+           <div class="image-gallery">
+               <img src="${testImage}" alt="${property.name}" />
+               <img src="${testImage}" alt="${property.name}" />
+               <img src="${testImage}" alt="${property.name}" />
+           </div>           
+           <p class="description">${property.description}</p>
+           <div class="d-inline-flex">
+           <p class="price">€${property.pricePerNight} per night</p>           
+           <p class="guests"><i class="fa-solid fa-person fa-xl"></i> ${property.maxGuests}</p>
+           </div>
+          
+       </div>`
         );
 
         const marker = new mapboxgl.Marker({
             color: "#2C5530",
-        });
+        })
+            .setLngLat([property.address.longitude, property.address.latitude])
+            .setPopup(popup)
+            .addTo(map.current!);
 
-        marker.getElement().addEventListener('click', () => {
+        // Use popup's 'open' and 'close' events carefully
+        marker.getElement().addEventListener("click", () => {
             handlePropertySelect(property.id);
         });
 
-        marker.setPopup(popup);
         return marker;
     };
 
@@ -119,8 +133,8 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             const {latitude, longitude} = property.address;
             if (typeof latitude === 'number' && typeof longitude === 'number') {
                 const marker = createMarker(property);
-                marker.setLngLat([longitude, latitude]).addTo(map.current!);
-                markersRef.current.push(marker);
+                marker?.setLngLat([longitude, latitude]).addTo(map.current!);
+                if (marker) markersRef.current.push(marker);
             }
         });
     };

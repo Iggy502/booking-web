@@ -1,40 +1,97 @@
-.property-overview {
-  .pagination {
-    .page-item {
-      .page-link {
-        color: #2C5530;
-        border-color: #dee2e6;
-        padding: 0.5rem 1rem;
+.properties-overview {
+  .property-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    --bs-card-border-width: 0 !important;
 
-        &:hover {
-          background-color: #f8f9fa;
-          border-color: #dee2e6;
-          color: #1a3b1d;
-        }
+    .card-body {
+        padding: 1.15rem !important;
+    }
 
-        &:focus {
-          box-shadow: 0 0 0 0.2rem rgba(44, 85, 48, 0.25);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+      border-color: #0d6efd;
+      box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+    }
+
+    .card-img-wrapper {
+      position: relative;
+
+      .card-img-top {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .selected-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 110, 253, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: 2rem;
+          color: #0d6efd;
         }
       }
 
-      &.active .page-link {
-        background-color: #2C5530;
-        border-color: #2C5530;
-        color: white;
+      .price-badge {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
       }
+    }
 
-      &.disabled .page-link {
+    .location {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    .amenities-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .amenity-badge {
+        background-color: #f8f9fa;
         color: #6c757d;
-        pointer-events: none;
-        background-color: #fff;
-        border-color: #dee2e6;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+
+        &.more {
+          background-color: #e9ecef;
+        }
       }
     }
   }
 
-  // Add responsive gap between rows
-  .row {
-    --bs-gutter-x: 1.5rem;
-    --bs-gutter-y: 1.5rem;
+  .pagination {
+    .page-item {
+      .page-link {
+        color: #0d6efd;
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
+
+      &.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+      }
+    }
   }
 }

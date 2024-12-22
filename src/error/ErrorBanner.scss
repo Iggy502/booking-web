@@ -1,0 +1,66 @@
+.error-banner {
+  position: fixed;
+  top: 80px; // Gives space from the top of the screen
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  animation: slideDown 0.3s ease-out;
+  pointer-events: none; // Allows clicking through the banner container
+
+  .error-alert {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: auto; // Restores click events for the alert itself
+
+    .btn-close {
+      padding: 1.25rem;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .error-icon {
+    font-size: 1.25rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .error-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .error-status {
+    font-weight: 600;
+  }
+
+  .error-separator {
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  .error-message {
+    font-weight: 500;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

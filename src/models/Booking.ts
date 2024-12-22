@@ -1,6 +1,6 @@
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
 
-export interface IBookingBase {
+export interface Booking {
     id: string;
     property: string;
     guest: string;
@@ -10,3 +10,11 @@ export interface IBookingBase {
     status: BookingStatus;
     numberOfGuests: number;
 }
+
+
+export interface BookingCreate extends Omit<Booking, 'id' | 'status'> {
+}
+
+
+
+

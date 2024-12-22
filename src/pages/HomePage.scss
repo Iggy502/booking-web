@@ -1,73 +1,27 @@
 // src/pages/HomePage/HomePage.scss
 
 
-.filters-dropdown-menu {
-  min-width: 500px;
-
-  @media (max-width: 576px) {
-    min-width: 300px;
-  }
-}
-
-
-@media (max-width: 992px) {
-  .filters-section {
-    .amenity-filters {
-      margin-bottom: 1.5rem;
-    }
-  }
-}
-
-
 .home-page {
 
+  .dropdown {
 
-  .view-toggle {
-    .nav-link {
-      color: #2C5530;
-      border: none;
-      padding: 0.5rem 1rem;
+  }
 
-      &:hover {
-        border-color: transparent;
-        background-color: rgba(44, 85, 48, 0.1);
-      }
+  .filters-dropdown-menu {
+    min-width: 500px;
 
-      &.active {
-        color: white;
-        background-color: #2C5530;
-        border-color: #2C5530;
-      }
-
-      i {
-        font-size: 0.9em;
-      }
+    @media (max-width: 576px) {
+      min-width: 300px;
     }
   }
 
-  // Adjust header layout for smaller screens
-  @media (max-width: 768px) {
-    .d-flex.justify-content-between {
-      flex-direction: column;
-      align-items: center !important;
-      gap: 1rem;
 
-      .responsive-heading {
-        margin-bottom: 0 !important;
-      }
-
-      .view-toggle {
-        width: 100%;
-        justify-content: center;
+  @media (max-width: 992px) {
+    .filters-section {
+      .amenity-filters {
+        margin-bottom: 1.5rem;
       }
     }
-  }
-
-  .container-xxl {
-    min-height: 100vh;
-    padding: 1rem; // Reduced padding
-    display: flex;
-    flex-direction: column;
   }
 
   .selected-property-banner {
@@ -143,11 +97,11 @@
     width: 400px;
 
 
-
     &.date-picker-success {
       input {
         border: 1px solid #2C5530;
         box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.35);
+
         &:focus {
           border-color: #2C5530;
           box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.4);
@@ -223,73 +177,75 @@
       }
     }
 
+
+    // Calendar styling
+    .react-datepicker {
+      border: 1px solid #e9ecef;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      display: flex !important;
+      font-family: "Arial Rounded MT Bold";
+
+      &__month-container {
+        float: none !important;
+        background: white;
+
+        & + .react-datepicker__month-container {
+          border-left: 1px solid #e9ecef;
+        }
+      }
+
+      &__header {
+        background-color: white;
+        border-bottom: 1px solid #e9ecef;
+        padding-top: 0.5rem;
+      }
+
+      &__current-month {
+        color: #2C5530;
+        font-weight: 600;
+        padding: 0.5rem 0;
+        font-size: 1.5em;
+      }
+
+      &__day {
+        color: #495057;
+        margin: 0.2rem;
+        width: 2rem;
+
+        &--disabled {
+          color: red;
+          text-decoration: line-through;
+        }
+
+        &:hover {
+          background-color: #f8f9fa;
+        }
+
+        &--selected {
+          background-color: #2C5530 !important;
+          color: white !important;
+        }
+
+        &--in-range {
+          background-color: rgba(44, 85, 48, 0.1) !important;
+          color: #2C5530 !important;
+        }
+
+        &--keyboard-selected {
+          background-color: rgba(44, 85, 48, 0.2) !important;
+          color: #2C5530 !important;
+        }
+      }
+
+      &__day-name {
+        color: #6c757d;
+        font-weight: 500;
+        margin: 0.2rem;
+        width: 2rem;
+      }
+    }
+
   }
 
-  // Calendar styling
-  .react-datepicker {
-    border: 1px solid #e9ecef;
-    border-radius: 0.5rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    font-family: inherit;
-    display: flex !important;
-
-    &__month-container {
-      float: none !important;
-      background: white;
-
-      & + .react-datepicker__month-container {
-        border-left: 1px solid #e9ecef;
-      }
-    }
-
-    &__header {
-      background-color: white;
-      border-bottom: 1px solid #e9ecef;
-      padding-top: 0.5rem;
-    }
-
-    &__current-month {
-      color: #2C5530;
-      font-weight: 600;
-      padding: 0.5rem 0;
-    }
-
-    &__day {
-      color: #495057;
-      font-weight: 500;
-      margin: 0.2rem;
-      width: 2rem;
-
-      &--disabled {
-        color: red;
-        text-decoration: line-through;
-      }
-
-      &:hover {
-        background-color: #f8f9fa;
-      }
-
-      &--selected {
-        background-color: #2C5530 !important;
-        color: white !important;
-      }
-
-      &--in-range {
-        background-color: rgba(44, 85, 48, 0.1) !important;
-        color: #2C5530 !important;
-      }
-
-      &--keyboard-selected {
-        background-color: rgba(44, 85, 48, 0.2) !important;
-        color: #2C5530 !important;
-      }
-    }
-
-    &__day-name {
-      color: #6c757d;
-      font-weight: 500;
-      margin: 0.2rem;
-      width: 2rem;
-    }
-  }
 }

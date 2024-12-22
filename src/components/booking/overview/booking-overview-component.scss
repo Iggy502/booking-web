@@ -1,0 +1,171 @@
+// booking-table.scss
+
+// Variables
+$table-hover-bg: rgba(#f8f9fa, 0.7);
+$border-radius: 8px;
+$transition-duration: 0.2s;
+$max-property-width: 200px;
+
+.booking-table-container {
+  .table-wrapper {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    margin-bottom: 2rem;
+
+    .table {
+      margin-bottom: 0;
+
+      thead {
+        th {
+          background-color: #f8f9fa;
+          border-bottom: 2px solid #dee2e6;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.8rem;
+          letter-spacing: 0.5px;
+          padding: 1rem;
+
+          &:first-child {
+            border-top-left-radius: $border-radius;
+          }
+
+          &:last-child {
+            border-top-right-radius: $border-radius;
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          transition: all $transition-duration ease-in-out;
+
+          &:hover {
+            background-color: $table-hover-bg;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          }
+
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+
+            &.property-cell {
+              max-width: $max-property-width;
+
+              .property-image {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: $border-radius;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: transform $transition-duration ;
+
+                &:hover {
+                  transform: scale(1.05);
+                }
+              }
+
+              .property-name {
+                font-weight: 500;
+                color: #2c3e50;
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Status badges
+  .badge {
+    padding: 0.5rem 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+
+    &.bg-success {
+      background-color: rgba(#28a745, 0.1) !important;
+      color: #28a745;
+    }
+
+    &.bg-warning {
+      background-color: rgba(#ffc107, 0.1) !important;
+      color: #9f7f0f;
+    }
+
+    &.bg-danger {
+      background-color: rgba(#dc3545, 0.1) !important;
+      color: #dc3545;
+    }
+  }
+
+  // Action buttons
+  .btn-outline-primary {
+    border-width: 2px;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    transition: all $transition-duration ease-in-out;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Pagination customization
+  .pagination {
+    .page-item {
+      margin: 0 0.2rem;
+
+      .page-link {
+        border-radius: $border-radius;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all $transition-duration ease-in-out;
+
+        &:hover {
+          background-color: #f8f9fa;
+          transform: translateY(-1px);
+        }
+      }
+
+      &.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+      }
+    }
+  }
+
+  // Loading spinner customization
+  .spinner-border {
+    color: #0d6efd;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  // Empty state customization
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: white;
+    border-radius: $border-radius;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    i {
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+    }
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #6c757d;
+    }
+  }
+}

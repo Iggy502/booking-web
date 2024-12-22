@@ -1,12 +1,12 @@
-import {AmenityType, PropertyResponse} from "../models/Property.ts";
-import {IBookingBase} from "../models/Booking.ts";
+import {AmenityType, Property} from "../models/Property.ts";
+import {Booking} from "../models/Booking.ts";
 
-export const properties: PropertyResponse[] = [
+export const properties: Property[] = [
     // Add these to the properties array
     {
         id: "60d21b4667d0d8992e610c90",
         name: "Antwerp Harbor Glamping",
-        owner: "owner_113",
+        owner: "12345",
         description: "Unique glamping experience with views of the Antwerp harbor and the Scheldt river.",
         address: {
             street: "Scheldelaan 405",
@@ -32,7 +32,7 @@ export const properties: PropertyResponse[] = [
     {
         id: "60d21b4667d0d8992e610c91",
         name: "Ghent Canal Camping",
-        owner: "owner_114",
+        owner: "12345",
         description: "Peaceful camping site along Ghent's historic waterways, walking distance to medieval city center.",
         address: {
             street: "Voorhoutkaai 43",
@@ -58,7 +58,7 @@ export const properties: PropertyResponse[] = [
     {
         id: "60d21b4667d0d8992e610c92",
         name: "Spa Forest Haven",
-        owner: "owner_115",
+        owner: "12345",
         description: "Luxury camping in the woods near the famous thermal city of Spa.",
         address: {
             street: "Route des Sources 67",
@@ -84,7 +84,7 @@ export const properties: PropertyResponse[] = [
     {
         id: "60d21b4667d0d8992e610c93",
         name: "Bastogne Historical Camp",
-        owner: "owner_116",
+        owner: "12345",
         description: "Historical camping site near the Battle of the Bulge memorials and museums.",
         address: {
             street: "Route de Martelange 21",
@@ -110,7 +110,7 @@ export const properties: PropertyResponse[] = [
     {
         id: "60d21b4667d0d8992e610c85",
         name: "Ardennes Wilderness Camp",
-        owner: "owner_123",
+        owner: "12345",
         description: "Secluded camping spot in the heart of the Ardennes forest, perfect for nature lovers.",
         address: {
             street: "Rue de la Forêt 45",
@@ -209,7 +209,7 @@ export const properties: PropertyResponse[] = [
         ]
     }
 ];
-export const bookings: IBookingBase[] = [
+export const bookings: Booking[] = [
     // Ardennes Wilderness Camp bookings
     {
         id: "booking_001",

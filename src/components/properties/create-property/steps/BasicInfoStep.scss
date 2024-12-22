@@ -1,0 +1,154 @@
+// basic-info-step.scss
+
+.basic-info-form {
+  // Form controls
+  .form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease-in-out;
+    background-color: #fff;
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &:hover:not(:focus):not(.is-invalid) {
+      border-color: #cbd5e1;
+    }
+
+    &.is-invalid {
+      border-color: #e53e3e;
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+      }
+    }
+
+    // Textarea specific styles
+    &[as="textarea"] {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    // Number input specific styles
+    &[type="number"] {
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        opacity: 1;
+        height: 1.75rem;
+        margin: 0 0.5rem;
+      }
+    }
+  }
+
+  // Helper text
+  .form-text {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.375rem;
+    display: block;
+  }
+
+  // Invalid feedback
+  .invalid-feedback {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: #e53e3e;
+    display: block;
+  }
+
+  // Navigation buttons
+  .step-navigation {
+    .btn {
+      padding: 0.75rem 2rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease-in-out;
+
+      &-primary {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: #fff;
+
+        &:hover {
+          background-color: #2563eb;
+          border-color: #2563eb;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+      }
+    }
+  }
+
+  // Row gutters
+  .row {
+    --bs-gutter-x: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .row {
+      --bs-gutter-x: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .step-navigation {
+      flex-direction: column;
+      gap: 1rem;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+
+  // Animations
+  .form-control,
+  .btn {
+    &:focus {
+      transition: box-shadow 0.2s ease-in-out;
+    }
+  }
+
+  // Custom placeholder styles
+  .form-control::placeholder {
+    color: #94a3b8;
+    opacity: 0.7;
+  }
+
+  // Improve number input appearance in Firefox
+  @-moz-document url-prefix() {
+    input[type="number"] {
+      padding-right: 0.5rem;
+    }
+  }
+}

@@ -1,15 +1,18 @@
-import { Outlet } from 'react-router-dom';
-import NavBar from "./components/navbar/Navbar.tsx";
-
+import {Outlet} from 'react-router-dom';
+import NavBar from "./components/navbar/Navbar";
+import {ErrorProvider} from './context/error.context.tsx';
+import ErrorBanner from './error/ErrorBanner.tsx';
 
 const App = () => {
     return (
-        <>
-            <NavBar />
-            <Outlet />
-        </>
+        <ErrorProvider>
+            <NavBar/>
+            <ErrorBanner/>
+            <main>
+            <Outlet/>
+            </main>
+        </ErrorProvider>
     );
 };
 
 export default App;
-

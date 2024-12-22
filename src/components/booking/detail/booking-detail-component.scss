@@ -1,0 +1,85 @@
+.booking-overview-page {
+  .back-link {
+    color: #6c757d;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #138663;
+    }
+  }
+
+  .custom-header {
+    background-color: #138663;
+    color: white;
+    border-bottom: none;
+
+    h3 {
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    .card-body {
+      h4 {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .info-section {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        height: 100%;
+
+        h5 {
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: #6c757d;
+          margin-bottom: 0.75rem;
+        }
+      }
+
+      .price-section {
+        border-top: 2px dashed #e9ecef;
+
+        .total-price {
+          font-family: 'Playfair Display', serif;
+          font-size: 2rem;
+          color: #138663;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .status-confirmed {
+    color: #2e7d32;
+  }
+
+  .status-pending {
+    color: #ef6c00;
+  }
+
+  .status-cancelled {
+    color: #c62828;
+  }
+
+  .status-completed {
+    color: #283593;
+  }
+}
+
+.custom-text-green {
+  color: #138663;
+}
+
+.spinner-custom {
+  color: #138663;
+}

@@ -3,6 +3,9 @@
 .navbar {
   background-color: theme.$primary;
   height:  4rem;
+  position: fixed;
+
+  min-width: 100%;
 
   .navbar-toggler {
     border: none !important;

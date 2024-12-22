@@ -1,138 +1,145 @@
-import React, {useState, useMemo} from 'react';
-import {Container, Row, Col, Pagination} from 'react-bootstrap';
-import {PropertyResponse} from '../../../models/Property';
-import PropertyCard from '../property-card/property-card.tsx';
+import React, {useMemo, useState} from 'react';
+import {Row, Col, Card, Pagination, Badge, Carousel} from 'react-bootstrap';
+import {Property} from '../../../models/Property';
 import './properties-overview.scss';
 
 interface PropertyOverviewProps {
-    properties: PropertyResponse[];
-    propertiesPerPage?: number;
-    className?: string;
+    properties: Property[];
+    propertiesPerPage: number;
+    onPropertySelect?: (propertyId: string) => void;
+    selectedPropertyId?: string | null;
 }
 
 const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                                                properties,
-                                                               propertiesPerPage = 6,
-                                                               className = ''
+                                                               propertiesPerPage,
+                                                               onPropertySelect,
+                                                               selectedPropertyId
                                                            }) => {
-    const [currentPage, setCurrentPage] = useState(1);
 
-    const PAGINATION_CONFIG = {
-        MIN_PER_PAGE: 3,
-        MAX_PER_PAGE: 12,
-        VISIBLE_PAGE_NUMBERS: 3  // Number of page numbers to show between first and last
-    };
+    const [activePage, setActivePage] = useState(1);
+    const totalPages = Math.ceil(properties.length / propertiesPerPage);
 
-    // Validate properties per page
-    const validatedPropertiesPerPage = useMemo(() => (
-        Math.min(Math.max(propertiesPerPage, PAGINATION_CONFIG.MIN_PER_PAGE), PAGINATION_CONFIG.MAX_PER_PAGE)
-    ), [propertiesPerPage]);
 
-    // Calculate total pages
-    const totalPages = Math.ceil(properties.length / validatedPropertiesPerPage);
-
-    // Get current page's properties
-    const currentProperties = useMemo(() => {
-        const startIndex = (currentPage - 1) * validatedPropertiesPerPage;
-        const endIndex = startIndex + validatedPropertiesPerPage;
-        return properties.slice(startIndex, endIndex);
-    }, [properties, currentPage, validatedPropertiesPerPage]);
-
-    // Handle page navigation
     const handlePageChange = (pageNumber: number) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        setActivePage(pageNumber);
     };
 
-    // Generate array of page numbers to display
-    const getVisiblePageNumbers = () => {
-        if (totalPages <= PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS + 2) {
-            // If few pages, show all
-            return Array.from({length: totalPages}, (_, i) => i + 1);
+
+    const startIndex = (activePage - 1) * propertiesPerPage;
+    const visibleProperties = properties.slice(startIndex, startIndex + propertiesPerPage);
+
+    const paginationItems = useMemo(() => {
+        if (activePage > totalPages) {
+            setActivePage(1);
         }
-
-        const pageNumbers: (number | 'ellipsis')[] = [1];
-        const middleStart = Math.max(2, Math.min(
-            currentPage - 1,
-            totalPages - PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS
-        ));
-        const middleEnd = Math.min(
-            middleStart + PAGINATION_CONFIG.VISIBLE_PAGE_NUMBERS - 1,
-            totalPages - 1
-        );
-
-        // Add first ellipsis if needed
-        if (middleStart > 2) {
-            pageNumbers.push('ellipsis');
-        }
-
-        // Add middle pages
-        for (let i = middleStart; i <= middleEnd; i++) {
-            pageNumbers.push(i);
-        }
-
-        // Add last ellipsis if needed
-        if (middleEnd < totalPages - 1) {
-            pageNumbers.push('ellipsis');
-        }
-
-        // Add last page
-        pageNumbers.push(totalPages);
-
-        return pageNumbers;
-    };
-
-    const renderPaginationItems = () => {
-        return getVisiblePageNumbers().map((pageNumber, index) => {
-            if (pageNumber === 'ellipsis') {
-                return <Pagination.Ellipsis key={`ellipsis-${index}`} disabled/>;
-            }
-
-            return (
+        const items = [];
+        for (let number = 1; number <= totalPages; number++) {
+            items.push(
                 <Pagination.Item
-                    key={pageNumber}
-                    active={currentPage === pageNumber}
-                    onClick={() => handlePageChange(pageNumber)}
+                    key={number}
+                    active={number === activePage}
+                    onClick={() => handlePageChange(number)}
                 >
-                    {pageNumber}
+                    {number}
                 </Pagination.Item>
             );
-        });
-    };
+        }
+        return items;
+    }, [totalPages, activePage]);
+
+
+    if (properties.length === 0) {
+        return (
+            <div className="text-center my-5">
+                <i className="fas fa-search fa-3x text-secondary mb-3"></i>
+                <h4 className="text-secondary">No properties found matching your criteria</h4>
+                <p className="text-muted">Try adjusting your filters or search terms</p>
+            </div>
+        );
+    }
 
     return (
-        <Container fluid className={`property-overview ${className}`}>
-            {properties.length ? (
-                <>
-                    <Row className="g-4">
-                        {currentProperties.map((property) => (
-                            <Col key={property.id} xs={12} md={6} lg={4} xxl={3}>
-                                <PropertyCard property={property}/>
-                            </Col>
-                        ))}
-                    </Row>
-                    {totalPages > 1 && (
-                        <Row className="mt-4 mb-3">
-                            <Col className="d-flex justify-content-center">
-                                <Pagination>
-                                    <Pagination.Prev
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                    />
-                                    {renderPaginationItems()}
-                                    <Pagination.Next
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                    />
-                                </Pagination>
-                            </Col>
-                        </Row>
-                    )}
-                </>
-            ) : (
-                <h1 className="text-center">No properties found</h1>
+        <div className="properties-overview">
+            <Row xs={1} md={2} lg={3} xl={4} className="g-4">
+                {visibleProperties.map((property) => (
+                    <Col key={property.id}>
+                        <Card
+                            className={`h-100 property-card ${selectedPropertyId === property.id ? 'selected' : ''}`}
+                            onClick={(e) => {
+                                if (!(e.target as HTMLElement).closest('.carousel-control-next, .carousel-control-prev')) {
+                                    onPropertySelect?.(property.id);
+                                }
+                            }}
+                            role="button"
+                        >
+                            <div className="card-img-wrapper">
+                                <Carousel interval={null}>
+                                    {property.imagePaths?.slice(0, 3).map((imagePath, index) => (
+                                        <Carousel.Item key={index}>
+                                            <Card.Img
+                                                variant="top"
+                                                src={imagePath || '/placeholder-image.jpg'}
+                                                alt={`${property.name} image ${index + 1}`}
+                                            />
+                                        </Carousel.Item>
+                                    ))}
+                                </Carousel>
+                                {selectedPropertyId === property.id && (
+                                    <div className="selected-overlay">
+                                        <i className="fas fa-check-circle"></i>
+                                    </div>
+                                )}
+                                <Badge
+                                    bg="primary"
+                                    className="price-badge"
+                                >
+                                    €{property.pricePerNight}/night
+                                </Badge>
+                            </div>
+                            <Card.Body>
+                                <Card.Title className="mb-2">{property.name}</Card.Title>
+                                <Card.Text className="location mb-2">
+                                    <i className="fas fa-map-marker-alt me-2"></i>
+                                    {property.address.city}, {property.address.country}
+                                </Card.Text>
+                                <Card.Text className="description mb-2 text-muted">
+                                    {property.description}
+                                </Card.Text>
+                                <div className="amenities-preview">
+                                    {property.amenities?.slice(0, 3).map((amenity, index) => (
+                                        <span key={index} className="amenity-badge">
+                                            {amenity.type}
+                                        </span>
+                                    ))}
+                                    {(property.amenities?.length || 0) > 3 && (
+                                        <span className="amenity-badge more">
+                                            +{(property.amenities?.length || 0) - 3} more
+                                        </span>
+                                    )}
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+
+            {totalPages > 1 && (
+                <div className="d-flex justify-content-center mt-4">
+                    <Pagination>
+                        <Pagination.Prev
+                            onClick={() => handlePageChange(activePage - 1)}
+                            disabled={activePage === 1}
+                        />
+                        {paginationItems}
+                        <Pagination.Next
+                            onClick={() => handlePageChange(activePage + 1)}
+                            disabled={activePage === totalPages}
+                        />
+                    </Pagination>
+                </div>
             )}
-        </Container>
+        </div>
     );
 };
 
