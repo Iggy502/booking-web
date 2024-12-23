@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Form, Button, Row, Col, Card} from 'react-bootstrap';
-import {IAmenity, AmenityType} from '../../../../models/Property';
+import {Button, Card, Col, Form, Row} from 'react-bootstrap';
+import {AmenityType, IAmenity} from '../../../../models/Property';
 import './AmenitiesStep.scss';
 
 interface AmenitiesStepProps {

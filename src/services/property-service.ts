@@ -13,6 +13,9 @@ export class PropertyService {
 
     static async fetchPropertyById(id: string): Promise<Property | undefined> {
         await new Promise(resolve => setTimeout(resolve, 500));
+
+        // throw NotFound('Property not found');
+
         return properties.find(property => property.id === id);
     }
 

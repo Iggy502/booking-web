@@ -1,10 +1,10 @@
-import React, {useEffect, useState, useMemo} from 'react';
-import {Table, Container, Pagination, Badge, Spinner, Button, Form, Row, Col, InputGroup} from 'react-bootstrap';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Badge, Button, Col, Container, Form, InputGroup, Pagination, Row, Spinner, Table} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {Property} from '../../../models/Property';
 import {PropertyService} from '../../../services/property-service';
 import {useError} from '../../../context/error.context';
-import {ChevronUp, ChevronDown} from 'lucide-react';
+import {ChevronDown, ChevronUp} from 'lucide-react';
 import './my-properties-component.scss';
 
 const ITEMS_PER_PAGE = 10;

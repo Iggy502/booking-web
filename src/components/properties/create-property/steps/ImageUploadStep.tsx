@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Button, Alert, ProgressBar } from 'react-bootstrap';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import React, {useCallback, useState} from 'react';
+import {useDropzone} from 'react-dropzone';
+import {Alert, Button, ProgressBar} from 'react-bootstrap';
+import {Image as ImageIcon, Upload, X} from 'lucide-react';
 import './ImageUploadStep.scss';
 
 interface ImageUploadStepProps {

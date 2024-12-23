@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './BasicInfoStep.scss';
-import {Form, Button, Row, Col} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 import {PropertyCreate} from '../../../../models/Property';
 
 

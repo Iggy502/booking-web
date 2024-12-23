@@ -9,7 +9,8 @@ import {AmenityType, Property} from "../../../models/Property";
 import './PropertyWrapper.scss';
 import {Booking} from "../../../models/Booking.ts";
 import {useNavigate} from "react-router-dom";
-import {ServerError} from "../../../context/error.context.tsx";
+import {useError} from "../../../context/error.context.tsx";
+import createHttpError, {HttpError, InternalServerError} from "http-errors";
 
 const getAmenityIcon = (type: AmenityType): string => {
     const icons: Record<AmenityType, string> = {
@@ -41,7 +42,7 @@ const PropertyWrapper = () => {
     const [propertyBookings, setPropertyBookings] = useState<Booking[]>([]);
     const [guestCount, setGuestCount] = useState<number>(1);
     const navigate = useNavigate();
-
+    const {showError} = useError();
 
 
     const minPrice = 0;
@@ -53,7 +54,15 @@ const PropertyWrapper = () => {
                 const properties = await PropertyService.fetchProperties();
                 allProperties.current = properties;
                 setFilteredProperties(properties);
-            } catch (err) {
+            } catch (error) {
+                if (error instanceof HttpError && (error.status || error.message)) {
+                    showError(
+                        createHttpError(error.status || 500, error.message || 'Internal Server Error'));
+
+                } else {
+                    showError(InternalServerError("Internal Server Error"));
+
+                }
                 setFilteredProperties([]);
             } finally {
                 setIsLoading(false);
@@ -71,9 +80,18 @@ const PropertyWrapper = () => {
                     setPropertyBookings(bookings);
                 } catch (error) {
                     console.error('Error fetching bookings:', error);
+                    if (error instanceof HttpError && (error.status || error.message)) {
+                        showError(
+                            createHttpError(error.status || 500, error.message || 'Internal Server Error'));
+
+                    } else {
+                        showError(InternalServerError("Internal Server Error"));
+
+                    }
                     setPropertyBookings([]);
                 }
             } else {
+
                 setPropertyBookings([]);
             }
         };

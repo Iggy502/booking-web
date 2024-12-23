@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {Row, Col, Card, Pagination, Badge, Carousel} from 'react-bootstrap';
+import {Badge, Card, Carousel, Col, Pagination, Row} from 'react-bootstrap';
 import {Property} from '../../../models/Property';
 import './properties-overview.scss';
 

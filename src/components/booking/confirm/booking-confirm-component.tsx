@@ -7,6 +7,7 @@ import {ServerError, useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
 import './booking-confirm-component.scss'
 import {BookingCreate} from "../../../models/Booking.ts";
+import createHttpError, {HttpError, InternalServerError} from "http-errors";
 
 const getAmenityIcon = (type: AmenityType): string => {
     const icons: Record<AmenityType, string> = {
@@ -53,9 +54,17 @@ const BookingConfirmComponent: React.FC = () => {
                     throw {status: 404, message: 'Property not found'} as ServerError;
                 }
                 setProperty(propertyData);
-            }).catch((err: ServerError) => {
+            }).catch((error: any) => {
                 setHasError(true);
-                showError({status: err.status, message: err.message});
+                console.error(error);
+                if (error instanceof HttpError && (error.status || error.message)) {
+                    showError(
+                        createHttpError(error.status || 500, error.message || 'Internal Server Error'));
+
+                } else {
+                    showError(InternalServerError("Internal Server Error"));
+
+                }
             }).finally(
                 () => setIsLoading(false)
             )
@@ -156,12 +165,16 @@ const BookingConfirmComponent: React.FC = () => {
             const newBooking = await BookingService.createBooking(bookingData);
             navigate(`/bookings/${newBooking.id}`);
         } catch (error) {
-            showError({
-                status: error.status || 500,
-                message: error.message || 'Failed to confirm booking'
-            });
+            if (error instanceof HttpError && (error.status || error.message)) {
+                showError(
+                    createHttpError(error.status || 500, error.message || 'Internal Server Error'));
+
+            } else {
+                showError(InternalServerError("Internal Server Error"));
+            }
         }
     };
+
 
     return (
         <Container fluid className="py-5 booking-page">
@@ -286,7 +299,8 @@ const BookingConfirmComponent: React.FC = () => {
                         </Card.Body>
                         <Card.Footer className="bg-light p-4">
                             <div className="d-grid gap-2">
-                                <button className="btn custom-btn-green btn-lg" onClick={() => handleConfirmBooking()}>
+                                <button className="btn custom-btn-green btn-lg"
+                                        onClick={() => handleConfirmBooking()}>
                                     <i className="fas fa-check-circle me-2"></i>
                                     Confirm Booking
                                 </button>

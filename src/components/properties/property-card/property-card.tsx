@@ -1,6 +1,6 @@
 import React from 'react';
-import {Card, Carousel, Badge} from 'react-bootstrap';
-import {Property, AmenityType} from '../../../models/Property.ts';
+import {Badge, Card, Carousel} from 'react-bootstrap';
+import {AmenityType, Property} from '../../../models/Property.ts';
 import './property-card.scss';
 
 interface PropertyCardProps {

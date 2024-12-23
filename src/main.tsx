@@ -11,6 +11,9 @@ import BookingDetailComponent from "./components/booking/detail/booking-detail-c
 import BookingOverviewComponent from "./components/booking/overview/booking-overview-component.tsx";
 import CreatePropertyComponent from "./components/properties/create-property/create-property-component.tsx";
 import MyPropertiesComponent from "./components/properties/my-properties/my-properties-component.tsx";
+import {PrivateRoute} from "./components/auth/private-route.tsx";
+import {LoginPage} from "./pages/LoginPage.tsx";
+import 'dotenv';
 
 const router = createBrowserRouter([
     {
@@ -37,8 +40,12 @@ const router = createBrowserRouter([
                         element: <CreatePropertyComponent/>,
                     },
                     {
-                        path:'my-properties',
-                        element: <MyPropertiesComponent/>
+                        path: 'my-properties',
+                        element: (
+                            <PrivateRoute>
+                                <MyPropertiesComponent/>
+                            </PrivateRoute>
+                        )
 
                     }
                 ]
@@ -54,6 +61,10 @@ const router = createBrowserRouter([
             {
                 path: 'bookings',
                 element: <BookingOverviewComponent/>,
+            },
+            {
+                path: 'login',
+                element: <LoginPage/>
             }
         ],
     },

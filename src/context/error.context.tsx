@@ -1,4 +1,5 @@
-import React, {createContext, useContext, useState, useCallback} from 'react';
+import React, {createContext, useCallback, useContext, useState} from 'react';
+import {HttpError} from "http-errors";
 
 export interface ServerError {
     status: number;
@@ -6,9 +7,9 @@ export interface ServerError {
 }
 
 interface ErrorContextType {
-    showError: (error: ServerError) => void;
+    showError: (error: HttpError) => void;
     clearError: () => void;
-    error: ServerError | null;
+    error: HttpError | null;
 }
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
@@ -18,9 +19,9 @@ interface ErrorProviderProps {
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({children}) => {
-    const [error, setError] = useState<ServerError | null>(null);
+    const [error, setError] = useState<HttpError | null>(null);
 
-    const showError = useCallback((serverError: ServerError) => {
+    const showError = useCallback((serverError: HttpError) => {
         setError(serverError);
         setTimeout(() => {
             setError(null);

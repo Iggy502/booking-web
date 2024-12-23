@@ -12,6 +12,8 @@ import {AmenityType, Property} from "../models/Property";
 import {Booking} from "../models/Booking";
 import {BookingService} from "../services/booking-service";
 import {useNavigate} from "react-router-dom";
+import {useError} from "../context/error.context.tsx";
+import createHttpError, {HttpError} from "http-errors";
 
 interface FilterDropdownProps {
     title: string;
@@ -70,6 +72,7 @@ const HomePage = () => {
     const [selectedPriceRangeId, setSelectedPriceRangeId] = useState<string | null>(null);
     const [guestCount, setGuestCount] = useState<number>(1);
 
+    const {showError} = useError();
 
     // Data state
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -101,6 +104,15 @@ const HomePage = () => {
                 setBookingsByProperty(bookingsMap);
             } catch (error) {
                 console.error('Failed to fetch initial data:', error);
+                if (error instanceof HttpError && (error.status || error.message)) {
+                    showError(
+                        createHttpError(error.status || 500, error.message)
+                    );
+
+                } else {
+                    showError(createHttpError.InternalServerError());
+
+                }
             } finally {
                 setIsInitialLoading(false);
             }

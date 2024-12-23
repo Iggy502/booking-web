@@ -1,10 +1,26 @@
 // Navbar.tsx
-import { Container, Nav, Navbar, Offcanvas, NavDropdown } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import {Container, Nav, Navbar, NavDropdown, Offcanvas} from 'react-bootstrap';
+import {Link, useLocation} from 'react-router-dom';
+import {useAuth} from '../../context/auth.context.tsx';
+import {useEffect, useState} from 'react';
 import './NavBar.scss';
 
 const NavBar = () => {
     const location = useLocation();
+    const {isAuthenticated, getUserInfo, logout} = useAuth();
+    const [userInfo, setUserInfo] = useState<{ firstName: string; lastName: string } | null>(null);
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            if (isAuthenticated) {
+                const info = await getUserInfo();
+                if (info) {
+                    setUserInfo({firstName: info.firstName, lastName: info.lastName});
+                }
+            }
+        };
+        fetchUserInfo();
+    }, [isAuthenticated, getUserInfo]);
 
     return (
         <Navbar variant="dark" expand="lg" className="shadow-sm">
@@ -13,7 +29,6 @@ const NavBar = () => {
                     CampSpot
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-                {/* Expanded mode nav */}
                 <Nav className="ms-auto d-none d-lg-flex">
                     <NavDropdown
                         title="Find a Spot"
@@ -30,9 +45,39 @@ const NavBar = () => {
                         </NavDropdown.Item>
                     </NavDropdown>
                     <Nav.Link as={Link} to="/bookings" className="d-none">My Bookings</Nav.Link>
-                    <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
+
+                    {isAuthenticated ? (
+                        <NavDropdown
+                            title={
+                                <span>
+                                    <i className="fas fa-user me-1"></i>
+                                    {userInfo?.firstName}
+                                </span>
+                            }
+                            id="user-dropdown"
+                        >
+                            <NavDropdown.Item as={Link} to="/properties/my-properties">
+                                <i className="fas fa-home me-1"></i>
+                                My Properties
+                            </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/bookings">
+                                <i className="fas fa-calendar me-1"></i>
+                                My Bookings
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider/>
+                            <NavDropdown.Item onClick={logout}>
+                                <i className="fas fa-sign-out-alt me-1"></i>
+                                Logout
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    ) : (
+                        <Nav.Link as={Link} to="/login">
+                            <i className="fas fa-sign-in-alt me-1"></i>
+                            Log In
+                        </Nav.Link>
+                    )}
                 </Nav>
-                {/* Collapsed mode offcanvas */}
+
                 <Navbar.Offcanvas
                     id="basic-navbar-nav"
                     placement="end"
@@ -40,7 +85,13 @@ const NavBar = () => {
                     className="sidebar d-lg-none"
                 >
                     <Offcanvas.Header closeButton>
-                        <Offcanvas.Title id="offcanvasNavbarLabel">Menu</Offcanvas.Title>
+                        <Offcanvas.Title id="offcanvasNavbarLabel">
+                            {isAuthenticated && userInfo ? (
+                                <span>{userInfo.firstName} {userInfo.lastName}</span>
+                            ) : (
+                                'Menu'
+                            )}
+                        </Offcanvas.Title>
                     </Offcanvas.Header>
                     <Offcanvas.Body>
                         <Nav className="justify-content-end flex-grow-1 pe-3">
@@ -53,8 +104,27 @@ const NavBar = () => {
                                 <i className="fas fa-th-large me-2"></i>
                                 List View
                             </Nav.Link>
-                            <Nav.Link as={Link} to="/bookings">My Bookings</Nav.Link>
-                            <Nav.Link as={Link} to="/spots">Log In</Nav.Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <Nav.Link as={Link} to="/properties/my-properties">
+                                        <i className="fas fa-home me-2"></i>
+                                        My Properties
+                                    </Nav.Link>
+                                    <Nav.Link as={Link} to="/bookings">
+                                        <i className="fas fa-calendar me-2"></i>
+                                        My Bookings
+                                    </Nav.Link>
+                                    <Nav.Link onClick={logout}>
+                                        <i className="fas fa-sign-out-alt me-2"></i>
+                                        Logout
+                                    </Nav.Link>
+                                </>
+                            ) : (
+                                <Nav.Link as={Link} to="/login">
+                                    <i className="fas fa-sign-in-alt me-2"></i>
+                                    Log In
+                                </Nav.Link>
+                            )}
                         </Nav>
                     </Offcanvas.Body>
                 </Navbar.Offcanvas>

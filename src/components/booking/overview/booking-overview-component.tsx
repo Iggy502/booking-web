@@ -1,6 +1,6 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Table, Container, Pagination, Badge, Spinner} from 'react-bootstrap';
+import {Badge, Container, Pagination, Spinner, Table} from 'react-bootstrap';
 import {BookingService} from '../../../services/booking-service';
 import {PropertyService} from '../../../services/property-service';
 import {Booking, BookingStatus} from '../../../models/Booking';

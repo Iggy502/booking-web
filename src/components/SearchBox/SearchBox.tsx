@@ -1,6 +1,6 @@
 // src/components/AutoComplete/index.tsx
 import {useEffect, useRef, useState} from "react";
-import {getPlaces, Address, MapboxFeature} from "../../services/Mapbox";
+import {Address, getPlaces, MapboxFeature} from "../../services/Mapbox";
 import "./SearchBox.scss";
 
 interface SearchBoxProps {

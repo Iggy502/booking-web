@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Card, Row, Col } from 'react-bootstrap';
-import { BookingService } from '../../../services/booking-service';
-import { PropertyService } from '../../../services/property-service';
-import { Booking } from '../../../models/Booking';
-import { Property } from '../../../models/Property';
-import { ServerError, useError } from '../../../context/error.context';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Card, Col, Container, Row} from 'react-bootstrap';
+import {BookingService} from '../../../services/booking-service';
+import {PropertyService} from '../../../services/property-service';
+import {Booking} from '../../../models/Booking';
+import {Property} from '../../../models/Property';
+import {ServerError, useError} from '../../../context/error.context';
 import './booking-detail-component.scss';
 
 const BookingDetailComponent: React.FC = () => {
