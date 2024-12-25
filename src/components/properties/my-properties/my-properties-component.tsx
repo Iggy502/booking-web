@@ -6,6 +6,8 @@ import {PropertyService} from '../../../services/property-service';
 import {useError} from '../../../context/error.context';
 import {ChevronDown, ChevronUp} from 'lucide-react';
 import './my-properties-component.scss';
+import createHttpError from "http-errors";
+import {useAuth} from "../../../context/auth.context.tsx";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -31,6 +33,7 @@ const MyPropertiesComponent: React.FC = () => {
     const [properties, setProperties] = useState<Property[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const {getUserInfo} = useAuth();
     const [sortConfig, setSortConfig] = useState<SortConfig>({field: 'name', direction: 'asc'});
     const [filters, setFilters] = useState<Filters>({
         search: '',
@@ -40,25 +43,27 @@ const MyPropertiesComponent: React.FC = () => {
         location: ''
     });
 
-    const userId = '12345';
-
     useEffect(() => {
-        const fetchProperties = async () => {
+        const fetchPropertiesForCurrentUser = async () => {
+            const currUser = await getUserInfo();
+
+            if (!currUser) {
+                return;
+            }
+
             try {
-                const userProperties = await PropertyService.fetchPropertiesByOwner(userId);
+                const userProperties = await PropertyService.fetchPropertiesForUser(currUser.id);
                 setProperties(userProperties);
-            } catch (error) {
-                showError({
-                    status: 500,
-                    message: 'Failed to load properties'
-                });
+            } catch (error: any) {
+                showError(createHttpError(error.status || 500, error.message));
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchProperties();
-    }, [userId, showError]);
+        fetchPropertiesForCurrentUser();
+
+    }, [showError, getUserInfo]);
 
     const handleSort = (field: SortField) => {
         setSortConfig(current => ({

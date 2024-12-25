@@ -1,5 +1,5 @@
 // src/services/auth.service.ts
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import createHttpError, {HttpError} from "http-errors";
 import {jwtDecode} from "jwt-decode";
 
@@ -49,7 +49,7 @@ export class AuthService {
         const accessTokenPayload = jwtDecode<AccessTokenPayload>(token);
 
         if (!accessTokenPayload) {
-            throw this.handleError({status: 401, message: 'Invalid token'});
+            createHttpError(401, "Invalid token");
         }
 
         return accessTokenPayload;
@@ -79,8 +79,8 @@ export class AuthService {
             });
             this.setAccessToken(response.data.accessToken);
         } catch (error) {
-            console.error("Error logging in:", error);
-            throw this.handleError(error);
+
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -94,7 +94,7 @@ export class AuthService {
             console.log("refresh token response", response);
             this.setAccessToken(response.data.accessToken);
         } catch (error) {
-            throw this.handleError(error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -116,7 +116,7 @@ export class AuthService {
             await axios.post(`${process.env.SERVER_HOST}${this.BASE_URL}/logout-all`);
             this.removeAccessToken();
         } catch (error) {
-            throw this.handleError(error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -126,16 +126,19 @@ export class AuthService {
             const response = await axios.get<Session[]>(`${process.env.SERVER_HOST}${this.BASE_URL}/sessions`);
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
-    static handleError(error: any): HttpError {
-        if (axios.isAxiosError(error)) {
-            return createHttpError(error.response?.status || 500, error.response?.statusText || 'Network Error');
-        }
+    //Axios wraps each error response in a different object
+    //Convert it back to HttpError as is the type from the server
+    static convertApiError(error: AxiosError<HttpError>): HttpError {
 
-        return createHttpError(error.status || 500, error.message);
+        const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
+        errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
+
+        return errorConvertedToHttpError;
+
     }
 
 }

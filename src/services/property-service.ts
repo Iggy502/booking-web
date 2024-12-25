@@ -2,8 +2,8 @@
 import {Property, PropertyCreate} from '../models/Property';
 import {properties} from '../util/TestData';
 import {ServerError} from "../context/error.context.tsx";
-import axios from "axios";
-import createHttpError from "http-errors";
+import axios, {AxiosError} from "axios";
+import createHttpError, {HttpError} from "http-errors";
 
 export class PropertyService {
 
@@ -18,7 +18,7 @@ export class PropertyService {
             return response.data;
         } catch (error: any) {
             console.error("Error fetching properties:", error);
-            throw createHttpError(error.status || 500, error.message);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -27,9 +27,16 @@ export class PropertyService {
         return properties.find(property => property.id === id);
     }
 
-    static async fetchPropertiesByOwner(ownerId: string): Promise<Property[]> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return properties.filter(property => property.owner === ownerId);
+    static async fetchPropertiesForUser(userId: string): Promise<Property[]> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/findByUser/${userId}`;
+
+        try {
+            const response = await axios.get<Property[]>(url)
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching properties for User :", error, userId);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
     }
 
 
@@ -41,7 +48,7 @@ export class PropertyService {
             return response.data;
         } catch (error: any) {
             console.error("Error creating property:", error);
-            throw createHttpError(error.status || 500, error.message);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
 
     }
@@ -67,12 +74,22 @@ export class PropertyService {
 
         property.imagePaths?.push(...images.map(image => URL.createObjectURL(image)));
 
-
-        // return images.map(image => URL.createObjectURL(image));
     }
 
     static async fetchPropertiesByIds(propertyIds: string[]) {
         await new Promise(resolve => setTimeout(resolve, 500));
         return properties.filter(property => propertyIds.includes(property.id));
+    }
+
+
+    //Axios wraps each error response in a different object
+    //Convert it back to HttpError as is the type from the server
+    static convertApiError(error: AxiosError<HttpError>): HttpError {
+
+        const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
+        errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
+
+        return errorConvertedToHttpError;
+
     }
 }

@@ -1,8 +1,8 @@
 import {Booking, BookingCreate, BookingStatus} from "../models/Booking.ts";
 import {bookings} from "../util/TestData.ts";
 import {ServerError} from "../context/error.context.tsx";
-import createHttpError from "http-errors";
-import axios from "axios";
+import createHttpError, {HttpError} from "http-errors";
+import axios, {AxiosError} from "axios";
 
 export class BookingService {
 
@@ -50,8 +50,7 @@ export class BookingService {
             return response.data;
 
         } catch (error: any) {
-            console.error(error);
-            throw createHttpError(error.status || 500, error.message);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -74,8 +73,7 @@ export class BookingService {
             return response.data;
 
         } catch (error: any) {
-            console.error(error);
-            throw createHttpError(error.status || 500, error.message);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
 
@@ -83,6 +81,16 @@ export class BookingService {
         await new Promise(resolve => setTimeout(resolve, 500));
         const booking = bookings.find(booking => booking.property === propertyId && booking.checkIn === startDate && booking.checkOut === endDate);
         return booking ? booking.totalPrice : 0;
+    }
+
+
+    static convertApiError(error: AxiosError<HttpError>): HttpError {
+
+        const errorConvertedToHttpError = createHttpError(error.response?.status || error.response?.data.status || 500);
+        errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
+
+        return errorConvertedToHttpError;
+
     }
 
 

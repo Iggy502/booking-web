@@ -44,13 +44,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 console.log("trying to refresh token");
                 const originalRequest = error.config;
 
-                if (error.response?.status === 401 && !originalRequest._retry) {
+                if (error.response?.status === 401 && !originalRequest._retry
+                    && !originalRequest.url?.includes('/refresh-token')
+                    && !originalRequest.url?.includes('/login')
+                ) {
 
                     try {
                         await AuthService.refreshToken();
                         originalRequest._retry = true;
+                        return axios(originalRequest);
                     } catch (refreshError) {
-
                         console.error("Error refreshing token:", refreshError);
                         setIsAuthenticated(false);
                         throw refreshError;

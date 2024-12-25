@@ -26,6 +26,9 @@ export const LoginPage = () => {
         } catch (error) {
             if (error instanceof HttpError && (error.status || error.message)) {
                 console.error("Error logging in for http:", error);
+                console.log("error message", error.message);
+                console.log("error status", error.status);
+
                 showError(error);
 
             } else {
