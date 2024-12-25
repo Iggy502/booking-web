@@ -86,10 +86,9 @@ const HomePage = () => {
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
-                const [propertiesData, bookingsData] = await Promise.all([
-                    PropertyService.fetchProperties(),
-                    BookingService.fetchBookings()
-                ]);
+
+                const propertiesData = await PropertyService.fetchAllProperties();
+                const bookingsData = await BookingService.searchBookingsByPropertyIds(propertiesData.map(p => p.id));
 
                 const bookingsMap = bookingsData.reduce((acc, booking) => {
                     if (!acc[booking.property]) {
@@ -119,7 +118,7 @@ const HomePage = () => {
         };
 
         fetchInitialData()
-    }, []);
+    }, [showError]);
 
     const isDateRangeAvailable = useCallback((
         propertyId: string,
@@ -330,10 +329,16 @@ const HomePage = () => {
                             excludeDateIntervals={
                                 selectedProperty ?
                                     (bookingsByProperty[selectedProperty] || [])
-                                        .map(booking => ({
-                                            start: new Date(booking.checkIn),
-                                            end: new Date(booking.checkOut)
-                                        }))
+                                        .map(booking => {
+                                                const startInclusive = new Date(booking.checkIn);
+                                                startInclusive.setDate(startInclusive.getDate() - 1);
+
+                                                return {
+                                                    start: startInclusive,
+                                                    end: new Date(booking.checkOut)
+                                                };
+                                            }
+                                        )
                                     : []
                             }
                         />

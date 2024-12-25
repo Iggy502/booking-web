@@ -1,5 +1,35 @@
 import {AmenityType, Property} from "../models/Property.ts";
 import {Booking} from "../models/Booking.ts";
+import {Conversation} from "../models/Conversation.ts";
+
+export const conversations: Conversation[] = [
+    {
+        id: "conv_001",
+        active: true,
+        messages: [
+            { from: "owner_456", to: "guest_126", content: "Welcome! Looking forward to hosting you at Coastal Dunes Camp." },
+            { from: "guest_126", to: "owner_456", content: "Thanks! What's the best time for check-in?" },
+            { from: "owner_456", to: "guest_126", content: "You can check in anytime after 2 PM. I'll send the access code on arrival day." }
+        ]
+    },
+    {
+        id: "conv_002",
+        active: true,
+        messages: [
+            { from: "owner_789", to: "guest_129", content: "Hello! Your booking at Flanders Fields is confirmed." },
+            { from: "guest_129", to: "owner_789", content: "Great! Are there any good restaurants nearby?" },
+            { from: "owner_789", to: "guest_129", content: "Yes, there's a great local place just 5 minutes away. I'll share the details during check-in." }
+        ]
+    },
+    {
+        id: "conv_003",
+        active: false,
+        messages: [
+            { from: "owner_112", to: "guest_135", content: "Your Christmas booking is confirmed for Brussels Forest Retreat!" },
+            { from: "guest_135", to: "owner_112", content: "Perfect, looking forward to the stay." }
+        ]
+    }
+];
 
 export const properties: Property[] = [
     // Add these to the properties array
@@ -219,7 +249,8 @@ export const bookings: Booking[] = [
         checkOut: new Date("2024-06-20"),
         totalPrice: 375,
         status: "confirmed",
-        numberOfGuests: 4
+        numberOfGuests: 4,
+        conversation: conversations[0]
     },
     {
         id: "booking_002",
@@ -229,7 +260,8 @@ export const bookings: Booking[] = [
         checkOut: new Date("2024-07-05"),
         totalPrice: 300,
         status: "pending",
-        numberOfGuests: 2
+        numberOfGuests: 2,
+        conversation: conversations[1]
     },
     {
         id: "booking_003",
@@ -239,7 +271,8 @@ export const bookings: Booking[] = [
         checkOut: new Date("2024-08-15"),
         totalPrice: 375,
         status: "cancelled",
-        numberOfGuests: 3
+        numberOfGuests: 3,
+        conversation: conversations[2]
     },
     // Coastal Dunes Camp bookings
     {

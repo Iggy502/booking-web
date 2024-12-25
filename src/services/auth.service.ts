@@ -40,13 +40,11 @@ export class AuthService {
 
     static getUserInfo = async (): Promise<AccessTokenPayload | null> => {
 
-        const tokenWithBearer = this.getAccessToken();
+        const token = this.getAccessToken();
 
-        if (!tokenWithBearer) {
+        if (!token) {
             return null;
         }
-
-        const token = tokenWithBearer?.replace('Bearer ', '');
 
         const accessTokenPayload = jwtDecode<AccessTokenPayload>(token);
 
@@ -105,9 +103,10 @@ export class AuthService {
         console.log("Logging out");
         try {
             await axios.post(`${process.env.SERVER_HOST}${this.BASE_URL}/logout`);
-            this.removeAccessToken();
         } catch (error) {
-            throw this.handleError(error);
+            console.error("Error logging out:", error);
+        } finally {
+            this.removeAccessToken();
         }
     }
 

@@ -80,7 +80,6 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
     }, []);
 
     const createMarker = (property: Property) => {
-        const testImage = "https://media.istockphoto.com/id/1377841262/photo/the-beautiful-scenery-of-a-tent-in-a-pine-tree-forest-at-pang-oung-mae-hong-son-province.jpg?s=612x612&w=0&k=20&c=1JvDx-16zTIeytdcC-Fa27nVJ_8SveP-omNKKlUJ-lQ=";
 
         if (!property?.address?.latitude || !property?.address?.longitude) {
             return null;
@@ -93,9 +92,9 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             `<div class="map-popup">
            <h5>${property.name}</h5>
            <div class="image-gallery">
-               <img src="${testImage}" alt="${property.name}" />
-               <img src="${testImage}" alt="${property.name}" />
-               <img src="${testImage}" alt="${property.name}" />
+               <img src="${property.imagePaths[0]}" alt="${property.name}" />
+               <img src="${property.imagePaths[1]}" alt="${property.name}" />
+               <img src="${property.imagePaths[2]}" alt="${property.name}" />
            </div>           
            <p class="description">${property.description}</p>
            <div class="d-inline-flex">
@@ -133,8 +132,13 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             const {latitude, longitude} = property.address;
             if (typeof latitude === 'number' && typeof longitude === 'number') {
                 const marker = createMarker(property);
-                marker?.setLngLat([longitude, latitude]).addTo(map.current!);
-                if (marker) markersRef.current.push(marker);
+
+                if (marker) {
+                    marker.setLngLat([longitude, latitude]).addTo(map.current!);
+                    markersRef.current.push(marker);
+                }
+
+
             }
         });
     };

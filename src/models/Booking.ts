@@ -1,3 +1,5 @@
+import {Conversation} from "./Conversation.ts";
+
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
 
 export interface Booking {
@@ -9,6 +11,7 @@ export interface Booking {
     totalPrice: number;
     status: BookingStatus;
     numberOfGuests: number;
+    readonly conversation?: Conversation;
 }
 
 

@@ -1,6 +1,6 @@
 body {
     background-color: #f5f7f6;
-    font-family: Georgia, serif;
+    font-family: Georgia, serif !important;
 }
 
 main {

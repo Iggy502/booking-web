@@ -20,9 +20,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
 
-    const getUserInfo = useCallback(async () => {
-        return await AuthService.getUserInfo();
-    }, [isAuthenticated]);
+    const getUserInfo = useCallback(() => {
+        return AuthService.getUserInfo();
+    }, []);
 
     // Setup axios interceptor for adding the token to requests
     useEffect(() => {
@@ -45,12 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 const originalRequest = error.config;
 
                 if (error.response?.status === 401 && !originalRequest._retry) {
-                    console.log("lmao reaching this")
-                    originalRequest._retry = true;
 
                     try {
                         await AuthService.refreshToken();
-                        return axios(originalRequest);
+                        originalRequest._retry = true;
                     } catch (refreshError) {
 
                         console.error("Error refreshing token:", refreshError);
@@ -77,7 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const logout = async () => {
         await AuthService.logout();
         setIsAuthenticated(false);
-        console.log("Logged out", isAuthenticated);
     };
 
 

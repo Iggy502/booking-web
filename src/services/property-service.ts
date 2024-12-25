@@ -2,20 +2,28 @@
 import {Property, PropertyCreate} from '../models/Property';
 import {properties} from '../util/TestData';
 import {ServerError} from "../context/error.context.tsx";
+import axios from "axios";
+import createHttpError from "http-errors";
 
 export class PropertyService {
-    static async fetchProperties(): Promise<Property[]> {
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+    private static BASE_URL = '/properties';
 
-        return properties.filter(property => property.available);
+
+    static async fetchAllProperties(): Promise<Property[]> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/`;
+
+        try {
+            const response = await axios.get<Property[]>(url)
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching properties:", error);
+            throw createHttpError(error.status || 500, error.message);
+        }
     }
 
     static async fetchPropertyById(id: string): Promise<Property | undefined> {
         await new Promise(resolve => setTimeout(resolve, 500));
-
-        // throw NotFound('Property not found');
-
         return properties.find(property => property.id === id);
     }
 
@@ -26,10 +34,16 @@ export class PropertyService {
 
 
     static async createProperty(property: PropertyCreate): Promise<Property> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const response: Property = {...property, id: (properties.length + 1).toString()};
-        properties.push(response);
-        return response;
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/`;
+
+        try {
+            const response = await axios.post<Property>(url, property)
+            return response.data;
+        } catch (error: any) {
+            console.error("Error creating property:", error);
+            throw createHttpError(error.status || 500, error.message);
+        }
+
     }
 
     static async checkAvailability(propertyId: string, checkIn: Date, checkOut: Date): Promise<boolean> {

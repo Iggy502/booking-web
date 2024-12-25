@@ -2,7 +2,6 @@ import {useEffect, useRef, useState} from 'react';
 import {Badge, Container, Form, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import PropertyOverview from '../properties-overview/properties-overview';
-import {properties} from '../../../util/TestData';
 import {PropertyService} from '../../../services/property-service.ts'
 import {BookingService} from "../../../services/booking-service.ts";
 import {AmenityType, Property} from "../../../models/Property";
@@ -10,7 +9,6 @@ import './PropertyWrapper.scss';
 import {Booking} from "../../../models/Booking.ts";
 import {useNavigate} from "react-router-dom";
 import {useError} from "../../../context/error.context.tsx";
-import createHttpError, {HttpError, InternalServerError} from "http-errors";
 
 const getAmenityIcon = (type: AmenityType): string => {
     const icons: Record<AmenityType, string> = {
@@ -28,7 +26,7 @@ const getAmenityIcon = (type: AmenityType): string => {
 };
 
 const PropertyWrapper = () => {
-    const [filteredProperties, setFilteredProperties] = useState<Property[]>(properties);
+    const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAmenities, setSelectedAmenities] = useState<Set<AmenityType>>(new Set());
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -51,26 +49,20 @@ const PropertyWrapper = () => {
     useEffect(() => {
         const loadProperties = async () => {
             try {
-                const properties = await PropertyService.fetchProperties();
+                const properties = await PropertyService.fetchAllProperties();
                 allProperties.current = properties;
                 setFilteredProperties(properties);
-            } catch (error) {
-                if (error instanceof HttpError && (error.status || error.message)) {
-                    showError(
-                        createHttpError(error.status || 500, error.message || 'Internal Server Error'));
-
-                } else {
-                    showError(InternalServerError("Internal Server Error"));
-
-                }
+            } catch (error: any) {
+                console.error('Error fetching properties:', error);
+                showError(error);
                 setFilteredProperties([]);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        loadProperties().catch(console.error);
-    }, []);
+        loadProperties();
+    }, [showError]);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -78,16 +70,9 @@ const PropertyWrapper = () => {
                 try {
                     const bookings = await BookingService.fetchBookingsByProperty(selectedProperty);
                     setPropertyBookings(bookings);
-                } catch (error) {
+                } catch (error: any) {
                     console.error('Error fetching bookings:', error);
-                    if (error instanceof HttpError && (error.status || error.message)) {
-                        showError(
-                            createHttpError(error.status || 500, error.message || 'Internal Server Error'));
-
-                    } else {
-                        showError(InternalServerError("Internal Server Error"));
-
-                    }
+                    showError(error)
                     setPropertyBookings([]);
                 }
             } else {
@@ -96,12 +81,16 @@ const PropertyWrapper = () => {
             }
         };
 
-        fetchBookings().catch(console.error);
-    }, [selectedProperty]);
+        fetchBookings()
+    }, [selectedProperty, showError]);
 
     function convertBookingToDateIntervals(booking: Booking) {
+
+        const startDateInclusive = new Date(booking.checkIn);
+        startDateInclusive.setDate(startDateInclusive.getDate() - 1);
+
         return {
-            start: new Date(booking.checkIn),
+            start: startDateInclusive,
             end: new Date(booking.checkOut)
         };
     }
@@ -183,14 +172,26 @@ const PropertyWrapper = () => {
             return;
         }
 
-
-        setIsLoadingBookings(true);
+        // setIsLoadingBookings(true);
         console.log('Fetching bookings for property:', propertyId);
         try {
-            // Fetch bookings for the new property
+
+            let hasLoaded = false;
+
+            const loadingTimer = setTimeout(() => {
+                if (!hasLoaded) {
+                    setIsLoadingBookings(true);
+                }
+            }, 500);
+
             const newPropertyBookings = await BookingService.fetchBookingsByProperty(propertyId);
+            hasLoaded = true;
+            clearTimeout(loadingTimer);
+
             setPropertyBookings(newPropertyBookings);
             setSelectedProperty(propertyId);
+
+            console.log("selected property is now: ", propertyId);
 
             // Validate dates for the new property if dates are selected
             if (startDate && endDate) {
@@ -291,10 +292,10 @@ const PropertyWrapper = () => {
                             onChange={handleDateChange}
                             dateFormat="dd/MM/yyyy"
                             minDate={new Date()}
-                            disabled={isLoadingBookings}
                             placeholderText="Select dates"
                             className="form-control"
                             monthsShown={2}
+                            disabled={isLoadingBookings}
                             excludeDateIntervals={
                                 selectedProperty
                                     ? propertyBookings
@@ -417,7 +418,7 @@ const PropertyWrapper = () => {
                         bg="primary"
                         className="d-inline-flex align-items-center"
                     >
-                        <div>{properties.find(p => p.id === selectedProperty)?.name}</div>
+                        <div>{filteredProperties.find(property => property.id === selectedProperty)?.name}</div>
                         <button
                             className="btn btn-link btn-sm text-white"
                             onClick={() => handlePropertySelect('')}
@@ -444,7 +445,7 @@ const PropertyWrapper = () => {
                         <div className="d-flex align-items-center">
                             <i className="fas fa-check-circle text-success me-2"></i>
                             <span className="text-muted">
-                            {properties.find(p => p.id === selectedProperty)?.name} •
+                            {filteredProperties.find(p => p.id === selectedProperty)?.name} •
                                 {startDate?.toLocaleDateString()} - {endDate?.toLocaleDateString()}
                         </span>
                         </div>
@@ -453,7 +454,7 @@ const PropertyWrapper = () => {
                             onClick={HandleBooking}
                         >
                             <i className="fas fa-calendar-check"></i>
-                            Book Now - €{properties.find(p => p.id === selectedProperty)?.pricePerNight}/night
+                            Book Now - €{filteredProperties.find(p => p.id === selectedProperty)?.pricePerNight}/night
                         </button>
                     </div>
                 </div>
