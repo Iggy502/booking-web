@@ -29,6 +29,7 @@ export const getPlaces = async (query: string): Promise<MapboxFeature[]> => {
                     access_token: 'pk.eyJ1IjoiaWdvcjUwMiIsImEiOiJjbTQ1bmdnN3gwdmRvMmxxeDgwOG12M2gxIn0.UxOguMQKWi0366_3MF45mw',
                     country: 'BE'
                 },
+                withCredentials: false
             }
         );
         return response.data.features;

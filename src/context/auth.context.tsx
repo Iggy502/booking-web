@@ -36,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             return config;
         });
 
+
         // Setup axios interceptor for handling token refresh
         const responseInterceptor = axios.interceptors.response.use(
             (response) => response,
