@@ -5,13 +5,14 @@ import {BookingService} from '../../../services/booking-service';
 import {PropertyService} from '../../../services/property-service';
 import {Booking} from '../../../models/Booking';
 import {Property} from '../../../models/Property';
-import {ServerError, useError} from '../../../context/error.context';
+import {useError} from '../../../context/error.context';
 import './booking-detail-component.scss';
+import {NotFound} from "http-errors";
 
 const BookingDetailComponent: React.FC = () => {
-    const { bookingId } = useParams();
+    const {bookingId} = useParams();
     const navigate = useNavigate();
-    const { showError } = useError();
+    const {showError} = useError();
     const [booking, setBooking] = useState<Booking | null>(null);
     const [property, setProperty] = useState<Property | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -23,17 +24,17 @@ const BookingDetailComponent: React.FC = () => {
             try {
                 const bookingData = await BookingService.fetchBookingById(bookingId);
                 if (!bookingData) {
-                    throw { status: 404, message: 'Booking not found' };
+                    NotFound('Booking not found');
                 }
                 setBooking(bookingData);
 
                 const propertyData = await PropertyService.fetchPropertyById(bookingData.property);
                 if (!propertyData) {
-                    throw { status: 404, message: 'Property not found' };
+                    NotFound('Property not found');
                 }
                 setProperty(propertyData);
-            } catch (error) {
-                showError(error as ServerError);
+            } catch (error: any) {
+                showError(error);
                 navigate('/');
             } finally {
                 setIsLoading(false);

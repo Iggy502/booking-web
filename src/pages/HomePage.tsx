@@ -13,7 +13,6 @@ import {Booking} from "../models/Booking";
 import {BookingService} from "../services/booking-service";
 import {useNavigate} from "react-router-dom";
 import {useError} from "../context/error.context.tsx";
-import createHttpError, {HttpError} from "http-errors";
 
 interface FilterDropdownProps {
     title: string;
@@ -101,17 +100,8 @@ const HomePage = () => {
 
                 setProperties(propertiesData);
                 setBookingsByProperty(bookingsMap);
-            } catch (error) {
-                console.error('Failed to fetch initial data:', error);
-                if (error instanceof HttpError && (error.status || error.message)) {
-                    showError(
-                        createHttpError(error.status || 500, error.message)
-                    );
-
-                } else {
-                    showError(createHttpError.InternalServerError());
-
-                }
+            } catch (error: any) {
+                showError(error)
             } finally {
                 setIsInitialLoading(false);
             }
@@ -127,9 +117,10 @@ const HomePage = () => {
     ): boolean => {
         const propertyBookings = bookingsByProperty[propertyId] || [];
         return !propertyBookings.some(booking => {
-            const bookingStart = new Date(booking.checkIn);
-            const bookingEnd = new Date(booking.checkOut);
-            return bookingStart <= end && bookingEnd >= start;
+            const bookingStart = booking.checkIn;
+            const bookingEnd = booking.checkOut;
+
+            return !(bookingEnd < start || bookingStart > end);
         });
     }, [bookingsByProperty]);
 
@@ -204,6 +195,7 @@ const HomePage = () => {
         setStartDate(start ?? undefined);
         setEndDate(end ?? undefined);
 
+
         if (!start || !end) {
             setDateError(null);
             return;
@@ -240,7 +232,17 @@ const HomePage = () => {
 
     const handleBookNow = useCallback(() => {
         if (selectedProperty && startDate && endDate && !dateError) {
-            navigation(`/booking?propertyId=${selectedProperty}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`);
+            const utcStartDate = new Date(Date.UTC(
+                startDate.getFullYear(),
+                startDate.getMonth(),
+                startDate.getDate()
+            ));
+            const utcEndDate = new Date(Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate()
+            ));
+            navigation(`/booking?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
         }
     }, [selectedProperty, startDate, endDate, dateError, navigation]);
 
@@ -304,7 +306,7 @@ const HomePage = () => {
                 </div>
 
                 <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
-                    <SearchBox onAddressSelect={handleAddressSelect}/>
+                    <SearchBox onAddressSelect={handleAddressSelect} />
                     <div className={`date-picker-container ${
                         dateError ? 'date-picker-error' :
                             selectedProperty ? 'date-picker-success' : ''
@@ -335,7 +337,7 @@ const HomePage = () => {
 
                                                 return {
                                                     start: startInclusive,
-                                                    end: new Date(booking.checkOut)
+                                                    end: booking.checkOut
                                                 };
                                             }
                                         )

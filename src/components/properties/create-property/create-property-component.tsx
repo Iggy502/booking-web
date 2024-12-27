@@ -8,6 +8,8 @@ import AmenitiesStep from './steps/AmenitiesStep';
 import ImageUploadStep from './steps/ImageUploadStep';
 import {PropertyService} from "../../../services/property-service.ts";
 import './create-property-component.scss';
+import {useAuth} from "../../../context/auth.context.tsx";
+import {Unauthorized} from "http-errors";
 
 enum StepEnum {
     BASIC_INFO = 0,
@@ -27,9 +29,8 @@ const CreatePropertyComponent: React.FC = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState<StepEnum>(StepEnum.BASIC_INFO);
     const [propertyImages, setPropertyImages] = useState<File[]>([]);
-    const [property, setProperty] = useState<PropertyCreate>({
+    const [property, setProperty] = useState<Omit<PropertyCreate, 'owner'>>({
         name: '',
-        owner: '12345', // Hardcoded for now
         description: '',
         pricePerNight: 0,
         maxGuests: 1,
@@ -42,6 +43,7 @@ const CreatePropertyComponent: React.FC = () => {
         },
         amenities: [],
     });
+    const {getUserInfo} = useAuth();
 
     const handleNext = () => {
         setCurrentStep(prev => prev + 1);
@@ -64,8 +66,17 @@ const CreatePropertyComponent: React.FC = () => {
 
     const handleSubmit = async () => {
         try {
+
+            const userInfo = await getUserInfo();
+
+            if (!userInfo) {
+                throw Unauthorized('User not authenticated. Cannot create property');
+            }
+
+            const propertyWithOwner = {...property, owner: userInfo.id};
+
             // First create the property
-            const createdProperty = await PropertyService.createProperty(property);
+            const createdProperty = await PropertyService.createProperty(propertyWithOwner);
 
             // Then upload images if there are any
             if (propertyImages.length > 0) {

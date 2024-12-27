@@ -4,6 +4,55 @@
     margin-bottom: 1.5rem;
   }
 
+  .position-relative {
+    position: relative;
+  }
+
+  .validation-status {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .address-warning {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 0.25rem;
+    color: #664d03;
+    font-size: 0.9rem;
+  }
+
+  .suggestions-list {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+
+    li {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+
   .form-label {
     font-weight: 500;
     color: #2d3748;

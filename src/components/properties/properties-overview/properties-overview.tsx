@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {Badge, Card, Carousel, Col, Pagination, Row} from 'react-bootstrap';
+import {Badge, Card, Carousel, Col, Pagination, Row, Spinner} from 'react-bootstrap';
 import {Property} from '../../../models/Property';
 import './properties-overview.scss';
 
@@ -16,15 +16,13 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                                                onPropertySelect,
                                                                selectedPropertyId
                                                            }) => {
-
     const [activePage, setActivePage] = useState(1);
+    const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({});
     const totalPages = Math.ceil(properties.length / propertiesPerPage);
-
 
     const handlePageChange = (pageNumber: number) => {
         setActivePage(pageNumber);
     };
-
 
     const startIndex = (activePage - 1) * propertiesPerPage;
     const visibleProperties = properties.slice(startIndex, startIndex + propertiesPerPage);
@@ -47,7 +45,6 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
         }
         return items;
     }, [totalPages, activePage]);
-
 
     if (properties.length === 0) {
         return (
@@ -77,10 +74,22 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                 <Carousel interval={null}>
                                     {property.imagePaths?.slice(0, 3).map((imagePath, index) => (
                                         <Carousel.Item key={index}>
+                                            {!imageLoaded[`${property.id}-${index}`] && (
+                                                <div className="spinner-container">
+                                                    <Spinner animation="border" role="status">
+                                                        <span className="visually-hidden">Loading...</span>
+                                                    </Spinner>
+                                                </div>
+                                            )}
                                             <Card.Img
                                                 variant="top"
                                                 src={imagePath || '/placeholder-image.jpg'}
                                                 alt={`${property.name} image ${index + 1}`}
+                                                onLoad={() => setImageLoaded(prev => ({
+                                                    ...prev,
+                                                    [`${property.id}-${index}`]: true
+                                                }))}
+                                                style={{display: imageLoaded[`${property.id}-${index}`] ? 'block' : 'none'}}
                                             />
                                         </Carousel.Item>
                                     ))}

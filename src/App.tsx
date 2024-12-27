@@ -3,7 +3,6 @@ import NavBar from "./components/navbar/Navbar";
 import {ErrorProvider} from './context/error.context.tsx';
 import ErrorBanner from './error/ErrorBanner.tsx';
 import {AuthProvider} from "./context/auth.context.tsx";
-import Footer from "./pages/Footer.tsx";
 
 const App = () => {
     return (
@@ -14,7 +13,7 @@ const App = () => {
                 <main>
                     <Outlet/>
                 </main>
-                <Footer/>
+                {/*<Footer/>*/}
             </ErrorProvider>
         </AuthProvider>
     );

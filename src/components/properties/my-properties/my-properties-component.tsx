@@ -53,6 +53,7 @@ const MyPropertiesComponent: React.FC = () => {
 
             try {
                 const userProperties = await PropertyService.fetchPropertiesForUser(currUser.id);
+                console.log(` userProperties: ${userProperties}`);
                 setProperties(userProperties);
             } catch (error: any) {
                 showError(createHttpError(error.status || 500, error.message));

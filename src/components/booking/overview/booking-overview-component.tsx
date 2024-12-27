@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Badge, Container, Pagination, Spinner, Table} from 'react-bootstrap';
 import {BookingService} from '../../../services/booking-service';
@@ -7,6 +7,8 @@ import {Booking, BookingStatus} from '../../../models/Booking';
 import {Property} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
 import './booking-overview-component.scss';
+import {useAuth} from "../../../context/auth.context.tsx";
+import {Unauthorized} from "http-errors";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -18,12 +20,20 @@ const BookingOverviewComponent = () => {
     })>>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const userId = '12345';
+    const {getUserInfo} = useAuth();
 
     useEffect(() => {
         const fetchBookingsAndProperties = async () => {
             try {
-                const userBookings = await BookingService.fetchBookingsByUser(userId);
+
+                const userInfo = await getUserInfo();
+
+                if (!userInfo) {
+                    throw Unauthorized('User not authenticated');
+                }
+
+                const userBookings = await BookingService.fetchBookingsByUser(userInfo.id);
+                console.log(`bookings: ${userBookings}`);
                 const propertyIds = [...new Set(userBookings.map(booking => booking.property))];
                 const properties = await PropertyService.fetchPropertiesByIds(propertyIds);
                 const propertyMap = new Map(properties.map(property => [property.id, property]));
@@ -34,18 +44,16 @@ const BookingOverviewComponent = () => {
                 }));
 
                 setBookings(bookingsWithProperties);
-            } catch (error) {
-                showError({
-                    status: 500,
-                    message: 'Failed to load bookings'
-                });
+            } catch (error: any) {
+                console.error('Error fetching bookings:', error);
+                showError(error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchBookingsAndProperties();
-    }, [userId, showError]);
+    }, [getUserInfo, showError]);
 
     const totalPages = Math.ceil(bookings.length / ITEMS_PER_PAGE);
     const paginatedBookings = bookings.slice(

@@ -47,8 +47,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 if (error.response?.status === 401 && !originalRequest._retry
                     && !originalRequest.url?.includes('/refresh-token')
-                    && !originalRequest.url?.includes('/login')
+                    && !originalRequest.url?.includes('/login') && isAuthenticated
                 ) {
+                    console.log("refreshing token");
 
                     try {
                         await AuthService.refreshToken();

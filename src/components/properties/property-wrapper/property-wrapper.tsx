@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {Badge, Container, Form, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import PropertyOverview from '../properties-overview/properties-overview';
@@ -86,32 +86,54 @@ const PropertyWrapper = () => {
 
     function convertBookingToDateIntervals(booking: Booking) {
 
-        const startDateInclusive = new Date(booking.checkIn);
-        startDateInclusive.setDate(startDateInclusive.getDate() - 1);
 
         return {
-            start: startDateInclusive,
-            end: new Date(booking.checkOut)
+            start: booking.checkIn,
+            end: booking.checkOut
         };
     }
 
+    const excludedDateIntervals = useMemo(() => {
+        if (!selectedProperty) return [];
+
+
+        return propertyBookings
+            .filter(booking =>
+                booking.status === 'confirmed' || booking.status === 'pending'
+            )
+            .map(convertBookingToDateIntervals);
+    }, [selectedProperty, propertyBookings]);
+
     const HandleBooking = () => {
         console.log('Booking property:', selectedProperty);
+
         if (selectedProperty && startDate && endDate) {
-            navigate(`/booking?propertyId=${selectedProperty}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`);
+
+            const utcStartDate = new Date(Date.UTC(
+                startDate.getFullYear(),
+                startDate.getMonth(),
+                startDate.getDate()
+            ));
+            const utcEndDate = new Date(Date.UTC(
+                endDate.getFullYear(),
+                endDate.getMonth(),
+                endDate.getDate()
+            ));
+
+            navigate(`/booking?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
         }
     };
 
     const isDateRangeValidComparedToExistingBookings = (start: Date | null, end: Date | null, propertyId: string | null, existingBookings: Booking[]) => {
         if (!start || !end || !propertyId || !existingBookings?.length) return true;
 
-        return !existingBookings.some(booking => {
-            const bookingStart = new Date(booking.checkIn);
-            const bookingEnd = new Date(booking.checkOut);
 
-            return (start <= bookingEnd && start >= bookingStart) ||
-                (end <= bookingEnd && end >= bookingStart) ||
-                (start <= bookingStart && end >= bookingEnd);
+        return !existingBookings.some(booking => {
+            const bookingStart = booking.checkIn;
+            const bookingEnd = booking.checkOut;
+
+            return !(start > bookingEnd || end < bookingStart);
+
         });
     };
 
@@ -193,6 +215,7 @@ const PropertyWrapper = () => {
 
             console.log("selected property is now: ", propertyId);
 
+
             // Validate dates for the new property if dates are selected
             if (startDate && endDate) {
                 const dateRangeValid = isDateRangeValidComparedToExistingBookings(
@@ -221,6 +244,8 @@ const PropertyWrapper = () => {
         const [start, end] = dates;
         setStartDate(start ?? undefined);
         setEndDate(end ?? undefined);
+
+        console.log(`Property wrapper start date: ${start} end date: ${end}`);
 
         // Clear error if dates are cleared
         if (!start || !end) {
@@ -296,15 +321,12 @@ const PropertyWrapper = () => {
                             className="form-control"
                             monthsShown={2}
                             disabled={isLoadingBookings}
-                            excludeDateIntervals={
-                                selectedProperty
-                                    ? propertyBookings
-                                        .filter(booking =>
-                                            booking.status === 'confirmed' || booking.status === 'pending'
-                                        )
-                                        .map(convertBookingToDateIntervals)
-                                    : []
-                            }
+                            excludeDateIntervals={excludedDateIntervals.map(interval => {
+                                const startDateInclusive = new Date(interval.start);
+                                startDateInclusive.setDate(startDateInclusive.getDate() - 1);
+
+                                return {...interval, start: startDateInclusive};
+                            })}
                         />
                         {dateError && (
                             <div className="invalid-feedback">
@@ -412,22 +434,24 @@ const PropertyWrapper = () => {
             </div>
 
 
-            {selectedProperty && (
-                <div className="mb-4">
-                    <Badge
-                        bg="primary"
-                        className="d-inline-flex align-items-center"
-                    >
-                        <div>{filteredProperties.find(property => property.id === selectedProperty)?.name}</div>
-                        <button
-                            className="btn btn-link btn-sm text-white"
-                            onClick={() => handlePropertySelect('')}
+            {
+                selectedProperty && (
+                    <div className="mb-4">
+                        <Badge
+                            bg="primary"
+                            className="d-inline-flex align-items-center"
                         >
-                            <i className="fa-solid fa-xmark fa-lg"></i>
-                        </button>
-                    </Badge>
-                </div>
-            )}
+                            <div>{filteredProperties.find(property => property.id === selectedProperty)?.name}</div>
+                            <button
+                                className="btn btn-link btn-sm text-white"
+                                onClick={() => handlePropertySelect('')}
+                            >
+                                <i className="fa-solid fa-xmark fa-lg"></i>
+                            </button>
+                        </Badge>
+                    </div>
+                )
+            }
 
             <PropertyOverview
                 properties={filteredProperties}
@@ -436,31 +460,34 @@ const PropertyWrapper = () => {
                 selectedPropertyId={selectedProperty}
             />
 
-            {selectedProperty && startDate && endDate && !dateError && (
-                <div
-                    className="position-sticky bottom-0 start-0 w-100 py-3 bg-white border-top shadow-lg"
-                    style={{zIndex: 1030, marginTop: 'auto'}}
-                >
-                    <div className="d-flex justify-content-between align-items-center px-4">
-                        <div className="d-flex align-items-center">
-                            <i className="fas fa-check-circle text-success me-2"></i>
-                            <span className="text-muted">
+            {
+                selectedProperty && startDate && endDate && !dateError && (
+                    <div
+                        className="position-sticky bottom-0 start-0 w-100 py-3 bg-white border-top shadow-lg"
+                        style={{zIndex: 1030, marginTop: 'auto'}}
+                    >
+                        <div className="d-flex justify-content-between align-items-center px-4">
+                            <div className="d-flex align-items-center">
+                                <i className="fas fa-check-circle text-success me-2"></i>
+                                <span className="text-muted">
                             {filteredProperties.find(p => p.id === selectedProperty)?.name} •
-                                {startDate?.toLocaleDateString()} - {endDate?.toLocaleDateString()}
+                                    {startDate?.toLocaleDateString()} - {endDate?.toLocaleDateString()}
                         </span>
+                            </div>
+                            <button
+                                className="btn btn-primary d-flex align-items-center gap-2"
+                                onClick={HandleBooking}
+                            >
+                                <i className="fas fa-calendar-check"></i>
+                                Book Now - €{filteredProperties.find(p => p.id === selectedProperty)?.pricePerNight}/night
+                            </button>
                         </div>
-                        <button
-                            className="btn btn-primary d-flex align-items-center gap-2"
-                            onClick={HandleBooking}
-                        >
-                            <i className="fas fa-calendar-check"></i>
-                            Book Now - €{filteredProperties.find(p => p.id === selectedProperty)?.pricePerNight}/night
-                        </button>
                     </div>
-                </div>
-            )}
+                )
+            }
         </Container>
-    );
+    )
+        ;
 };
 
 export default PropertyWrapper;

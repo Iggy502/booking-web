@@ -1,10 +1,10 @@
 // src/components/chat/ChatFooter.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { Conversation } from '../models/Conversation.ts';
-import { useAuth } from '../context/auth.context.tsx';
-import { bookings } from '../util/TestData.ts';
-import { OverlayTrigger, Popover, Button } from 'react-bootstrap';
-import { ChatDotsFill, ArrowLeft, X } from 'react-bootstrap-icons';
+import React, {useEffect, useRef, useState} from 'react';
+import {Conversation} from '../models/Conversation.ts';
+import {useAuth} from '../context/auth.context.tsx';
+import {bookings} from '../util/TestData.ts';
+import {Button, OverlayTrigger, Popover} from 'react-bootstrap';
+import {ArrowLeft, ChatDotsFill, X} from 'react-bootstrap-icons';
 import './Footer.scss';
 
 const ChatFooter: React.FC = () => {
@@ -15,7 +15,6 @@ const ChatFooter: React.FC = () => {
     const { getUserInfo } = useAuth();
     const [currentUserId, setCurrentUserId] = useState<string>('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const target = useRef(null);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -87,9 +86,8 @@ const ChatFooter: React.FC = () => {
                 {!activeConversation ? (
                     <div className="list-group list-group-flush overflow-auto h-100">
                         {conversations.filter(conv => conv.active).map(conversation => (
-                            <Button
+                            <div
                                 key={conversation.id}
-                                variant="light"
                                 className="chat-footer__conversation-item list-group-item list-group-item-action border-0 py-3 text-start rounded-0"
                                 onClick={() => setActiveConversation(conversation.id)}
                             >
@@ -103,7 +101,7 @@ const ChatFooter: React.FC = () => {
                                         </small>
                                     )}
                                 </div>
-                            </Button>
+                            </div>
                         ))}
                     </div>
                 ) : (
@@ -145,7 +143,7 @@ const ChatFooter: React.FC = () => {
                             <div className="input-group">
                                 <input
                                     type="text"
-                                    className="form-control border-end-0"
+                                    className="form-control"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder="Type a message..."
@@ -153,7 +151,7 @@ const ChatFooter: React.FC = () => {
                                 <Button
                                     type="submit"
                                     variant="outline-success"
-                                    className="border-start-0"
+                                    className=""
                                     disabled={!newMessage.trim()}
                                 >
                                     Send
@@ -167,7 +165,7 @@ const ChatFooter: React.FC = () => {
     );
 
     return (
-        <div className="fixed-bottom d-flex justify-content-end me-4 mb-4">
+        <div className="chat-footer fixed-bottom d-flex justify-content-end me-5 mb-4 z-1">
             <OverlayTrigger
                 trigger="click"
                 placement="top-end"

@@ -1,6 +1,5 @@
-import {Booking, BookingCreate, BookingStatus} from "../models/Booking.ts";
+import {Booking, BookingCreate, BookingResponse} from "../models/Booking.ts";
 import {bookings} from "../util/TestData.ts";
-import {ServerError} from "../context/error.context.tsx";
 import createHttpError, {HttpError} from "http-errors";
 import axios, {AxiosError} from "axios";
 
@@ -15,28 +14,31 @@ export class BookingService {
     }
 
     static async createBooking(booking: BookingCreate): Promise<Booking> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const statusConfirmed: BookingStatus = 'confirmed';
-        const response = {...booking, id: (bookings.length + 1).toString(), status: statusConfirmed};
-        bookings.push(response);
-        return response;
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/`;
+
+        try {
+            const response = await axios.post<BookingResponse>(url, booking);
+            return this.convertBookingToBookingWithDates(response.data);
+        } catch (error: any) {
+            console.error("Error creating booking:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
     }
 
     static fetchBookingById = async (bookingId: string): Promise<Booking> => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/${bookingId}`;
 
-        const res = bookings.find(booking => booking.id === bookingId);
-
-        if (!res) {
-            throw {message: 'Booking not found', status: 404} as ServerError;
+        try {
+            const response = await axios.get<BookingResponse>(url);
+            return this.convertBookingToBookingWithDates(response.data);
+        } catch (error: any) {
+            console.error("Error creating booking:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
         }
-
-        return res;
     };
 
 
     static async fetchBookingsByProperty(propertyId: string): Promise<Booking[]> {
-
 
         const url = `${process.env.SERVER_HOST}${this.BASE_URL}/findByProperty/${propertyId}`;
 
@@ -46,8 +48,8 @@ export class BookingService {
                 throw createHttpError(400);
             }
 
-            const response = await axios.get<Booking[]>(url);
-            return response.data;
+            const response = await axios.get<BookingResponse[]>(url);
+            return response.data.map(this.convertBookingToBookingWithDates);
 
         } catch (error: any) {
             throw this.convertApiError(error as AxiosError<HttpError>);
@@ -55,7 +57,19 @@ export class BookingService {
     }
 
     static async fetchBookingsByUser(userId: string): Promise<Booking[]> {
-        return bookings.filter(booking => booking.guest === userId);
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/user/${userId}`;
+
+        console.log("Fetching bookings for user:", userId);
+
+        try {
+            const response = await axios.get<BookingResponse[]>(url);
+            console.log("Bookings retieved for user:", response.data);
+            return response.data.map(this.convertBookingToBookingWithDates);
+        } catch (error: any) {
+            console.error("Error creating booking:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+
     }
 
     //ideally should be a 'GET' request
@@ -69,10 +83,12 @@ export class BookingService {
                 throw createHttpError(400);
             }
 
-            const response = await axios.post<Booking[]>(url, propertyIds);
-            return response.data;
+            const response = await axios.post<BookingResponse[]>(url, propertyIds);
+             console.log("Bookings retrieved for property ids:", response.data);
+            return response.data.map(this.convertBookingToBookingWithDates);
 
         } catch (error: any) {
+            console.log("Error searching bookings by property ids:", error);
             throw this.convertApiError(error as AxiosError<HttpError>);
         }
     }
@@ -91,6 +107,14 @@ export class BookingService {
 
         return errorConvertedToHttpError;
 
+    }
+
+    static convertBookingToBookingWithDates(booking: BookingResponse): Booking {
+        return {
+            ...booking,
+            checkIn: new Date(booking.checkIn),
+            checkOut: new Date(booking.checkOut)
+        };
     }
 
 

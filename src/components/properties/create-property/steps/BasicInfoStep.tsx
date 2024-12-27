@@ -5,7 +5,7 @@ import {PropertyCreate} from '../../../../models/Property';
 
 
 interface BasicInfoStepProps {
-    property: PropertyCreate;
+    property: Omit<PropertyCreate, 'owner'>;
     onUpdate: (updates: Partial<PropertyCreate>) => void;
     onNext: () => void;
 }
@@ -111,7 +111,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
         const fields = ['name', 'description', 'pricePerNight', 'maxGuests'];
 
         fields.forEach(field => {
-            const value = property[field as keyof PropertyCreate];
+            const value = property[field as keyof typeof property];
             const error = validateField(field, value);
             if (error) {
                 newErrors[field as keyof ValidationErrors] = error;

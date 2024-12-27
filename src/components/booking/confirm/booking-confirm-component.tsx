@@ -3,11 +3,12 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, Col, Container, Row} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service.ts';
 import {AmenityType, Property} from '../../../models/Property.ts';
-import {ServerError, useError} from '../../../context/error.context.tsx';
+import {useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
 import './booking-confirm-component.scss'
 import {BookingCreate} from "../../../models/Booking.ts";
-import createHttpError, {HttpError, InternalServerError} from "http-errors";
+import {BadRequest, Unauthorized} from "http-errors";
+import {useAuth} from "../../../context/auth.context.tsx";
 
 const getAmenityIcon = (type: AmenityType): string => {
     const icons: Record<AmenityType, string> = {
@@ -32,11 +33,11 @@ const BookingConfirmComponent: React.FC = () => {
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [hasError, setHasError] = useState(false);
     const {showError} = useError();
+    const {getUserInfo} = useAuth();
 
     const propertyId = searchParams.get('propertyId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
-    const userId = '12345'; // Hardcoded user ID for now
 
     useEffect(() => {
         const fetchProperty = async () => {
@@ -44,27 +45,16 @@ const BookingConfirmComponent: React.FC = () => {
             setHasError(false);
 
             PropertyService.checkAvailability(propertyId, new Date(startDate), new Date(endDate))
-                .then((isAvailable) => {
-                    if (!isAvailable) {
-                        throw {status: 400, message: 'Property is not available for selected dates'} as ServerError;
+                .then((available) => {
+                    if (!available) {
+                        throw BadRequest('Property is not available for selected dates');
                     }
                     return PropertyService.fetchPropertyById(propertyId);
                 }).then((propertyData) => {
-                if (!propertyData) {
-                    throw {status: 404, message: 'Property not found'} as ServerError;
-                }
                 setProperty(propertyData);
             }).catch((error: any) => {
-                setHasError(true);
-                console.error(error);
-                if (error instanceof HttpError && (error.status || error.message)) {
-                    showError(
-                        createHttpError(error.status || 500, error.message || 'Internal Server Error'));
-
-                } else {
-                    showError(InternalServerError("Internal Server Error"));
-
-                }
+                console.error("Error fetching property:", error);
+                showError(error);
             }).finally(
                 () => setIsLoading(false)
             )
@@ -72,6 +62,7 @@ const BookingConfirmComponent: React.FC = () => {
 
         fetchProperty();
     }, [propertyId, startDate, endDate, showError]);
+
 
     if (!propertyId || !startDate || !endDate) {
         return (
@@ -146,17 +137,28 @@ const BookingConfirmComponent: React.FC = () => {
     }
 
     const checkInDate = new Date(startDate);
+
     const checkOutDate = new Date(endDate);
+
+
+    console.log(`checkInDate: ${checkInDate} and checkOutDate: ${checkOutDate} inside confirm booking component`);
     const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
     const totalPrice = (property?.pricePerNight ?? 0) * nights;
 
 
     const handleConfirmBooking = async () => {
         try {
+
+            const userInfo = await getUserInfo();
+
+            if (!userInfo) {
+                throw Unauthorized('User not authenticated');
+            }
+
             const bookingData: BookingCreate = {
                 property: property.id,
-                guest: userId,
                 checkIn: checkInDate,
+                guest: userInfo.id,
                 checkOut: checkOutDate,
                 numberOfGuests: selectedGuests,
                 totalPrice: totalPrice
@@ -164,14 +166,9 @@ const BookingConfirmComponent: React.FC = () => {
 
             const newBooking = await BookingService.createBooking(bookingData);
             navigate(`/bookings/${newBooking.id}`);
-        } catch (error) {
-            if (error instanceof HttpError && (error.status || error.message)) {
-                showError(
-                    createHttpError(error.status || 500, error.message || 'Internal Server Error'));
-
-            } else {
-                showError(InternalServerError("Internal Server Error"));
-            }
+        } catch (error: any) {
+            console.error("Error creating booking:", error);
+            showError(error);
         }
     };
 

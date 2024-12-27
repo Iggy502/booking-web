@@ -8,6 +8,7 @@ export interface MapboxFeature {
         id: string;
         text: string;
     }>;
+    place_type: string[];
 }
 
 export interface Address {

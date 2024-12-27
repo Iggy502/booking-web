@@ -15,9 +15,12 @@ export interface Booking {
 }
 
 
-export interface BookingCreate extends Omit<Booking, 'id' | 'status'> {
+export interface BookingResponse extends Omit<Booking, 'checkOut' | 'checkIn'> {
+    checkIn: string;
+    checkOut: string;
 }
 
 
-
+export interface BookingCreate extends Omit<Booking, 'id' | 'status'> {
+}
 

@@ -1,17 +1,16 @@
 // src/services/PropertyService.ts
 import {Property, PropertyCreate} from '../models/Property';
-import {properties} from '../util/TestData';
-import {ServerError} from "../context/error.context.tsx";
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
 
 export class PropertyService {
 
-    private static BASE_URL = '/properties';
+    private static BASE_URL_PROPERTIES = '/properties';
+    private static BASE_URL_IMAGES = '/images';
 
 
     static async fetchAllProperties(): Promise<Property[]> {
-        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/`;
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/`;
 
         try {
             const response = await axios.get<Property[]>(url)
@@ -22,13 +21,20 @@ export class PropertyService {
         }
     }
 
-    static async fetchPropertyById(id: string): Promise<Property | undefined> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return properties.find(property => property.id === id);
+    static async fetchPropertyById(id: string): Promise<Property> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${id}`;
+
+        try {
+            const response = await axios.get<Property>(url)
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching property for given property id :", error, id);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
     }
 
     static async fetchPropertiesForUser(userId: string): Promise<Property[]> {
-        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/findByUser/${userId}`;
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/findByUser/${userId}`;
 
         try {
             const response = await axios.get<Property[]>(url)
@@ -41,7 +47,7 @@ export class PropertyService {
 
 
     static async createProperty(property: PropertyCreate): Promise<Property> {
-        const url = `${process.env.SERVER_HOST}${this.BASE_URL}/`;
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/`;
 
         try {
             const response = await axios.post<Property>(url, property)
@@ -54,31 +60,61 @@ export class PropertyService {
     }
 
     static async checkAvailability(propertyId: string, checkIn: Date, checkOut: Date): Promise<boolean> {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/checkAvailabilityForPropertyStartAndEndDate/${propertyId}`;
 
-        return true;
+        console.log(`checkavailability with url: ${url} and checkIn: ${checkIn} and checkOut: ${checkOut}`);
 
-        // mock error
-        // const err: ServerError = {message: 'Failed to check availability', status: 500};
-        // throw err;
+        try {
+            const response = await axios.get<boolean>(url, {
+                params: {
+                    checkIn: checkIn.toISOString(),
+                    checkOut: checkOut.toISOString()
+                }
+            });
+
+            return response.data;
+        } catch (error: any) {
+            console.error("Error checking availability:", error);
+            const httpError = this.convertApiError(error as AxiosError<HttpError>);
+            console.log("httpError", httpError);
+            throw httpError;
+        }
+
     }
 
     static async uploadImages(propertyId: string, images: File[]): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const property = properties.find(property => property.id === propertyId);
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_IMAGES}/property/${propertyId}`;
+        const formData = new FormData();
 
-        if (!property) {
-            const err: ServerError = {message: 'Property not found', status: 404};
-            throw err;
+        // Append each image with the field name 'images'
+        images.forEach(image => {
+            formData.append('images', image);  // This matches multer's expected field name
+        });
+
+        try {
+            await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        } catch (error: any) {
+            const httpError = this.convertApiError(error as AxiosError<HttpError>);
+            throw httpError;
         }
-
-        property.imagePaths?.push(...images.map(image => URL.createObjectURL(image)));
-
     }
 
     static async fetchPropertiesByIds(propertyIds: string[]) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return properties.filter(property => propertyIds.includes(property.id));
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/searchByIds`;
+
+        try {
+            const response = await axios.post<Property[]>(url, propertyIds)
+            console.log("Properties fetched by ids:", response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error creating property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+
     }
 
 
