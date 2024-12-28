@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
-import {Button, Card, Col, Form, Row} from 'react-bootstrap';
+import {Card, Col, Form, Row, Button} from 'react-bootstrap';
 import {AmenityType, IAmenity} from '../../../../models/Property';
 import './AmenitiesStep.scss';
 
 interface AmenitiesStepProps {
     amenities: IAmenity[];
     onUpdate: (amenities: IAmenity[]) => void;
-    onNext: () => void;
-    onBack: () => void;
+    onNextAction?: { actionName: string, action: () => void };
+    onBackAction?: { actionName: string, action: () => void };
+    readOnly?: boolean;
 }
 
 interface ValidationErrors {
@@ -17,8 +18,9 @@ interface ValidationErrors {
 const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
                                                          amenities,
                                                          onUpdate,
-                                                         onNext,
-                                                         onBack
+                                                         onNextAction,
+                                                         onBackAction,
+                                                         readOnly = false
                                                      }) => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -42,6 +44,8 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
     };
 
     const handleAmenityToggle = (type: AmenityType) => {
+        if (readOnly) return;
+
         let newAmenities: IAmenity[];
 
         if (selectedAmenities.has(type)) {
@@ -62,6 +66,8 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
     };
 
     const handleDescriptionChange = (type: AmenityType, description: string) => {
+        if (readOnly) return;
+
         const newAmenities = amenities.map(amenity =>
             amenity.type === type ? {...amenity, description} : amenity
         );
@@ -84,10 +90,7 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
         }
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        // Validate all selected amenities
+    const validateForm = (): boolean => {
         const newErrors: ValidationErrors = {};
         let hasErrors = false;
 
@@ -107,8 +110,13 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
         }), {});
         setTouched(newTouched);
 
-        if (!hasErrors) {
-            onNext();
+        return !hasErrors;
+    };
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (validateForm() && onNextAction) {
+            onNextAction.action();
         }
     };
 
@@ -125,7 +133,7 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
             <div className="mb-4">
                 <p className="text-muted">
                     Select and describe the amenities available at your property.
-                    Detailed descriptions help guests understand what to expect.
+                    {!readOnly && ' Detailed descriptions help guests understand what to expect.'}
                 </p>
             </div>
 
@@ -143,6 +151,7 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
                                             label={amenityType.replace(/([A-Z])/g, ' $1').trim()}
                                             checked={selectedAmenities.has(amenityType)}
                                             onChange={() => handleAmenityToggle(amenityType)}
+                                            disabled={readOnly}
                                             className="mb-2"
                                         />
                                         {selectedAmenities.has(amenityType) && (
@@ -154,6 +163,8 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
                                                     value={selectedAmenities.get(amenityType) || ''}
                                                     onChange={(e) => handleDescriptionChange(amenityType, e.target.value)}
                                                     isInvalid={touched[amenityType] && !!errors[amenityType]}
+                                                    readOnly={readOnly}
+                                                    plaintext={readOnly}
                                                 />
                                                 <Form.Control.Feedback type="invalid">
                                                     {errors[amenityType]}
@@ -168,22 +179,28 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
                 </Card>
             ))}
 
-            <div className="step-navigation">
-                <Button
-                    variant="outline-secondary"
-                    onClick={onBack}
-                    className="px-4"
-                >
-                    Back
-                </Button>
-                <Button
-                    type="submit"
-                    variant="primary"
-                    className="px-4"
-                >
-                    Create Property
-                </Button>
-            </div>
+            {(onNextAction || onBackAction) && (
+                <div className="step-navigation">
+                    {onBackAction && (
+                        <Button
+                            variant="outline-secondary"
+                            onClick={onBackAction.action}
+                            className="px-4"
+                        >
+                            {onBackAction.actionName}
+                        </Button>
+                    )}
+                    {onNextAction && (
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            className="px-4"
+                        >
+                            {onNextAction.actionName}
+                        </Button>
+                    )}
+                </div>
+            )}
         </Form>
     );
 };

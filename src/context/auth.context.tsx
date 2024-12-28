@@ -24,6 +24,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return AuthService.getUserInfo();
     }, []);
 
+    const forceLogout = useCallback(() => {
+        AuthService.clearTokens();
+        setIsAuthenticated(false);
+    }, []);
+
     // Setup axios interceptor for adding the token to requests
     useEffect(() => {
         axios.defaults.withCredentials = true;  // Add this line
@@ -44,6 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 console.log("trying to refresh token");
                 const originalRequest = error.config;
+
+                if (error.response?.data?.code === 'AUTH_USER_NOT_FOUND') {
+                    forceLogout();
+                    return Promise.reject(error);
+                }
 
                 if (error.response?.status === 401 && !originalRequest._retry
                     && !originalRequest.url?.includes('/refresh-token')

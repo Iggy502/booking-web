@@ -1,11 +1,19 @@
-export interface IUser {
+export interface User {
     email: string;
     firstName: string;
     lastName: string;
     phone: string;
+}
+
+
+export interface UserViewModel extends User{
+    id: string;
     profilePicturePath?: string;
 }
 
-export interface IUserCreate extends IUser {
-    password: string;
+export interface IUserCreate extends User {
+}
+
+export interface IUserUpdate extends Partial<User> {
+
 }

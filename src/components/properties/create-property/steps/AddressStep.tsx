@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Col, Form, Row, Spinner} from 'react-bootstrap';
+import {Col, Form, Row, Spinner, Button} from 'react-bootstrap';
 import {IAddress} from '../../../../models/Property';
 import {getPlaces, MapboxFeature} from '../../../../services/Mapbox';
 import './AddressStep.scss';
@@ -7,8 +7,9 @@ import './AddressStep.scss';
 interface AddressStepProps {
     address: IAddress;
     onUpdate: (address: IAddress) => void;
-    onNext: () => void;
-    onBack: () => void;
+    onNextAction?: { actionName: string, action: () => void };
+    onBackAction?: { actionName: string, action: () => void };
+    readOnlyOptions?: Record<keyof Omit<IAddress, 'latitude' | 'longitude'>, boolean>;
 }
 
 interface ValidationErrors {
@@ -22,8 +23,9 @@ interface ValidationErrors {
 const AddressStep: React.FC<AddressStepProps> = ({
                                                      address,
                                                      onUpdate,
-                                                     onNext,
-                                                     onBack
+                                                     onNextAction,
+                                                     onBackAction,
+                                                     readOnlyOptions
                                                  }) => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -31,27 +33,18 @@ const AddressStep: React.FC<AddressStepProps> = ({
     const [activeSuggestionField, setActiveSuggestionField] = useState<string | null>(null);
     const [isValidatingAddress, setIsValidatingAddress] = useState(false);
 
-    // Add address validation when fields change
     useEffect(() => {
         const validateAddressCombination = async () => {
-
-            console.log(Object.values(address).join(' '));
-
-
             if (address.street && address.city && address.country && address.postalCode) {
                 setIsValidatingAddress(true);
                 const query = `${address.street}, ${address.city}, ${address.country}, ${address.postalCode}`;
                 const places = await getPlaces(query);
 
-                const isValid = places.some(place => {
-                        console.log(`place data is: ${place.place_name}`);
-
-
-                        return place.place_name.toLowerCase().includes(address.street.toLowerCase()) &&
-                            place.place_name.toLowerCase().includes(address.city.toLowerCase()) &&
-                            place.place_name.toLowerCase().includes(address.country.toLowerCase()) &&
-                            place.place_name.toLowerCase().includes(address.postalCode.toLowerCase());
-                    }
+                const isValid = places.some(place =>
+                    place.place_name.toLowerCase().includes(address.street.toLowerCase()) &&
+                    place.place_name.toLowerCase().includes(address.city.toLowerCase()) &&
+                    place.place_name.toLowerCase().includes(address.country.toLowerCase()) &&
+                    place.place_name.toLowerCase().includes(address.postalCode.toLowerCase())
                 );
 
                 setErrors(prev => ({
@@ -63,40 +56,43 @@ const AddressStep: React.FC<AddressStepProps> = ({
             }
         };
 
+        if (errors.street || errors.city || errors.country || errors.postalCode) {
+            if(errors.combination) {
+                delete errors.combination;
+            }
+            return;
+        }
+
         const timeoutId = setTimeout(validateAddressCombination, 1000);
         return () => clearTimeout(timeoutId);
-    }, [address.street, address.city, address.country, address.postalCode]);
+    }, [address.street, address.city, address.country, address.postalCode, errors.street, errors.city, errors.country, errors.postalCode]);
 
-    const validateField = (name: string, value: IAddress[keyof IAddress]): string | undefined => {
+    const validateField = (name: string, value: string): string | undefined => {
         switch (name) {
             case 'street': {
-                const street = value as string;
-                if (!street.trim()) return 'Street is required';
-                if (street.length < 5) return 'Street must be at least 5 characters';
-                if (street.length > 100) return 'Street must be less than 100 characters';
+                if (!value.trim()) return 'Street is required';
+                if (value.length < 5) return 'Street must be at least 5 characters';
+                if (value.length > 100) return 'Street must be less than 100 characters';
                 const streetRegex = /^[a-zA-Z\s]+\s\d+$/;
-                if (!streetRegex.test(street)) return 'Street must contain a name and a number';
+                if (!streetRegex.test(value)) return 'Street must contain a name and a number';
                 return undefined;
             }
             case 'city': {
-                const city = value as string;
-                if (!city.trim()) return 'City is required';
-                if (city.length < 2) return 'City must be at least 2 characters';
-                if (city.length > 50) return 'City must be less than 50 characters';
+                if (!value.trim()) return 'City is required';
+                if (value.length < 2) return 'City must be at least 2 characters';
+                if (value.length > 50) return 'City must be less than 50 characters';
                 return undefined;
             }
             case 'country': {
-                const country = value as string;
-                if (!country.trim()) return 'Country is required';
-                if (country.length < 2) return 'Country must be at least 2 characters';
-                if (country.length > 50) return 'Country must be less than 50 characters';
+                if (!value.trim()) return 'Country is required';
+                if (value.length < 2) return 'Country must be at least 2 characters';
+                if (value.length > 50) return 'Country must be less than 50 characters';
                 return undefined;
             }
             case 'postalCode': {
-                const postalCode = value as string;
-                if (!postalCode.trim()) return 'Postal code is required';
+                if (!value.trim()) return 'Postal code is required';
                 const belgianPostalCodeRegex = /^\d{4}$/;
-                if (!belgianPostalCodeRegex.test(postalCode)) return 'Postal code must be a 4-digit number';
+                if (!belgianPostalCodeRegex.test(value)) return 'Postal code must be a 4-digit number';
                 return undefined;
             }
             default:
@@ -129,12 +125,12 @@ const AddressStep: React.FC<AddressStepProps> = ({
             [name]: value
         });
 
-        // Get suggestions for the current field
-        const newSuggestions = await getFilteredSuggestions(value, name);
-        setSuggestions(newSuggestions);
-        setActiveSuggestionField(name);
+        if (!readOnlyOptions?.[name as keyof Omit<IAddress, 'latitude' | 'longitude'>]) {
+            const newSuggestions = await getFilteredSuggestions(value, name);
+            setSuggestions(newSuggestions);
+            setActiveSuggestionField(name);
+        }
 
-        // Validate field
         const error = validateField(name, value);
         setErrors(prev => ({
             ...prev,
@@ -174,7 +170,6 @@ const AddressStep: React.FC<AddressStepProps> = ({
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        // Delay clearing suggestions to allow for clicks
         setTimeout(() => {
             setSuggestions([]);
             setActiveSuggestionField(null);
@@ -220,7 +215,9 @@ const AddressStep: React.FC<AddressStepProps> = ({
             if (!confirmProceed) return;
         }
 
-        onNext();
+        if (onNextAction) {
+            onNextAction.action();
+        }
     };
 
     return (
@@ -237,8 +234,10 @@ const AddressStep: React.FC<AddressStepProps> = ({
                             onBlur={handleBlur}
                             isInvalid={touched.street && !!errors.street}
                             placeholder="e.g., 123 Main Street"
+                            readOnly={readOnlyOptions?.street}
+                            plaintext={readOnlyOptions?.street}
                         />
-                        {activeSuggestionField === 'street' && suggestions.length > 0 && (
+                        {!readOnlyOptions?.street && activeSuggestionField === 'street' && suggestions.length > 0 && (
                             <ul className="suggestions-list">
                                 {suggestions.map((suggestion, index) => (
                                     <li
@@ -253,9 +252,6 @@ const AddressStep: React.FC<AddressStepProps> = ({
                         <Form.Control.Feedback type="invalid">
                             {errors.street}
                         </Form.Control.Feedback>
-                        <Form.Text className="text-muted">
-                            Enter the complete street address
-                        </Form.Text>
                     </Form.Group>
                 </Col>
             </Row>
@@ -272,8 +268,10 @@ const AddressStep: React.FC<AddressStepProps> = ({
                             onBlur={handleBlur}
                             isInvalid={touched.city && !!errors.city}
                             placeholder="e.g., Amsterdam"
+                            readOnly={readOnlyOptions?.city}
+                            plaintext={readOnlyOptions?.city}
                         />
-                        {activeSuggestionField === 'city' && suggestions.length > 0 && (
+                        {!readOnlyOptions?.city && activeSuggestionField === 'city' && suggestions.length > 0 && (
                             <ul className="suggestions-list">
                                 {suggestions.map((suggestion, index) => (
                                     <li
@@ -288,9 +286,6 @@ const AddressStep: React.FC<AddressStepProps> = ({
                         <Form.Control.Feedback type="invalid">
                             {errors.city}
                         </Form.Control.Feedback>
-                        <Form.Text className="text-muted">
-                            Enter the city name
-                        </Form.Text>
                     </Form.Group>
                 </Col>
                 <Col md={6}>
@@ -304,8 +299,10 @@ const AddressStep: React.FC<AddressStepProps> = ({
                             onBlur={handleBlur}
                             isInvalid={touched.country && !!errors.country}
                             placeholder="e.g., Netherlands"
+                            readOnly={readOnlyOptions?.country}
+                            plaintext={readOnlyOptions?.country}
                         />
-                        {activeSuggestionField === 'country' && suggestions.length > 0 && (
+                        {!readOnlyOptions?.country && activeSuggestionField === 'country' && suggestions.length > 0 && (
                             <ul className="suggestions-list">
                                 {suggestions.map((suggestion, index) => (
                                     <li
@@ -320,9 +317,6 @@ const AddressStep: React.FC<AddressStepProps> = ({
                         <Form.Control.Feedback type="invalid">
                             {errors.country}
                         </Form.Control.Feedback>
-                        <Form.Text className="text-muted">
-                            Enter the country name
-                        </Form.Text>
                     </Form.Group>
                 </Col>
             </Row>
@@ -338,14 +332,13 @@ const AddressStep: React.FC<AddressStepProps> = ({
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                             isInvalid={touched.postalCode && !!errors.postalCode}
-                            placeholder="e.g., 1234 AB"
+                            placeholder="e.g., 1234"
+                            readOnly={readOnlyOptions?.postalCode}
+                            plaintext={readOnlyOptions?.postalCode}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.postalCode}
                         </Form.Control.Feedback>
-                        <Form.Text className="text-muted">
-                            Enter the postal/zip code
-                        </Form.Text>
                     </Form.Group>
                 </Col>
             </Row>
@@ -364,22 +357,28 @@ const AddressStep: React.FC<AddressStepProps> = ({
                 </div>
             )}
 
+
             <div className="step-navigation">
-                <Button
-                    variant="outline-secondary"
-                    onClick={onBack}
-                    className="px-4"
-                >
-                    Back
-                </Button>
-                <Button
-                    type="submit"
-                    variant="primary"
-                    className="px-4"
-                >
-                    Continue to Amenities
-                </Button>
+                {onBackAction && (
+                    <Button
+                        variant="outline-secondary"
+                        onClick={onBackAction.action}
+                        className="px-4"
+                    >
+                        {onBackAction.actionName}
+                    </Button>
+                )}
+                {onNextAction && (
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        className="px-4"
+                    >
+                        {onNextAction.actionName}
+                    </Button>
+                )}
             </div>
+
         </Form>
     );
 };

@@ -1,37 +1,61 @@
-import React, {useCallback, useState} from 'react';
+import {forwardRef, useCallback, useImperativeHandle, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
-import {Alert, Button, ProgressBar} from 'react-bootstrap';
-import {Image as ImageIcon, Upload, X} from 'lucide-react';
+import {Button, Alert, ProgressBar} from 'react-bootstrap';
+import {Upload, X, Image as ImageIcon} from 'lucide-react';
 import './ImageUploadStep.scss';
 
 interface ImageUploadStepProps {
     onUpdate: (files: File[]) => void;
-    onSubmit: () => void;
-    onBack: () => void;
+    maxFiles?: { amount: number; errorMessage?: string };
+    onBackAction?: { actionName: string; action: () => void };
+    onNextAction?: { actionName: string; action: () => void };
+    disabled?: boolean;
+    onSuccess?: () => void;
 }
 
-interface ProcessedImage {
+export interface ProcessedImage {
     file: File;
     preview: string;
     status: 'processing' | 'ready' | 'error';
     error?: string;
 }
 
-const MAX_FILES = 10;
+export interface ImageUploadStepRef {
+    clearAll: () => void;
+}
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const TARGET_WIDTH = 1920;
 const TARGET_HEIGHT = 1080;
 const QUALITY = 0.8;
 
-const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
-                                                             onUpdate,
-                                                             onSubmit,
-                                                             onBack
-                                                         }) => {
+const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
+                                                                                  onUpdate,
+                                                                                  maxFiles,
+                                                                                  onNextAction,
+                                                                                  onBackAction,
+                                                                              }, ref) => {
     const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const MAX_FILES = maxFiles?.amount ?? 5;
+
+
+    // Expose the clearAll method through the ref
+    useImperativeHandle(ref, () => ({
+        clearAll: () => {
+            // Clean up URL objects to prevent memory leaks
+            processedImages.forEach(image => {
+                URL.revokeObjectURL(image.preview);
+            });
+            setProcessedImages([]);
+            setError(null);
+            // onUpdate([]);
+        }
+    }));
+
 
     const processImage = async (file: File): Promise<ProcessedImage> => {
         return new Promise((resolve) => {
@@ -111,13 +135,15 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
     };
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
+
+
         setError(null);
         setIsProcessing(true);
 
         try {
             // Validate number of files
             if (processedImages.length + acceptedFiles.length > MAX_FILES) {
-                setError(`Maximum ${MAX_FILES} images allowed`);
+                setError(maxFiles?.errorMessage || `Maximum ${MAX_FILES} images allowed`);
                 return;
             }
 
@@ -164,7 +190,7 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
         }
     }, [onUpdate, processedImages.length]);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({
         onDrop,
         accept: {
             'image/jpeg': ['.jpg', '.jpeg'],
@@ -177,7 +203,11 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
     });
 
     const removeImage = (index: number) => {
-        setProcessedImages(prev => prev.filter((_, i) => i !== index));
+        setProcessedImages(prev => {
+            const updatedImages = [...prev];
+            updatedImages.splice(index, 1);
+            return updatedImages;
+        })
     };
 
     const handleSubmit = () => {
@@ -190,8 +220,10 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
             return;
         }
 
-        onSubmit();
+        if (onNextAction)
+            onNextAction.action();
     };
+
 
     return (
         <div className="image-upload-step">
@@ -206,7 +238,7 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
                 className={`dropzone ${isDragActive ? 'active' : ''}`}
             >
                 <input {...getInputProps()} />
-                <Upload size={48} className="upload-icon" />
+                <Upload size={48} className="upload-icon"/>
                 <p className="upload-text">
                     {isDragActive
                         ? 'Drop your images here...'
@@ -219,7 +251,7 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
 
             {isProcessing && (
                 <div className="processing-indicator">
-                    <ProgressBar animated now={100} />
+                    <ProgressBar animated now={100}/>
                     <p>Processing images...</p>
                 </div>
             )}
@@ -234,18 +266,18 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
                             <div className="image-container">
                                 {image.status === 'error' ? (
                                     <div className="error-overlay">
-                                        <ImageIcon size={24} />
+                                        <ImageIcon size={24}/>
                                         <span>{image.error}</span>
                                     </div>
                                 ) : (
-                                    <img src={image.preview} alt={`Preview ${index + 1}`} />
+                                    <img src={image.preview} alt={`Preview ${index + 1}`}/>
                                 )}
                                 <button
                                     className="remove-button"
                                     onClick={() => removeImage(index)}
                                     title="Remove image"
                                 >
-                                    <X size={20} />
+                                    <X size={20}/>
                                 </button>
                             </div>
                         </div>
@@ -254,24 +286,33 @@ const ImageUploadStep: React.FC<ImageUploadStepProps> = ({
             )}
 
             <div className="step-navigation">
-                <Button
-                    variant="outline-secondary"
-                    onClick={onBack}
-                    className="px-4"
-                >
-                    Back
-                </Button>
-                <Button
-                    variant="primary"
-                    className="px-4"
-                    onClick={handleSubmit}
-                    disabled={isProcessing || processedImages.length === 0}
-                >
-                    Finish
-                </Button>
+
+                {onBackAction && (
+                    <Button
+                        variant="outline-secondary"
+                        onClick={onBackAction.action}
+                        className="px-4"
+                    >
+                        {onBackAction.actionName}
+                    </Button>
+                )}
+
+                {onNextAction && (
+
+                    <Button
+                        variant="primary"
+                        className="px-4"
+                        onClick={handleSubmit}
+                        disabled={isProcessing || processedImages.length === 0}
+                    >
+                        {onNextAction.actionName}
+                    </Button>
+
+                )}
+
             </div>
         </div>
     );
-};
+});
 
 export default ImageUploadStep;

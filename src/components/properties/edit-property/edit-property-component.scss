@@ -1,0 +1,59 @@
+.edit-property-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  h1 {
+    color: #333;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #eee;
+      padding: 1rem 1.5rem;
+
+      h2 {
+        margin: 0;
+        color: #444;
+        font-weight: 500;
+      }
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      background-color: white;
+    }
+  }
+
+  // Override basic-info-form styles for edit context
+  .basic-info-form {
+    .step-navigation {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+  }
+}
+
+// Loading state styles
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+// Error state styles
+.error-alert {
+  max-width: 600px;
+  margin: 2rem auto;
+}

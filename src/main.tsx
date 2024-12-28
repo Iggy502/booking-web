@@ -14,6 +14,9 @@ import MyPropertiesComponent from "./components/properties/my-properties/my-prop
 import {PrivateRoute} from "./components/auth/private-route.tsx";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import 'dotenv';
+import EditPropertyComponent from "./components/properties/edit-property/edit-property-component.tsx";
+import PropertyDetailComponent from "./components/properties/property-detail-component/property-detail-component.tsx";
+import UserEditComponent from "./components/user/edit/user-edit-component.tsx";
 
 const router = createBrowserRouter([
     {
@@ -40,6 +43,14 @@ const router = createBrowserRouter([
                         element: <CreatePropertyComponent/>,
                     },
                     {
+                        path: 'edit/:id',
+                        element: <EditPropertyComponent/>,
+                    },
+                    {
+                        path: ':id',
+                        element: <PropertyDetailComponent/>
+                    },
+                    {
                         path: 'my-properties',
                         element: (
                             <PrivateRoute>
@@ -51,16 +62,31 @@ const router = createBrowserRouter([
                 ]
             },
             {
-                path: 'booking',
-                element: <BookingConfirmComponent/>,
-            },
-            {
-                path: 'bookings/:bookingId',
-                element: <BookingDetailComponent/>,
-            },
-            {
                 path: 'bookings',
-                element: <BookingOverviewComponent/>,
+                children: [
+                    {
+                        path: '',
+                        element: <BookingOverviewComponent/>,
+                    },
+                    {
+                        path: ':bookingId',
+                        element: <BookingDetailComponent/>,
+                    },
+                    {
+                        path: 'confirm',
+                        element: <BookingConfirmComponent/>,
+                    },
+                ],
+            },
+            {
+                path: 'profile',
+                children: [
+                    {
+                        path: 'edit/:userId',
+                        element: <UserEditComponent/>,
+                    }
+                ]
+
             },
             {
                 path: 'login',

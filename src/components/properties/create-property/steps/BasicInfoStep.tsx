@@ -7,7 +7,8 @@ import {PropertyCreate} from '../../../../models/Property';
 interface BasicInfoStepProps {
     property: Omit<PropertyCreate, 'owner'>;
     onUpdate: (updates: Partial<PropertyCreate>) => void;
-    onNext: () => void;
+    onNextAction?: { actionName: string, action: () => void };
+    readonly readOnlyOptions?: Record<keyof Pick<PropertyCreate, "name" | "description" | "pricePerNight" | "maxGuests">, boolean>
 }
 
 interface ValidationErrors {
@@ -17,9 +18,11 @@ interface ValidationErrors {
     maxGuests?: string;
 }
 
-const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext}) => {
+const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNextAction, readOnlyOptions}) => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [errors, setErrors] = useState<ValidationErrors>({});
+
+    console.log('BasicInfoStepProps', property, onUpdate, readOnlyOptions);
 
     const validateField = (name: string, value: PropertyCreate[keyof PropertyCreate]): string | undefined => {
 
@@ -127,8 +130,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (validateForm()) {
-            onNext();
+        if (validateForm() && onNextAction) {
+            onNextAction.action();
         }
     };
 
@@ -141,6 +144,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                         <Form.Control
                             type="text"
                             name="name"
+                            readOnly={readOnlyOptions?.name}
+                            plaintext={readOnlyOptions?.name}
                             value={property.name}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
@@ -161,6 +166,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                         <Form.Control
                             type="number"
                             name="pricePerNight"
+                            readOnly={readOnlyOptions?.pricePerNight}
+                            plaintext={readOnlyOptions?.pricePerNight}
                             value={property.pricePerNight || ''}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
@@ -184,6 +191,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                 <Form.Control
                     as="textarea"
                     name="description"
+                    readOnly={readOnlyOptions?.description}
+                    plaintext={readOnlyOptions?.description}
                     value={property.description}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
@@ -204,6 +213,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                 <Form.Control
                     type="number"
                     name="maxGuests"
+                    readOnly={readOnlyOptions?.maxGuests}
+                    plaintext={readOnlyOptions?.maxGuests}
                     value={property.maxGuests || ''}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
@@ -219,18 +230,23 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                 </Form.Text>
             </Form.Group>
 
-            <div className="step-navigation">
-                <div>{/* Empty div for spacing */}</div>
-                <Button
-                    type="submit"
-                    variant="primary"
-                    className="px-4"
-                >
-                    Continue to Address
-                </Button>
-            </div>
+            {onNextAction &&
+                <div className="step-navigation">
+                    <div>{/* Empty div for spacing */}</div>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        className="px-4"
+                    >
+                        {onNextAction.actionName}
+                    </Button>
+                </div>
+
+            }
+
         </Form>
     );
 };
+
 
 export default BasicInfoStep;

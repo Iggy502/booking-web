@@ -141,4 +141,7 @@ export class AuthService {
 
     }
 
+    static clearTokens() {
+        localStorage.removeItem(this.ACCESS_TOKEN_KEY);  // or however you store your token
+    }
 }

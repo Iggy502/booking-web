@@ -1,5 +1,5 @@
 // src/services/PropertyService.ts
-import {Property, PropertyCreate} from '../models/Property';
+import {Property, PropertyCreate, PropertyUpdate} from '../models/Property';
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
 
@@ -23,14 +23,31 @@ export class PropertyService {
 
     static async fetchPropertyById(id: string): Promise<Property> {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${id}`;
+        console.log("fetching property with url:", url);
 
         try {
             const response = await axios.get<Property>(url)
+            console.log("Property fetched by id:", response.data);
             return response.data;
         } catch (error: any) {
             console.error("Error fetching property for given property id :", error, id);
             throw this.convertApiError(error as AxiosError<HttpError>);
         }
+    }
+
+    static async updateProperty(propertyId: string, property: PropertyUpdate): Promise<Property> {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${propertyId}`;
+
+        try {
+            const response = await axios.put<Property>(url, property)
+            return response.data;
+        } catch (error: any) {
+            console.error("Error updating property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+
+
     }
 
     static async fetchPropertiesForUser(userId: string): Promise<Property[]> {
@@ -103,6 +120,17 @@ export class PropertyService {
         }
     }
 
+    static async fetchPropertyImages(propertyId: string): Promise<string[]> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_IMAGES}/property/${propertyId}`;
+        try {
+            const response = await axios.get<string[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching property images:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
     static async fetchPropertiesByIds(propertyIds: string[]) {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/searchByIds`;
 
@@ -126,6 +154,21 @@ export class PropertyService {
         errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
 
         return errorConvertedToHttpError;
+
+    }
+
+    static async deletePropertyImage(id: string, selectedImage: string) {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_IMAGES}/property`;
+
+        console.log("deleting image with url: ", url, " and id: ", id, " and selectedImage: ", selectedImage);
+
+        try {
+            await axios.delete(url, {data: {propertyId: id, imagePath: selectedImage}});
+        } catch (error: any) {
+            const httpError = this.convertApiError(error as AxiosError<HttpError>);
+            throw httpError;
+        }
 
     }
 }

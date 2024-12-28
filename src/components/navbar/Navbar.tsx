@@ -1,26 +1,35 @@
 // Navbar.tsx
 import {Container, Nav, Navbar, NavDropdown, Offcanvas} from 'react-bootstrap';
-import {Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../context/auth.context.tsx';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import './NavBar.scss';
 
 const NavBar = () => {
     const location = useLocation();
     const {isAuthenticated, getUserInfo, logout} = useAuth();
-    const [userInfo, setUserInfo] = useState<{ firstName: string; lastName: string } | null>(null);
+    const [userInfo, setUserInfo] = useState<{ firstName: string, lastName: string, userId: string } | null>(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             if (isAuthenticated) {
                 const info = await getUserInfo();
                 if (info) {
-                    setUserInfo({firstName: info.firstName, lastName: info.lastName});
+                    setUserInfo({firstName: info.firstName, lastName: info.lastName, userId: info.id});
                 }
             }
         };
         fetchUserInfo();
     }, [isAuthenticated, getUserInfo]);
+
+
+    const logoutAndRedirect = useCallback(async () => {
+        logout().then(() => {
+            navigate('/');
+        });
+    }, [logout]);
 
     return (
         <Navbar variant="dark" expand="lg" className="shadow-sm">
@@ -64,8 +73,12 @@ const NavBar = () => {
                                 <i className="fas fa-calendar me-1"></i>
                                 My Bookings
                             </NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to={`/profile/edit/${userInfo?.userId}`}>
+                                <i className="fas fa-pencil me-1"></i>
+                                Edit Profile
+                            </NavDropdown.Item>
                             <NavDropdown.Divider/>
-                            <NavDropdown.Item onClick={logout}>
+                            <NavDropdown.Item onClick={logoutAndRedirect}>
                                 <i className="fas fa-sign-out-alt me-1"></i>
                                 Logout
                             </NavDropdown.Item>

@@ -1,6 +1,7 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Card, Carousel, Col, Pagination, Row, Spinner} from 'react-bootstrap';
 import {Property} from '../../../models/Property';
+import {useNavigate} from 'react-router-dom';
 import './properties-overview.scss';
 
 interface PropertyOverviewProps {
@@ -18,7 +19,11 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                                            }) => {
     const [activePage, setActivePage] = useState(1);
     const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({});
+    const navigate = useNavigate();
     const totalPages = Math.ceil(properties.length / propertiesPerPage);
+    const [showSpinners, setShowSpinners] = useState(true);
+
+
 
     const handlePageChange = (pageNumber: number) => {
         setActivePage(pageNumber);
@@ -26,6 +31,21 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
 
     const startIndex = (activePage - 1) * propertiesPerPage;
     const visibleProperties = properties.slice(startIndex, startIndex + propertiesPerPage);
+
+
+    useEffect(() => {
+        // Reset spinner visibility when properties change
+        setShowSpinners(true);
+
+        const timeout = setTimeout(() => {
+            setShowSpinners(false);  // Use state instead of ref
+        }, 1000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [properties]);
+
 
     const paginationItems = useMemo(() => {
         if (activePage > totalPages) {
@@ -61,20 +81,12 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
             <Row xs={1} md={2} lg={3} xl={4} className="g-4">
                 {visibleProperties.map((property) => (
                     <Col key={property.id}>
-                        <Card
-                            className={`h-100 property-card ${selectedPropertyId === property.id ? 'selected' : ''}`}
-                            onClick={(e) => {
-                                if (!(e.target as HTMLElement).closest('.carousel-control-next, .carousel-control-prev')) {
-                                    onPropertySelect?.(property.id);
-                                }
-                            }}
-                            role="button"
-                        >
+                        <Card className={`h-100 property-card ${selectedPropertyId === property.id ? 'selected' : ''}`}>
                             <div className="card-img-wrapper">
                                 <Carousel interval={null}>
                                     {property.imagePaths?.slice(0, 3).map((imagePath, index) => (
                                         <Carousel.Item key={index}>
-                                            {!imageLoaded[`${property.id}-${index}`] && (
+                                            {!imageLoaded[`${property.id}-${index}`] && showSpinners && (
                                                 <div className="spinner-container">
                                                     <Spinner animation="border" role="status">
                                                         <span className="visually-hidden">Loading...</span>
@@ -83,13 +95,13 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                             )}
                                             <Card.Img
                                                 variant="top"
-                                                src={imagePath || '/placeholder-image.jpg'}
+                                                src={imagePath}
                                                 alt={`${property.name} image ${index + 1}`}
                                                 onLoad={() => setImageLoaded(prev => ({
                                                     ...prev,
                                                     [`${property.id}-${index}`]: true
-                                                }))}
-                                                style={{display: imageLoaded[`${property.id}-${index}`] ? 'block' : 'none'}}
+                                                }))
+                                                }
                                             />
                                         </Carousel.Item>
                                     ))}
@@ -99,10 +111,7 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                         <i className="fas fa-check-circle"></i>
                                     </div>
                                 )}
-                                <Badge
-                                    bg="primary"
-                                    className="price-badge"
-                                >
+                                <Badge bg="primary" className="price-badge">
                                     €{property.pricePerNight}/night
                                 </Badge>
                             </div>
@@ -118,7 +127,7 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                 <div className="amenities-preview">
                                     {property.amenities?.slice(0, 3).map((amenity, index) => (
                                         <span key={index} className="amenity-badge">
-                                            {amenity.type}
+                                            {amenity.type.replace(/([A-Z])/g, ' $1').trim()}
                                         </span>
                                     ))}
                                     {(property.amenities?.length || 0) > 3 && (
@@ -126,6 +135,28 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
                                             +{(property.amenities?.length || 0) - 3} more
                                         </span>
                                     )}
+                                </div>
+                                <div className="mt-3 d-flex gap-2">
+                                    <button
+                                        className="btn btn-outline-primary btn-sm flex-grow-1"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/properties/${property.id}`);
+                                        }}
+                                    >
+                                        <i className="fas fa-info-circle me-1"></i>
+                                        View Details
+                                    </button>
+                                    <button
+                                        className={`btn btn-sm flex-grow-1 ${selectedPropertyId === property.id ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onPropertySelect?.(property.id);
+                                        }}
+                                    >
+                                        <i className={`fas ${selectedPropertyId === property.id ? 'fa-check-circle' : 'fa-calendar'} me-1`}></i>
+                                        {selectedPropertyId === property.id ? 'Selected' : 'Select'}
+                                    </button>
                                 </div>
                             </Card.Body>
                         </Card>

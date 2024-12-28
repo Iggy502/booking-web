@@ -352,7 +352,7 @@ const MyPropertiesComponent: React.FC = () => {
                                     <Button
                                         variant="outline-secondary"
                                         size="sm"
-                                        onClick={() => navigate(`/properties/${property.id}/edit`)}
+                                        onClick={() => navigate(`/properties/edit/${property.id}`)}
                                     >
                                         Edit
                                     </Button>

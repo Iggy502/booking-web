@@ -97,7 +97,7 @@ const CreatePropertyComponent: React.FC = () => {
                     <BasicInfoStep
                         property={property}
                         onUpdate={handlePropertyUpdate}
-                        onNext={handleNext}
+                        onNextAction={{actionName: "Continue to Address", action: handleNext}}
                     />
                 );
             case StepEnum.ADDRESS:
@@ -105,8 +105,8 @@ const CreatePropertyComponent: React.FC = () => {
                     <AddressStep
                         address={property.address}
                         onUpdate={(address) => handlePropertyUpdate({address})}
-                        onNext={handleNext}
-                        onBack={handleBack}
+                        onNextAction={{actionName: "Continue to Amenities", action: handleNext}}
+                        onBackAction={{actionName: "Back", action: handleBack}}
                     />
                 );
             case StepEnum.AMENITIES:
@@ -114,16 +114,17 @@ const CreatePropertyComponent: React.FC = () => {
                     <AmenitiesStep
                         amenities={property.amenities || []}
                         onUpdate={(amenities) => handlePropertyUpdate({amenities})}
-                        onNext={handleNext}
-                        onBack={handleBack}
+                        onNextAction={{actionName: "Continue to Images", action: handleNext}}
+                        onBackAction={{actionName: "Back", action: handleBack}}
                     />
                 );
             case StepEnum.IMAGES:
                 return (
                     <ImageUploadStep
                         onUpdate={handleImagesUpdate}
-                        onSubmit={handleSubmit}
-                        onBack={handleBack}
+                        onNextAction={{actionName: "Submit", action: handleSubmit}}
+                        onBackAction={{actionName: "Back", action: handleBack}}
+                        disabled={propertyImages.length === 0}
                     />
                 );
             default:

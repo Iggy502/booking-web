@@ -120,7 +120,7 @@ const PropertyWrapper = () => {
                 endDate.getDate()
             ));
 
-            navigate(`/booking?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
+            navigate(`/bookings/confirm?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
         }
     };
 

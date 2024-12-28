@@ -2,8 +2,8 @@ import {Conversation} from "./Conversation.ts";
 
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
 
-export interface Booking {
-    id: string;
+
+interface BookingBase {
     property: string;
     guest: string;
     checkIn: Date;
@@ -15,12 +15,18 @@ export interface Booking {
 }
 
 
-export interface BookingResponse extends Omit<Booking, 'checkOut' | 'checkIn'> {
+export interface Booking extends BookingBase {
+    id: string;
+}
+
+//Initial response will have dates in string format and will be converted in Servcice layer
+export interface BookingResponse extends Omit<BookingBase, 'checkOut' | 'checkIn'> {
+    id: string;
     checkIn: string;
     checkOut: string;
 }
 
 
-export interface BookingCreate extends Omit<Booking, 'id' | 'status'> {
+export interface BookingCreate extends Omit<BookingBase, 'status'> {
 }
 

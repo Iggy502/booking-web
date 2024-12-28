@@ -242,7 +242,7 @@ const HomePage = () => {
                 endDate.getMonth(),
                 endDate.getDate()
             ));
-            navigation(`/booking?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
+            navigation(`/bookings/confirm?propertyId=${selectedProperty}&startDate=${utcStartDate.toISOString()}&endDate=${utcEndDate.toISOString()}`);
         }
     }, [selectedProperty, startDate, endDate, dateError, navigation]);
 
@@ -306,7 +306,7 @@ const HomePage = () => {
                 </div>
 
                 <div className="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-4">
-                    <SearchBox onAddressSelect={handleAddressSelect} />
+                    <SearchBox onAddressSelect={handleAddressSelect}/>
                     <div className={`date-picker-container ${
                         dateError ? 'date-picker-error' :
                             selectedProperty ? 'date-picker-success' : ''
@@ -453,6 +453,7 @@ const HomePage = () => {
                     properties={filteredProperties}
                     selectedLocation={selectedLocation}
                     handlePropertySelect={handlePropertySelect}
+                    onViewDetails={(propertyId) => navigation(`/properties/${propertyId}`)}
                 />
             </Container>
         </div>

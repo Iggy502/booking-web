@@ -8,9 +8,10 @@ interface MapViewProps {
     properties: Property[];
     selectedLocation: { longitude: number | null, latitude: number | null } | null;
     handlePropertySelect: (propertyId: string | null) => void;
+    onViewDetails: (propertyId: string) => void;
 }
 
-const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewProps) => {
+const MapView = ({properties, selectedLocation, handlePropertySelect, onViewDetails}: MapViewProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -40,10 +41,7 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             zoom: 8
         };
 
-        console.log("properties.length: ", properties.length);
-
         if (properties.length > 0) {
-            console.log("properties.length > 0");
             // Calculate center from bounds
             const center = [
                 (bounds.getWest() + bounds.getEast()) / 2,
@@ -80,7 +78,6 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
     }, []);
 
     const createMarker = (property: Property) => {
-
         if (!property?.address?.latitude || !property?.address?.longitude) {
             return null;
         }
@@ -90,19 +87,22 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             maxWidth: '300px',
         }).setHTML(
             `<div class="map-popup">
-           <h5>${property.name}</h5>
-           <div class="image-gallery">
-               <img src="${property.imagePaths[0]}" alt="${property.name}" />
-               <img src="${property.imagePaths[1]}" alt="${property.name}" />
-               <img src="${property.imagePaths[2]}" alt="${property.name}" />
-           </div>           
-           <p class="description">${property.description}</p>
-           <div class="d-inline-flex">
-           <p class="price">€${property.pricePerNight} per night</p>           
-           <p class="guests"><i class="fa-solid fa-person fa-xl"></i> ${property.maxGuests}</p>
-           </div>
-          
-       </div>`
+               <h5>${property.name}</h5>
+               <div class="image-gallery">
+                   <img src="${property.imagePaths[0]}" alt="${property.name}" />
+                   <img src="${property.imagePaths[1]}" alt="${property.name}" />
+                   <img src="${property.imagePaths[2]}" alt="${property.name}" />
+               </div>           
+               <p class="description">${property.description}</p>
+               <div class="d-inline-flex">
+               <p class="price">€${property.pricePerNight} per night</p>           
+               <p class="guests"><i class="fa-solid fa-person fa-xl"></i> ${property.maxGuests}</p>
+               </div>
+               <button class="view-button" data-property-id="${property.id}">
+                  <i class="fas fa-info-circle me-1"></i>
+                  View
+               </button>          
+            </div>`
         );
 
         const marker = new mapboxgl.Marker({
@@ -112,9 +112,20 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             .setPopup(popup)
             .addTo(map.current!);
 
-        // Use popup's 'open' and 'close' events carefully
+        // Handle marker click
         marker.getElement().addEventListener("click", () => {
             handlePropertySelect(property.id);
+        });
+
+        // Handle popup button click
+        popup.on('open', () => {
+            const button = document.querySelector(`button[data-property-id="${property.id}"]`);
+            if (button) {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent event from bubbling up to map
+                    onViewDetails(property.id);
+                });
+            }
         });
 
         return marker;
@@ -132,13 +143,10 @@ const MapView = ({properties, selectedLocation, handlePropertySelect}: MapViewPr
             const {latitude, longitude} = property.address;
             if (typeof latitude === 'number' && typeof longitude === 'number') {
                 const marker = createMarker(property);
-
                 if (marker) {
                     marker.setLngLat([longitude, latitude]).addTo(map.current!);
                     markersRef.current.push(marker);
                 }
-
-
             }
         });
     };

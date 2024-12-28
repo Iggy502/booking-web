@@ -25,8 +25,7 @@ export interface IAmenity {
     amount?: number;
 }
 
-export interface Property{
-    id: string;
+interface PropertyBase {
     name: string;
     owner: string;
     description: string;
@@ -34,11 +33,19 @@ export interface Property{
     pricePerNight: number;
     maxGuests: number;
     available: boolean;
-    imagePaths: string[];
     amenities?: IAmenity[];
 }
 
 
-export interface PropertyCreate extends Omit<Property, 'id' | 'imagePaths'> {
+export interface Property extends PropertyBase {
+    id: string;
+    imagePaths: string[];
+}
 
+
+export interface PropertyCreate extends PropertyBase {
+
+}
+
+export interface PropertyUpdate extends Partial<PropertyBase> {
 }

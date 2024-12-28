@@ -9,6 +9,21 @@
     background-color: #f8fafc;
     margin-bottom: 1.5rem;
 
+    .dropzone {
+      &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+    }
+
+    .remove-button {
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
     &:hover, &.active {
       border-color: #3b82f6;
       background-color: #eff6ff;
