@@ -17,6 +17,9 @@ import 'dotenv';
 import EditPropertyComponent from "./components/properties/edit-property/edit-property-component.tsx";
 import PropertyDetailComponent from "./components/properties/property-detail-component/property-detail-component.tsx";
 import UserEditComponent from "./components/user/edit/user-edit-component.tsx";
+import UserCreateComponent from "./components/user/create/create-user-component.tsx";
+import {RequestPasswordReset} from "./components/user/password-reset/request/password-request-component.tsx";
+import {ResetPasswordConfirm} from "./components/user/password-reset/confirm/confirm-password-component.tsx";
 
 const router = createBrowserRouter([
     {
@@ -84,6 +87,18 @@ const router = createBrowserRouter([
                     {
                         path: 'edit/:userId',
                         element: <UserEditComponent/>,
+                    },
+                    {
+                        path: 'register',
+                        element: <UserCreateComponent/>,
+                    },
+                    {
+                        path: 'reset-password',
+                        element: <RequestPasswordReset/>,
+                    },
+                    {
+                        path: 'confirm-password-reset/:token',
+                        element: <ResetPasswordConfirm/>,
                     }
                 ]
 

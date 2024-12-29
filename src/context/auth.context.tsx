@@ -16,6 +16,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                                                                           children
                                                                       }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+        console.log("checking if authenticated");
+        console.log(!!AuthService.getAccessToken());
+
         return !!AuthService.getAccessToken();
     });
 

@@ -54,7 +54,6 @@ export const LoginPage = () => {
                                 name="email"
                                 placeholder="Enter your email"
                                 required className="form-control-lg"
-
                             />
                         </Form.Group>
 
@@ -82,8 +81,13 @@ export const LoginPage = () => {
 
                         <p className="text-center text-muted">
                             Don't have an account?{' '}
-                            <a href="/register" className="text-primary text-decoration-none">
+                            <a href="/profile/register" className="text-primary text-decoration-none">
                                 Create one
+                            </a>
+                        </p>
+                        <p className="text-center text-muted">
+                            <a href="/profile/reset-password" className="text-primary text-decoration-none">
+                                Forgot password?
                             </a>
                         </p>
                     </Form>

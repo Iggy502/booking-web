@@ -130,6 +130,7 @@ export class AuthService {
         }
     }
 
+
     //Axios wraps each error response in a different object
     //Convert it back to HttpError as is the type from the server
     static convertApiError(error: AxiosError<HttpError>): HttpError {
