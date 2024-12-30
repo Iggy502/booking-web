@@ -21,14 +21,13 @@ const EditPropertyComponent: React.FC = () => {
     const [property, setProperty] = useState<Property | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const {getUserInfo} = useAuth();
+    const {userInfo} = useAuth();
 
     useEffect(() => {
         const fetchProperty = async () => {
             try {
                 if (!id) return;
                 const fetchedProperty = await PropertyService.fetchPropertyById(id);
-                const userInfo = await getUserInfo();
 
                 if (fetchedProperty && fetchedProperty.owner !== userInfo?.id) {
                     throw Forbidden();

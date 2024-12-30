@@ -116,9 +116,8 @@ const EditPropertyImages: React.FC<EditPropertyImagesProps> = ({
                 <Card.Body>
                     <ImageUploadStep
                         ref={imageUploadRef}
-                        onUpdate={handleUpload}
+                        onUpdateNew={handleUpload}
                         maxFiles={{amount: 6 - imagePaths.length, errorMessage: "You can only upload 6 images"}}
-                        disabled={imagePaths.length >= 6}
                     />
                 </Card.Body>
             </Card>

@@ -5,7 +5,10 @@ import axios from "axios";
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    getUserInfo: () => Promise<AccessTokenPayload | null>;
+    userInfo: AccessTokenPayload | null;
+    refreshUserInfo: () => Promise<void>;
+    getAccessTokenCurrentUser: () => Promise<string | null>;
+    isInitialized: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -22,15 +25,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return !!AuthService.getAccessToken();
     });
 
+    const [userInfo, setUserInfo] = useState<AccessTokenPayload | null>(null);
 
-    const getUserInfo = useCallback(() => {
-        return AuthService.getUserInfo();
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Function to refresh token and update user info
+    const refreshUserInfo = useCallback(async () => {
+        try {
+            await AuthService.refreshToken();
+            const newUserInfo = await AuthService.getUserInfo();
+            setUserInfo(newUserInfo);
+        } catch (error) {
+            console.error("Error refreshing user info:", error);
+            throw error;
+        }
     }, []);
 
     const forceLogout = useCallback(() => {
         AuthService.clearTokens();
         setIsAuthenticated(false);
+        setUserInfo(null);
     }, []);
+
+
+    const getAccessTokenCurrentUser = useCallback(async () => {
+        if (isAuthenticated) {
+            return AuthService.getAccessToken();
+        }
+        return null;
+    }, [isAuthenticated]);
+
+
+    // Initialize user info when authenticated
+    useEffect(() => {
+        const initializeUserInfo = () => {
+            if (isAuthenticated) {
+                try {
+                    const info = AuthService.getUserInfo();
+                    setUserInfo(info);
+                } catch (error) {
+                    console.error("Error initializing user info:", error);
+                }
+            } else {
+                setUserInfo(null);
+            }
+            setIsInitialized(true);
+        };
+
+        initializeUserInfo();
+    }, [isAuthenticated]);
+
 
     // Setup axios interceptor for adding the token to requests
     useEffect(() => {
@@ -70,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                         return axios(originalRequest);
                     } catch (refreshError) {
                         console.error("Error refreshing token:", refreshError);
-                        setIsAuthenticated(false);
+                        forceLogout();
                         throw refreshError;
                     }
                 }
@@ -83,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             axios.interceptors.request.eject(requestInterceptor);
             axios.interceptors.response.eject(responseInterceptor);
         };
-    }, []);
+    }, [forceLogout, isAuthenticated]);
 
     const login = async (email: string, password: string) => {
         await AuthService.login(email, password);
@@ -100,7 +144,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         <AuthContext.Provider
             value={{
                 isAuthenticated,
-                getUserInfo,
+                userInfo,
+                refreshUserInfo,
+                isInitialized,
+                getAccessTokenCurrentUser,
                 login,
                 logout,
             }}

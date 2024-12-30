@@ -2,7 +2,7 @@
 
 .navbar {
   background-color: theme.$primary;
-  height: 4rem;
+  height: 5rem;
   position: fixed;
   min-width: 100%;
   z-index: 1000;
@@ -12,10 +12,23 @@
     box-shadow: none !important;
   }
 
-  #user-dropdown + .dropdown-menu {
-    left: -60px !important;
-  }
+  #user-dropdown {
+    display: flex;
+    align-items: center;
 
+    img {
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    &::after {
+      margin-left: 0.5rem;
+    }
+
+    + .dropdown-menu {
+      left: auto !important;
+      right: 0 !important;
+    }
+  }
 
   .dropdown-menu {
     border-radius: 0.5rem;
@@ -35,8 +48,6 @@
       }
     }
   }
-
-
 }
 
 .nav-link {
@@ -53,6 +64,12 @@
   .offcanvas-header {
     background-color: theme.$primary;
     color: white;
+
+    .offcanvas-title {
+      img {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+    }
 
     .btn-close {
       filter: brightness(0) invert(1);

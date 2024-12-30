@@ -33,7 +33,7 @@ const BookingConfirmComponent: React.FC = () => {
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [hasError, setHasError] = useState(false);
     const {showError} = useError();
-    const {getUserInfo} = useAuth();
+    const {userInfo} = useAuth();
 
     const propertyId = searchParams.get('propertyId');
     const startDate = searchParams.get('startDate');
@@ -148,8 +148,6 @@ const BookingConfirmComponent: React.FC = () => {
 
     const handleConfirmBooking = async () => {
         try {
-
-            const userInfo = await getUserInfo();
 
             if (!userInfo) {
                 throw Unauthorized('User not authenticated');

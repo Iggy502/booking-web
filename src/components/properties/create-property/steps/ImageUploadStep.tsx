@@ -1,15 +1,16 @@
-import {forwardRef, useCallback, useImperativeHandle, useState} from 'react';
+import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Button, Alert, ProgressBar} from 'react-bootstrap';
 import {Upload, X, Image as ImageIcon} from 'lucide-react';
 import './ImageUploadStep.scss';
 
 interface ImageUploadStepProps {
-    onUpdate: (files: File[]) => void;
+    onUpdateAll?: (files: File[]) => void;
+    onUpdateNew?: (files: File[]) => void;
+    onRemove?: (fileName: string) => void;
     maxFiles?: { amount: number; errorMessage?: string };
     onBackAction?: { actionName: string; action: () => void };
     onNextAction?: { actionName: string; action: () => void };
-    disabled?: boolean;
     onSuccess?: () => void;
 }
 
@@ -31,8 +32,10 @@ const TARGET_HEIGHT = 1080;
 const QUALITY = 0.8;
 
 const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
-                                                                                  onUpdate,
+                                                                                  onUpdateAll,
+                                                                                  onUpdateNew,
                                                                                   maxFiles,
+                                                                                  onRemove,
                                                                                   onNextAction,
                                                                                   onBackAction,
                                                                               }, ref) => {
@@ -136,7 +139,6 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
 
-
         setError(null);
         setIsProcessing(true);
 
@@ -176,11 +178,12 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
 
             setProcessedImages(prev => [...prev, ...newProcessedImages]);
 
-            // Update parent with only the successfully processed images
-            const validFiles = newProcessedImages
-                .filter(img => img.status === 'ready')
-                .map(img => img.file);
-            onUpdate(validFiles);
+            if (onUpdateNew) {
+                const newValidFiles = newProcessedImages
+                    .map(img => img.file);
+                onUpdateNew(newValidFiles);
+            }
+
 
         } catch (err) {
             setError('Failed to process images');
@@ -188,7 +191,19 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
         } finally {
             setIsProcessing(false);
         }
-    }, [onUpdate, processedImages.length]);
+    }, [onUpdateNew, maxFiles]);
+
+
+    useEffect(() => {
+        if (onUpdateAll) {
+            const validFiles = processedImages
+                .filter(img => img.status === 'ready')
+                .map(img => img.file);
+            onUpdateAll(validFiles);
+
+           console.log(`attempting to update all files: ${validFiles}`);
+        }
+    }, [processedImages, onUpdateAll]);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({
         onDrop,
@@ -202,12 +217,20 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
         maxSize: MAX_FILE_SIZE,
     });
 
+
     const removeImage = (index: number) => {
+
+        const filename = processedImages[index].file.name;
+
         setProcessedImages(prev => {
             const updatedImages = [...prev];
             updatedImages.splice(index, 1);
             return updatedImages;
-        })
+        });
+
+        if (onRemove) {
+            onRemove(filename);
+        }
     };
 
     const handleSubmit = () => {
@@ -290,7 +313,9 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
                 {onBackAction && (
                     <Button
                         variant="outline-secondary"
-                        onClick={onBackAction.action}
+                        onClick={
+                            onBackAction.action
+                        }
                         className="px-4"
                     >
                         {onBackAction.actionName}

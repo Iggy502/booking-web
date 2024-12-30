@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Container} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {PropertyCreate} from '../../../models/Property';
@@ -43,13 +43,14 @@ const CreatePropertyComponent: React.FC = () => {
         },
         amenities: [],
     });
-    const {getUserInfo} = useAuth();
+    const {userInfo} = useAuth();
 
     const handleNext = () => {
         setCurrentStep(prev => prev + 1);
     };
 
     const handleBack = () => {
+        setPropertyImages([]); // Clear images when going back
         setCurrentStep(prev => prev - 1);
     };
 
@@ -60,14 +61,13 @@ const CreatePropertyComponent: React.FC = () => {
         }));
     };
 
-    const handleImagesUpdate = (files: File[]) => {
+    const handleImagesUpdate = useCallback((files: File[]) => {
         setPropertyImages(files);
-    };
+        console.log('images updated:', files);
+    }, []);
 
     const handleSubmit = async () => {
         try {
-
-            const userInfo = await getUserInfo();
 
             if (!userInfo) {
                 throw Unauthorized('User not authenticated. Cannot create property');
@@ -75,8 +75,10 @@ const CreatePropertyComponent: React.FC = () => {
 
             const propertyWithOwner = {...property, owner: userInfo.id};
 
-            // First create the property
             const createdProperty = await PropertyService.createProperty(propertyWithOwner);
+
+
+            console.log(`attempting to upload images for property with ${propertyImages.length} images, images: ${propertyImages}`);
 
             // Then upload images if there are any
             if (propertyImages.length > 0) {
@@ -89,6 +91,15 @@ const CreatePropertyComponent: React.FC = () => {
             console.error('Failed to create property:', error);
         }
     };
+
+    function handleImageRemove(fileName?: string) {
+
+        if (!fileName) return;
+
+        console.log('removing image:', fileName);
+
+        setPropertyImages(prev => prev.filter(file => file.name !== fileName));
+    }
 
     const renderStep = () => {
         switch (currentStep) {
@@ -121,10 +132,10 @@ const CreatePropertyComponent: React.FC = () => {
             case StepEnum.IMAGES:
                 return (
                     <ImageUploadStep
-                        onUpdate={handleImagesUpdate}
+                        onUpdateAll={handleImagesUpdate}
+                        onRemove={handleImageRemove}
                         onNextAction={{actionName: "Submit", action: handleSubmit}}
                         onBackAction={{actionName: "Back", action: handleBack}}
-                        disabled={propertyImages.length === 0}
                     />
                 );
             default:

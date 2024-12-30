@@ -1,35 +1,21 @@
 // Navbar.tsx
-import {Container, Nav, Navbar, NavDropdown, Offcanvas} from 'react-bootstrap';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {useAuth} from '../../context/auth.context.tsx';
-import {useCallback, useEffect, useState} from 'react';
+import { Container, Nav, Navbar, NavDropdown, Offcanvas } from 'react-bootstrap';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/auth.context.tsx';
+import { useCallback } from 'react';
 import './NavBar.scss';
 
 const NavBar = () => {
     const location = useLocation();
-    const {isAuthenticated, getUserInfo, logout} = useAuth();
-    const [userInfo, setUserInfo] = useState<{ firstName: string, lastName: string, userId: string } | null>(null);
+    const { isAuthenticated, userInfo, logout } = useAuth();
     const navigate = useNavigate();
-
-
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            if (isAuthenticated) {
-                const info = await getUserInfo();
-                if (info) {
-                    setUserInfo({firstName: info.firstName, lastName: info.lastName, userId: info.id});
-                }
-            }
-        };
-        fetchUserInfo();
-    }, [isAuthenticated, getUserInfo]);
 
 
     const logoutAndRedirect = useCallback(async () => {
         logout().then(() => {
             navigate('/');
         });
-    }, [logout]);
+    }, [logout, navigate]);
 
     return (
         <Navbar variant="dark" expand="lg" className="shadow-sm">
@@ -37,8 +23,8 @@ const NavBar = () => {
                 <Navbar.Brand as={Link} to="/" className="fw-bold">
                     CampSpot
                 </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-                <Nav className="ms-auto d-none d-lg-flex">
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Nav className="ms-auto d-none d-lg-flex align-items-center">
                     <NavDropdown
                         title="Find a Spot"
                         id="properties-dropdown"
@@ -53,39 +39,53 @@ const NavBar = () => {
                             List View
                         </NavDropdown.Item>
                     </NavDropdown>
-                    <Nav.Link as={Link} to="/bookings" className="d-none">My Bookings</Nav.Link>
+                    <Nav.Link as={Link} to="/bookings" className="d-none">
+                        My Bookings
+                    </Nav.Link>
 
                     {isAuthenticated ? (
                         <NavDropdown
                             title={
-                                <span>
-                                    <i className="fas fa-user me-1"></i>
-                                    {userInfo?.firstName}
-                                </span>
+                                <div className="d-flex align-items-center">
+                                    {userInfo?.profilePicturePath ? (
+                                        <img
+                                            src={userInfo.profilePicturePath}
+                                            alt="Profile"
+                                            className="rounded-circle me-2"
+                                            width="45"
+                                            height="45"
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <i className="fas fa-user me-2"></i>
+                                    )}
+                                    <span>{userInfo?.firstName}</span>
+                                </div>
                             }
                             id="user-dropdown"
+                            align="end"
                         >
                             <NavDropdown.Item as={Link} to="/properties/my-properties">
-                                <i className="fas fa-home me-1"></i>
+                                <i className="fas fa-home me-2"></i>
                                 My Properties
                             </NavDropdown.Item>
                             <NavDropdown.Item as={Link} to="/bookings">
-                                <i className="fas fa-calendar me-1"></i>
+                                <i className="fas fa-calendar me-2"></i>
                                 My Bookings
                             </NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to={`/profile/edit/${userInfo?.userId}`}>
-                                <i className="fas fa-pencil me-1"></i>
+                            <NavDropdown.Item as={Link} to={`/profile/edit/${userInfo?.id}`}>
+                                <i className="fas fa-pencil me-2"></i>
                                 Edit Profile
                             </NavDropdown.Item>
-                            <NavDropdown.Divider/>
+                            <NavDropdown.Divider />
                             <NavDropdown.Item onClick={logoutAndRedirect}>
-                                <i className="fas fa-sign-out-alt me-1"></i>
+                                <i className="fas fa-sign-out-alt me-2"></i>
                                 Logout
                             </NavDropdown.Item>
                         </NavDropdown>
                     ) : (
                         <Nav.Link as={Link} to="/login">
-                            <i className="fas fa-sign-in-alt me-1"></i>
+                            <i className="fas fa-sign-in-alt me-2"></i>
                             Log In
                         </Nav.Link>
                     )}
@@ -100,7 +100,21 @@ const NavBar = () => {
                     <Offcanvas.Header closeButton>
                         <Offcanvas.Title id="offcanvasNavbarLabel">
                             {isAuthenticated && userInfo ? (
-                                <span>{userInfo.firstName} {userInfo.lastName}</span>
+                                <div className="d-flex align-items-center">
+                                    {userInfo.profilePicturePath ? (
+                                        <img
+                                            src={userInfo.profilePicturePath}
+                                            alt="Profile"
+                                            className="rounded-circle me-2"
+                                            width="32"
+                                            height="32"
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <i className="fas fa-user me-2"></i>
+                                    )}
+                                    <span>{userInfo.firstName} {userInfo.lastName}</span>
+                                </div>
                             ) : (
                                 'Menu'
                             )}
@@ -127,7 +141,11 @@ const NavBar = () => {
                                         <i className="fas fa-calendar me-2"></i>
                                         My Bookings
                                     </Nav.Link>
-                                    <Nav.Link onClick={logout}>
+                                    <Nav.Link as={Link} to={`/profile/edit/${userInfo?.id}`}>
+                                        <i className="fas fa-pencil me-2"></i>
+                                        Edit Profile
+                                    </Nav.Link>
+                                    <Nav.Link onClick={logoutAndRedirect}>
                                         <i className="fas fa-sign-out-alt me-2"></i>
                                         Logout
                                     </Nav.Link>

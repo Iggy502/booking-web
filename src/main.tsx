@@ -86,7 +86,9 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: 'edit/:userId',
-                        element: <UserEditComponent/>,
+                        element: <PrivateRoute>
+                            <UserEditComponent/>
+                        </PrivateRoute>,
                     },
                     {
                         path: 'register',

@@ -160,8 +160,8 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
                         </Form.Text>
                     </Form.Group>
                 </Col>
-                <Col md={6}>
-                    <Form.Group className="mb-4">
+                <Col md={6} className={"d-flex justify-content-md-center"}>
+                    <Form.Group className={"mb-4"}>
                         <Form.Label>Price per Night (€)</Form.Label>
                         <Form.Control
                             type="number"
@@ -211,6 +211,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNext
             <Form.Group className="mb-4">
                 <Form.Label>Maximum Guests</Form.Label>
                 <Form.Control
+                    style={{width: '100px'}}
                     type="number"
                     name="maxGuests"
                     readOnly={readOnlyOptions?.maxGuests}

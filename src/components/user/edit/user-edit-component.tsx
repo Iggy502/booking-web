@@ -38,14 +38,14 @@ const UserEditComponent = () => {
     const imageUploaderRef = useRef<ImageUploadStepRef>(null);
     const {userId} = useParams<{ userId: string }>();
     const {showError} = useError();
-    const {getUserInfo} = useAuth();
+    const {userInfo, refreshUserInfo} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUser = async () => {
             setIsLoading(true);
             try {
-                const currUserInfo = await getUserInfo();
+                const currUserInfo = userInfo;
 
                 if (!currUserInfo) {
                     throw new Unauthorized('Not authorized');
@@ -73,7 +73,7 @@ const UserEditComponent = () => {
         };
 
         fetchUser();
-    }, [userId, getUserInfo, showError]);
+    }, [userId, userInfo, showError]);
 
     useEffect(() => {
         return () => {
@@ -145,10 +145,15 @@ const UserEditComponent = () => {
             }
 
             const updatedUser = await UserService.getUserById(currentUser.id);
+
+            console.log('Updated user:', updatedUser);
+
             setCurrentUser(updatedUser);
             setPreviewImage(updatedUser.profilePicturePath || '');
             setNewProfileImage(null);
             setSaveSuccess(true);
+
+            await refreshUserInfo();
 
             setTimeout(() => {
                 setSaveSuccess(false);
@@ -252,7 +257,7 @@ const UserEditComponent = () => {
                                     <div className="mx-auto">
                                         <ImageUploadStep
                                             ref={imageUploaderRef}
-                                            onUpdate={handleImageUpdate}
+                                            onUpdateNew={handleImageUpdate}
                                             maxFiles={{amount: 1, errorMessage: "Only one profile picture allowed"}}
                                         />
                                     </div>

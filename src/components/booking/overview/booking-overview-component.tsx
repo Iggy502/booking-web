@@ -20,13 +20,12 @@ const BookingOverviewComponent = () => {
     })>>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const {getUserInfo} = useAuth();
+    const {userInfo} = useAuth();
 
     useEffect(() => {
         const fetchBookingsAndProperties = async () => {
             try {
 
-                const userInfo = await getUserInfo();
 
                 if (!userInfo) {
                     throw Unauthorized('User not authenticated');
@@ -53,7 +52,7 @@ const BookingOverviewComponent = () => {
         };
 
         fetchBookingsAndProperties();
-    }, [getUserInfo, showError]);
+    }, [userInfo, showError]);
 
     const totalPages = Math.ceil(bookings.length / ITEMS_PER_PAGE);
     const paginatedBookings = bookings.slice(

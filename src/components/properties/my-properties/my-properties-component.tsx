@@ -33,7 +33,7 @@ const MyPropertiesComponent: React.FC = () => {
     const [properties, setProperties] = useState<Property[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const {getUserInfo} = useAuth();
+    const {userInfo} = useAuth();
     const [sortConfig, setSortConfig] = useState<SortConfig>({field: 'name', direction: 'asc'});
     const [filters, setFilters] = useState<Filters>({
         search: '',
@@ -45,7 +45,7 @@ const MyPropertiesComponent: React.FC = () => {
 
     useEffect(() => {
         const fetchPropertiesForCurrentUser = async () => {
-            const currUser = await getUserInfo();
+            const currUser = userInfo;
 
             if (!currUser) {
                 return;
@@ -64,7 +64,7 @@ const MyPropertiesComponent: React.FC = () => {
 
         fetchPropertiesForCurrentUser();
 
-    }, [showError, getUserInfo]);
+    }, [showError, userInfo]);
 
     const handleSort = (field: SortField) => {
         setSortConfig(current => ({

@@ -13,6 +13,7 @@ export interface AccessTokenPayload {
     firstName: string;
     lastName: string;
     roles: UserRole[];
+    profilePicturePath?: string;
 }
 
 
@@ -38,7 +39,7 @@ export class AuthService {
         localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
     }
 
-    static getUserInfo = async (): Promise<AccessTokenPayload | null> => {
+    static getUserInfo = (): AccessTokenPayload | null => {
 
         const token = this.getAccessToken();
 
