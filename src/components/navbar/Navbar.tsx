@@ -106,8 +106,8 @@ const NavBar = () => {
                                             src={userInfo.profilePicturePath}
                                             alt="Profile"
                                             className="rounded-circle me-2"
-                                            width="32"
-                                            height="32"
+                                            width="45"
+                                            height="45"
                                             style={{ objectFit: 'cover' }}
                                         />
                                     ) : (
