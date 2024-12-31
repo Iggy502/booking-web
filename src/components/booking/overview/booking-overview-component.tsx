@@ -31,7 +31,7 @@ const BookingOverviewComponent = () => {
                     throw Unauthorized('User not authenticated');
                 }
 
-                const userBookings = await BookingService.fetchBookingsByUser(userInfo.id);
+                const userBookings = await BookingService.fetchBookingsByUserGuest(userInfo.id);
                 console.log(`bookings: ${userBookings}`);
                 const propertyIds = [...new Set(userBookings.map(booking => booking.property))];
                 const properties = await PropertyService.fetchPropertiesByIds(propertyIds);
