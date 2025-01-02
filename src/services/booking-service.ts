@@ -3,6 +3,7 @@ import {bookings} from "../util/TestData.ts";
 import createHttpError, {HttpError} from "http-errors";
 import axios, {AxiosError} from "axios";
 import {io, Socket} from 'socket.io-client';
+import SocketService from "./socket.service.ts";
 
 export class BookingService {
     private static readonly BASE_URL = '/bookings';
@@ -36,6 +37,9 @@ export class BookingService {
             if (this.socket?.connected) {
                 this.socket.emit('bookingCreated', newBooking);
             }
+
+            //independent so should not be awaited
+            SocketService.notifyBookingCreated(newBooking);
 
             return newBooking;
         } catch (error: any) {

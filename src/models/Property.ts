@@ -1,3 +1,5 @@
+import {UserChat} from "./User.ts";
+
 export interface IAddress {
     street: string;
     city: string;
@@ -40,6 +42,12 @@ interface PropertyBase {
 export interface Property extends PropertyBase {
     id: string;
     imagePaths: string[];
+}
+
+export interface PropertyChat {
+    id: string;
+    name: string;
+    owner: UserChat;
 }
 
 

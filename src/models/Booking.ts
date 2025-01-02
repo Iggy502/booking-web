@@ -1,4 +1,6 @@
 import {Conversation} from "./Conversation.ts";
+import {PropertyChat} from "./Property.ts";
+import {UserChat} from "./User.ts";
 
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
 
@@ -30,3 +32,9 @@ export interface BookingResponse extends Omit<BookingBase, 'checkOut' | 'checkIn
 export interface BookingCreate extends Omit<BookingBase, 'status'> {
 }
 
+export interface BookingChat {
+    id: string;
+    property: PropertyChat;
+    guest: UserChat;
+    conversation: Conversation;
+}

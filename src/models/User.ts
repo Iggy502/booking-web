@@ -18,3 +18,8 @@ export interface IUserCreate extends User {
 export interface IUserUpdate extends Partial<User> {
     password?: string;
 }
+
+export interface UserChat extends Omit<User, 'email' | 'phone'> {
+    id: string;
+    profilePicturePath?: string;
+}
