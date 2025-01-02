@@ -81,7 +81,7 @@ const PropertyDetailComponent: React.FC = () => {
                     </Button>
                     <Button
                         variant="outline-secondary"
-                        onClick={() => navigate('/properties')}
+                        onClick={() => navigate('/properties/list')}
                     >
                         Back to Properties
                     </Button>

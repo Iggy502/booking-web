@@ -20,6 +20,7 @@ import UserEditComponent from "./components/user/edit/user-edit-component.tsx";
 import UserCreateComponent from "./components/user/create/create-user-component.tsx";
 import {RequestPasswordReset} from "./components/user/password-reset/request/password-request-component.tsx";
 import {ResetPasswordConfirm} from "./components/user/password-reset/confirm/confirm-password-component.tsx";
+import EditPropertyImages from "./components/properties/edit-property/edit-property-image-component.tsx";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,11 @@ const router = createBrowserRouter([
                         path: 'edit/:id',
                         element: <EditPropertyComponent/>,
                     },
+                    {
+                        path: 'edit-images/:id',
+                        element: <EditPropertyImages/>
+                    },
+
                     {
                         path: ':id',
                         element: <PropertyDetailComponent/>

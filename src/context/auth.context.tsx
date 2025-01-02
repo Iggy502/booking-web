@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const refreshUserInfo = useCallback(async () => {
         try {
             await AuthService.refreshToken();
-            const newUserInfo = await AuthService.getUserInfo();
+            const newUserInfo = AuthService.getUserInfo();
             setUserInfo(newUserInfo);
         } catch (error) {
             console.error("Error refreshing user info:", error);
@@ -78,7 +78,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Setup axios interceptor for adding the token to requests
     useEffect(() => {
-        axios.defaults.withCredentials = true;  // Add this line
+        axios.defaults.withCredentials = true;
+
         const requestInterceptor = axios.interceptors.request.use((config) => {
             const token = AuthService.getAccessToken();
 

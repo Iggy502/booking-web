@@ -1,5 +1,5 @@
 // services/socket.service.ts
-import {io, Socket} from 'socket.io-client';
+import {Socket} from 'socket.io-client';
 import {Booking, BookingChat} from '../models/Booking';
 import {PropertyService} from "./property-service.ts";
 import {UserService} from "./user.service.ts";
@@ -10,14 +10,11 @@ import {BadRequest} from "http-errors";
 class SocketService {
     private static socket: Socket | null = null;
 
-    static initialize(token: string, userId: string) {
-        this.socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
-            path: '/socket.io',
-            auth: {token},
-            query: {userId}
-        });
-        return this.socket;
+    static initialize(current: Socket | null) {
+        this.socket = current;
+        console.log('Socket initialized');
     }
+
 
     static async notifyBookingCreated(booking: Booking) {
         try {
@@ -29,9 +26,13 @@ class SocketService {
                 throw BadRequest('Conversation not found for booking');
             }
 
+            console.log(`notifyBookingCreated: ${booking.id}, fetching property and user data`);
+
             const propertyRelatedTobooking = await PropertyService.fetchPropertyById(booking.property);
             const userPropertyOwner = await UserService.getUserById(propertyRelatedTobooking.owner);
             const guestUser = await UserService.getUserById(booking.guest);
+
+            console.log(`fetched data for booking: ${propertyRelatedTobooking} and ${userPropertyOwner} and ${guestUser}`);
 
             const propertyChat: PropertyChat = {
                 id: propertyRelatedTobooking.id,
@@ -55,8 +56,11 @@ class SocketService {
             }
 
             this.socket.emit('bookingCreated', bookingChat);
-        } catch (error: any) {
-            console.error("Something went wrong while fetching property or user data for booking", error);
+
+            console.log(`Notified room ${booking.conversation.id} about new booking`);
+        } catch (error) {
+            console.error("Failed to notify about new booking:", error);
+            throw error;
         }
 
     }
@@ -65,6 +69,8 @@ class SocketService {
         this.socket?.disconnect();
         this.socket = null;
     }
+
+
 }
 
 export default SocketService;

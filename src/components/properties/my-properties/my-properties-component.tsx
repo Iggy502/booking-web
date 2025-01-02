@@ -356,6 +356,13 @@ const MyPropertiesComponent: React.FC = () => {
                                     >
                                         Edit
                                     </Button>
+                                    <Button
+                                        variant="outline-success"
+                                        size="sm"
+                                        onClick={() => navigate(`/properties/edit-images/${property.id}`)}
+                                    >
+                                        <i className="fa-solid fa-image"></i>
+                                    </Button>
                                 </div>
                             </td>
                         </tr>

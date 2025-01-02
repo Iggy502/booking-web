@@ -1,14 +1,13 @@
-import React, {useState, useEffect} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
-import {Container, Card, Spinner, Alert, Button} from 'react-bootstrap';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Alert, Button, Card, Container, Spinner} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service';
-import {Property, PropertyCreate, IAddress, IAmenity} from '../../../models/Property';
+import {IAddress, IAmenity, Property, PropertyCreate} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
 import BasicInfoStep from '../create-property/steps/BasicInfoStep';
 import AddressStep from '../create-property/steps/AddressStep';
 import AmenitiesStep from '../create-property/steps/AmenitiesStep';
 import './edit-property-component.scss';
-import EditPropertyImages from "./edit-property-image-component.tsx";
 import './edit-property-image-component.scss'
 import {useAuth} from "../../../context/auth.context.tsx";
 import {Forbidden} from "http-errors";
@@ -43,7 +42,7 @@ const EditPropertyComponent: React.FC = () => {
         };
 
         fetchProperty();
-    }, [id, showError, navigate]);
+    }, [id, showError, navigate, userInfo]);
 
     const handleBasicInfoUpdate = (updates: Partial<PropertyCreate>) => {
         if (!property) return;
@@ -159,17 +158,6 @@ const EditPropertyComponent: React.FC = () => {
                     />
                 </Card.Body>
             </Card>
-
-            <Card className="mb-4">
-                <Card.Header>
-                    <h2 className="h5 mb-0">Amenities</h2>
-                </Card.Header>
-                <Card.Body>
-                    <EditPropertyImages
-                        propertyId={id}
-                    /> </Card.Body>
-            </Card>
-
             <div className="d-flex justify-content-end">
                 <Button
                     variant="secondary"

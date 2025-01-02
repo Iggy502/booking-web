@@ -1,11 +1,13 @@
 import React, {CSSProperties, useEffect, useRef, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
-import {Badge, Button} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 import {useAuth} from '../context/auth.context';
 import {BookingChat} from '../models/Booking';
 import {Message as ChatMessage} from '../models/Message';
-import {FaArrowLeft, FaComments, FaTimes} from 'react-icons/fa';
+import {FaArrowLeft, FaComments} from 'react-icons/fa';
 import {Check, CheckCheck} from 'lucide-react';
+
+import './ChatComponent.scss';
 
 
 import {
@@ -18,9 +20,9 @@ import {
     Message,
     MessageInput,
     MessageList,
-    TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import SocketService from "../services/socket.service.ts";
 
 const customStyles: Record<string, CSSProperties> = {
     chatContainer: {
@@ -58,6 +60,11 @@ const ChatFooter: React.FC = () => {
     const {userInfo, getAccessTokenCurrentUser, isAuthenticated} = useAuth();
     const [accessToken, setAccessToken] = useState<string | null>(null);
 
+    const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+    const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+
+
+    const messageListRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -74,6 +81,9 @@ const ChatFooter: React.FC = () => {
             auth: {token: accessToken},
             query: {userId: userInfo?.id}
         });
+
+        SocketService.initialize(socketRef.current);
+
 
         socketRef.current.on('connect', () => {
             console.log('Connected to socket');
@@ -94,27 +104,61 @@ const ChatFooter: React.FC = () => {
         if (!socketRef.current) return;
 
         socketRef.current.on('messageReceived', (message: ChatMessage) => {
-            setBookingsWithConversations(prev => prev.map(conv => {
-                if (conv.conversation.id === message.conversationId) {
-                    return {
-                        ...conv,
-                        conversation: {
-                            ...conv.conversation,
-                            messages: [...conv.conversation.messages, message]
+            if (message.to === userInfo?.id && (!show || message.conversationId !== activeConversation)) {
+                setUnreadCounts(prev => ({
+                    ...prev,
+                    [message.conversationId]: (prev[message.conversationId] || 0) + 1
+                }));
+
+                setTotalUnreadCount(prev => prev + 1);
+            }
+
+            setBookingsWithConversations(prev => {
+                const conversationExists = prev.some(conv => conv.conversation.id === message.conversationId);
+                if (!conversationExists) return prev;
+
+                return prev.map(conv => {
+                    if (conv.conversation.id === message.conversationId) {
+                        if (activeConversation === message.conversationId && message.to === userInfo?.id) {
+                            socketRef.current?.emit('openChat', message.conversationId);
                         }
-                    };
-                }
-                return conv;
-            }));
+
+                        return {
+                            ...conv,
+                            conversation: {
+                                ...conv.conversation,
+                                messages: [...conv.conversation.messages, {
+                                    ...message,
+                                    read: activeConversation === message.conversationId && message.to === userInfo?.id
+                                }]
+                            }
+                        };
+                    }
+                    return conv;
+                });
+            });
         });
 
         socketRef.current.on('bookingsUpdated', (updatedBookings: BookingChat[]) => {
             setBookingsWithConversations(updatedBookings);
+            setTotalUnreadCount(bookingsWithConversations.reduce((total, conv) => {
+                return total + conv.conversation.messages.filter(
+                    msg => !msg.read && msg.to === userInfo?.id
+                ).length;
+            }, 0));
         });
 
+        // In your socket message handlers useEffect
         socketRef.current.on('typing', ({userId, isTyping}) => {
+            // Only show typing indicator if the other person is typing
             if (userId !== userInfo?.id) {
                 setRecipientTyping(isTyping);
+                // Add a safety timeout to ensure the typing indicator disappears
+                if (isTyping) {
+                    setTimeout(() => {
+                        setRecipientTyping(false);
+                    }, 3000);
+                }
             }
         });
 
@@ -129,7 +173,7 @@ const ChatFooter: React.FC = () => {
                                 ...conv.conversation,
                                 messages: conv.conversation.messages.map(msg => ({
                                     ...msg,
-                                    read: msg.read || msg.to === userId
+                                    read: msg.read || msg.to === userId    // Mark all messages to the other user as read
                                 }))
                             }
                         };
@@ -139,13 +183,14 @@ const ChatFooter: React.FC = () => {
             }
         });
 
+
         return () => {
             socketRef.current?.off('messageReceived');
             socketRef.current?.off('bookingsUpdated');
             socketRef.current?.off('typing');
             socketRef.current?.off('messagesRead');
         };
-    }, [socketRef.current, userInfo?.id]);
+    }, [socketRef.current, userInfo?.id, show, activeConversation]);
 
     // Authentication effect
     useEffect(() => {
@@ -195,41 +240,18 @@ const ChatFooter: React.FC = () => {
         };
 
         socketRef.current.emit('sendMessage', message, (response: { success: boolean, error?: string }) => {
-            if (response.success) {
-                // Only update the UI after server confirms message was saved
-                setBookingsWithConversations(prev => prev.map(conv => {
-                    if (conv.conversation.id === activeConversation) {
-                        return {
-                            ...conv,
-                            conversation: {
-                                ...conv.conversation,
-                                messages: [...conv.conversation.messages, message]
-                            }
-                        };
-                    }
-                    return conv;
-                }));
-            } else {
-                // Handle error - show toast or notification
+            if (!response.success) {
                 console.error('Failed to send message:', response.error);
-                // Optionally, you could restore the message to the input
                 setNewMessage(message.content);
             }
         });
-        setNewMessage('');
     };
 
     const handleConversationOpen = (conversationId: string) => {
         setActiveConversation(conversationId);
         socketRef.current?.emit('openChat', conversationId);
-    };
-
-    const getTotalUnreadCount = (): number => {
-        return bookingsWithConversations.reduce((total, conv) => {
-            return total + conv.conversation.messages.filter(
-                msg => !msg.read && msg.to === userInfo?.id
-            ).length;
-        }, 0);
+        setTotalUnreadCount(prev => prev - (unreadCounts[conversationId] || 0));
+        setUnreadCounts(prev => ({...prev, [conversationId]: 0}));
     };
 
     const getConversationTitle = (conversationId: string): string => {
@@ -260,19 +282,18 @@ const ChatFooter: React.FC = () => {
 
     return (
         <>
-            <div style={customStyles.chatButton}>
+            <div className="chat-button-wrapper">
                 <Button
                     variant="success"
                     onClick={() => setShow(!show)}
-                    className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg relative"
                 >
-                    {show ? <FaTimes size={24}/> : <FaComments size={24}/>}
-                    {getTotalUnreadCount() > 0 && (
-                        <Badge bg="danger" className="absolute -top-2 -right-2">
-                            {getTotalUnreadCount()}
-                        </Badge>
-                    )}
+                    <FaComments size={24}/>
                 </Button>
+                {totalUnreadCount > 0 && (
+                    <div className="unread-badge">
+                        {totalUnreadCount}
+                    </div>
+                )}
             </div>
 
             {show && (
@@ -280,18 +301,14 @@ const ChatFooter: React.FC = () => {
                     <MainContainer style={customStyles.mainContainer} responsive>
                         {!activeConversation ? (
                             <>
-                                <ConversationHeader>
-                                    <ConversationHeader.Content>
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className={`w-2 h-2 rounded-full ${
-                                                    isConnected ? 'bg-green-500' : 'bg-red-500'
-                                                }`}
-                                            />
-                                            <span>Messages</span>
+                                <div className="chat-list-container">
+                                    <div className="chat-header">
+                                        <div className="d-flex align-items-center gap-2">
+                                            <div className={`connection-indicator ${isConnected ? 'connected' : ''}`}/>
+                                            <span className="header-title">Booking Chats</span>
                                         </div>
-                                    </ConversationHeader.Content>
-                                </ConversationHeader>
+                                    </div>
+                                </div>
                                 <ConversationList>
                                     {bookingsWithConversations.map((booking) => {
                                         const otherParticipant = getOtherParticipant(booking);
@@ -300,13 +317,28 @@ const ChatFooter: React.FC = () => {
                                         return (
                                             <Conversation
                                                 key={booking.conversation.id}
-                                                name={booking.property.name}
+
+                                                name={
+                                                    <>
+                                                        <span>{booking.property.name}</span>
+                                                        {unreadCounts[booking.conversation.id] > 0 && (
+                                                            <span
+                                                                className="unread-dot">{unreadCounts[booking.conversation.id]}</span>
+                                                        )}
+                                                    </>
+                                                }
                                                 lastSenderName={lastMessage ?
                                                     (lastMessage.from === userInfo?.id ? 'You' : otherParticipant.firstName)
                                                     : ''}
-                                                info={lastMessage?.content || 'No messages yet'}
+                                                info={
+                                                    <span
+                                                        className={`${unreadCounts[booking.conversation.id] > 0 ? 'fw-bold' : ''} conv-prev-text`}>
+                {lastMessage?.content || 'No messages yet'}
+            </span>
+                                                }
                                                 onClick={() => handleConversationOpen(booking.conversation.id)}
                                             >
+
                                                 <Avatar
                                                     src={otherParticipant.profilePicturePath}
                                                     name={otherParticipant.firstName}
@@ -319,15 +351,17 @@ const ChatFooter: React.FC = () => {
                         ) : (
                             <ChatContainer>
                                 <ConversationHeader>
-                                    <ConversationHeader.Back onClick={handleBack}>
-                                        <FaArrowLeft/>
+                                    <ConversationHeader.Back>
+                                        <Button variant="link" className={"d-flex"} onClick={handleBack}>
+                                            <FaArrowLeft/>
+                                        </Button>
                                     </ConversationHeader.Back>
                                     <ConversationHeader.Content>
                                         {getConversationTitle(activeConversation)}
                                     </ConversationHeader.Content>
                                 </ConversationHeader>
 
-                                <MessageList>
+                                <MessageList ref={messageListRef}>
                                     {bookingsWithConversations
                                         .find(b => b.conversation.id === activeConversation)
                                         ?.conversation.messages.map((msg, idx) => (
@@ -364,7 +398,13 @@ const ChatFooter: React.FC = () => {
                                             </Message>
                                         ))}
                                     {recipientTyping && (
-                                        <TypingIndicator content="Someone is typing"/>
+                                        <div className="typing-indicator-container">
+                                            <div className="typing-indicator">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
                                     )}
                                 </MessageList>
 
