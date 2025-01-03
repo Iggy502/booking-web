@@ -39,9 +39,11 @@ interface PropertyBase {
 }
 
 
-export interface Property extends PropertyBase {
+export interface PropertyViewModel extends PropertyBase {
     id: string;
     imagePaths: string[];
+    avgRating?: number;
+    totalRatings?: number;
 }
 
 export interface PropertyChat {
@@ -49,7 +51,6 @@ export interface PropertyChat {
     name: string;
     owner: UserChat;
 }
-
 
 export interface PropertyCreate extends PropertyBase {
 

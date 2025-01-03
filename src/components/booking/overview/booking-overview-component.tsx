@@ -4,7 +4,7 @@ import {Badge, Container, Pagination, Spinner, Table} from 'react-bootstrap';
 import {BookingService} from '../../../services/booking-service';
 import {PropertyService} from '../../../services/property-service';
 import {Booking, BookingStatus} from '../../../models/Booking';
-import {Property} from '../../../models/Property';
+import {PropertyViewModel} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
 import './booking-overview-component.scss';
 import {useAuth} from "../../../context/auth.context.tsx";
@@ -16,7 +16,7 @@ const BookingOverviewComponent = () => {
     const navigate = useNavigate();
     const {showError} = useError();
     const [bookings, setBookings] = useState<Array<Omit<Booking, 'property'> & ({
-        property: Property | undefined
+        property: PropertyViewModel | undefined
     })>>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);

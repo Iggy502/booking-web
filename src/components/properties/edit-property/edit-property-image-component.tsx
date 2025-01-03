@@ -96,7 +96,7 @@ const EditPropertyImages: React.FC = () => {
     };
 
     return (
-        <Container className={"mt-4"}>
+        <Container style={{marginTop: '7em', border: '1px solid red'}}>
             <div className="property-images">
                 {error && (
                     <Alert variant="danger" onClose={() => setError(null)} dismissible>

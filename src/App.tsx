@@ -3,7 +3,7 @@ import NavBar from "./components/navbar/Navbar";
 import {ErrorProvider} from './context/error.context.tsx';
 import ErrorBanner from './error/ErrorBanner.tsx';
 import {AuthProvider} from "./context/auth.context.tsx";
-import Footer from "./pages/ChatComponent.tsx";
+import Chat from "./pages/ChatComponent.tsx";
 
 const App = () => {
     return (
@@ -14,7 +14,7 @@ const App = () => {
                 <main>
                     <Outlet/>
                 </main>
-                <Footer/>
+                {/*<Chat/>*/}
             </ErrorProvider>
         </AuthProvider>
     );

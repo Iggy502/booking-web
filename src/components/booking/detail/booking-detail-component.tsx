@@ -4,7 +4,7 @@ import {Card, Col, Container, Row} from 'react-bootstrap';
 import {BookingService} from '../../../services/booking-service';
 import {PropertyService} from '../../../services/property-service';
 import {Booking} from '../../../models/Booking';
-import {Property} from '../../../models/Property';
+import {PropertyViewModel} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
 import './booking-detail-component.scss';
 import {NotFound} from "http-errors";
@@ -14,7 +14,7 @@ const BookingDetailComponent: React.FC = () => {
     const navigate = useNavigate();
     const {showError} = useError();
     const [booking, setBooking] = useState<Booking | null>(null);
-    const [property, setProperty] = useState<Property | null>(null);
+    const [property, setProperty] = useState<PropertyViewModel | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

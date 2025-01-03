@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Button, Col, Container, Form, InputGroup, Pagination, Row, Spinner, Table} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
-import {Property} from '../../../models/Property';
+import {PropertyViewModel} from '../../../models/Property';
 import {PropertyService} from '../../../services/property-service';
 import {useError} from '../../../context/error.context';
 import {ChevronDown, ChevronUp} from 'lucide-react';
@@ -30,7 +30,7 @@ interface Filters {
 const MyPropertiesComponent: React.FC = () => {
     const navigate = useNavigate();
     const {showError} = useError();
-    const [properties, setProperties] = useState<Property[]>([]);
+    const [properties, setProperties] = useState<PropertyViewModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const {userInfo} = useAuth();

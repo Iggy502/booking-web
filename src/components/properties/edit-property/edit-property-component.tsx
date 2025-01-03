@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Button, Card, Container, Spinner} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service';
-import {IAddress, IAmenity, Property, PropertyCreate} from '../../../models/Property';
+import {IAddress, IAmenity, PropertyViewModel, PropertyCreate} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
 import BasicInfoStep from '../create-property/steps/BasicInfoStep';
 import AddressStep from '../create-property/steps/AddressStep';
@@ -17,7 +17,7 @@ const EditPropertyComponent: React.FC = () => {
     const navigate = useNavigate();
     const {showError} = useError();
 
-    const [property, setProperty] = useState<Property | null>(null);
+    const [property, setProperty] = useState<PropertyViewModel | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const {userInfo} = useAuth();

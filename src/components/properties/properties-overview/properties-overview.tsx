@@ -1,11 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Badge, Card, Carousel, Col, Pagination, Row, Spinner} from 'react-bootstrap';
-import {Property} from '../../../models/Property';
+import {PropertyViewModel} from '../../../models/Property';
 import {useNavigate} from 'react-router-dom';
 import './properties-overview.scss';
 
 interface PropertyOverviewProps {
-    properties: Property[];
+    properties: PropertyViewModel[];
     propertiesPerPage: number;
     onPropertySelect?: (propertyId: string) => void;
     selectedPropertyId?: string | null;

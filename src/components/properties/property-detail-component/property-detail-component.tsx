@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import {AmenityType, Property} from '../../../models/Property';
+import {AmenityType, PropertyViewModel} from '../../../models/Property';
 import { PropertyService } from '../../../services/property-service';
 import { useError } from '../../../context/error.context';
 import './property-detail-component.scss';
@@ -27,7 +27,7 @@ const PropertyDetailComponent: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { showError } = useError();
-    const [property, setProperty] = useState<Property | null>(null);
+    const [property, setProperty] = useState<PropertyViewModel | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

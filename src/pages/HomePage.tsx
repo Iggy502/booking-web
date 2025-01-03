@@ -8,7 +8,7 @@ import './HomePage.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import {Address} from "../services/Mapbox";
 import {SearchBox} from "../components/SearchBox/SearchBox";
-import {AmenityType, Property} from "../models/Property";
+import {AmenityType, PropertyViewModel} from "../models/Property";
 import {Booking} from "../models/Booking";
 import {BookingService} from "../services/booking-service";
 import {useNavigate} from "react-router-dom";
@@ -75,7 +75,7 @@ const HomePage = () => {
 
     // Data state
     const [isInitialLoading, setIsInitialLoading] = useState(true);
-    const [properties, setProperties] = useState<Property[]>([]);
+    const [properties, setProperties] = useState<PropertyViewModel[]>([]);
     const [bookingsByProperty, setBookingsByProperty] = useState<BookingsByProperty>({});
     const [dateError, setDateError] = useState<string | null>(null);
 

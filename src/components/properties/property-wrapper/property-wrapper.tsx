@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import PropertyOverview from '../properties-overview/properties-overview';
 import {PropertyService} from '../../../services/property-service.ts'
 import {BookingService} from "../../../services/booking-service.ts";
-import {AmenityType, Property} from "../../../models/Property";
+import {AmenityType, PropertyViewModel} from "../../../models/Property";
 import './PropertyWrapper.scss';
 import {Booking} from "../../../models/Booking.ts";
 import {useNavigate} from "react-router-dom";
@@ -26,7 +26,7 @@ const getAmenityIcon = (type: AmenityType): string => {
 };
 
 const PropertyWrapper = () => {
-    const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
+    const [filteredProperties, setFilteredProperties] = useState<PropertyViewModel[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAmenities, setSelectedAmenities] = useState<Set<AmenityType>>(new Set());
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -36,7 +36,7 @@ const PropertyWrapper = () => {
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingBookings, setIsLoadingBookings] = useState(false);
-    const allProperties = useRef<Property[]>([]);
+    const allProperties = useRef<PropertyViewModel[]>([]);
     const [propertyBookings, setPropertyBookings] = useState<Booking[]>([]);
     const [guestCount, setGuestCount] = useState<number>(1);
     const navigate = useNavigate();

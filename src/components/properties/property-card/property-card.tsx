@@ -1,10 +1,10 @@
 import React from 'react';
 import {Badge, Card, Carousel} from 'react-bootstrap';
-import {AmenityType, Property} from '../../../models/Property.ts';
+import {AmenityType, PropertyViewModel} from '../../../models/Property.ts';
 import './property-card.scss';
 
 interface PropertyCardProps {
-    property: Property;
+    property: PropertyViewModel;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({property}) => {

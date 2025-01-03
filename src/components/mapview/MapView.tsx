@@ -1,11 +1,11 @@
 import {useEffect, useRef} from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import {Property} from '../../models/Property.ts';
+import {PropertyViewModel} from '../../models/Property.ts';
 import './MapView.scss';
 
 interface MapViewProps {
-    properties: Property[];
+    properties: PropertyViewModel[];
     selectedLocation: { longitude: number | null, latitude: number | null } | null;
     handlePropertySelect: (propertyId: string | null) => void;
     onViewDetails: (propertyId: string) => void;
@@ -77,7 +77,7 @@ const MapView = ({properties, selectedLocation, handlePropertySelect, onViewDeta
         };
     }, []);
 
-    const createMarker = (property: Property) => {
+    const createMarker = (property: PropertyViewModel) => {
         if (!property?.address?.latitude || !property?.address?.longitude) {
             return null;
         }

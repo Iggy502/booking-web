@@ -1,4 +1,4 @@
-import {AmenityType, Property} from "../models/Property.ts";
+import {AmenityType, PropertyViewModel} from "../models/Property.ts";
 import {Booking} from "../models/Booking.ts";
 import {Conversation} from "../models/Conversation.ts";
 
@@ -31,7 +31,7 @@ export const conversations: Conversation[] = [
     }
 ];
 
-export const properties: Property[] = [
+export const properties: PropertyViewModel[] = [
     // Add these to the properties array
     {
         id: "60d21b4667d0d8992e610c90",

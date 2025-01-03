@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, Col, Container, Row} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service.ts';
-import {AmenityType, Property} from '../../../models/Property.ts';
+import {AmenityType, PropertyViewModel} from '../../../models/Property.ts';
 import {useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
 import './booking-confirm-component.scss'
@@ -28,7 +28,7 @@ const getAmenityIcon = (type: AmenityType): string => {
 const BookingConfirmComponent: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [property, setProperty] = useState<Property | null>(null);
+    const [property, setProperty] = useState<PropertyViewModel | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [hasError, setHasError] = useState(false);

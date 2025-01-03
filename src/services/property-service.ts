@@ -1,7 +1,8 @@
 // src/services/PropertyService.ts
-import {Property, PropertyCreate, PropertyUpdate} from '../models/Property';
+import {PropertyViewModel, PropertyCreate, PropertyUpdate} from '../models/Property';
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
+import {CreateRatingRequest, RatingViewModel, UpdateRatingRequest} from "../models/Rating.ts";
 
 export class PropertyService {
 
@@ -9,11 +10,11 @@ export class PropertyService {
     private static BASE_URL_IMAGES = '/images';
 
 
-    static async fetchAllProperties(): Promise<Property[]> {
+    static async fetchAllProperties(): Promise<PropertyViewModel[]> {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/`;
 
         try {
-            const response = await axios.get<Property[]>(url)
+            const response = await axios.get<PropertyViewModel[]>(url)
             return response.data;
         } catch (error: any) {
             console.error("Error fetching properties:", error);
@@ -21,12 +22,12 @@ export class PropertyService {
         }
     }
 
-    static async fetchPropertyById(id: string): Promise<Property> {
+    static async fetchPropertyById(id: string): Promise<PropertyViewModel> {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${id}`;
         console.log("fetching property with url:", url);
 
         try {
-            const response = await axios.get<Property>(url)
+            const response = await axios.get<PropertyViewModel>(url)
             console.log("Property fetched by id:", response.data);
             return response.data;
         } catch (error: any) {
@@ -35,12 +36,12 @@ export class PropertyService {
         }
     }
 
-    static async updateProperty(propertyId: string, property: PropertyUpdate): Promise<Property> {
+    static async updateProperty(propertyId: string, property: PropertyUpdate): Promise<PropertyViewModel> {
 
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${propertyId}`;
 
         try {
-            const response = await axios.put<Property>(url, property)
+            const response = await axios.put<PropertyViewModel>(url, property)
             return response.data;
         } catch (error: any) {
             console.error("Error updating property:", error);
@@ -50,11 +51,11 @@ export class PropertyService {
 
     }
 
-    static async fetchPropertiesForUser(userId: string): Promise<Property[]> {
+    static async fetchPropertiesForUser(userId: string): Promise<PropertyViewModel[]> {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/findByUser/${userId}`;
 
         try {
-            const response = await axios.get<Property[]>(url)
+            const response = await axios.get<PropertyViewModel[]>(url)
             return response.data;
         } catch (error: any) {
             console.error("Error fetching properties for User :", error, userId);
@@ -63,11 +64,11 @@ export class PropertyService {
     }
 
 
-    static async createProperty(property: PropertyCreate): Promise<Property> {
+    static async createProperty(property: PropertyCreate): Promise<PropertyViewModel> {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/`;
 
         try {
-            const response = await axios.post<Property>(url, property)
+            const response = await axios.post<PropertyViewModel>(url, property)
             return response.data;
         } catch (error: any) {
             console.error("Error creating property:", error);
@@ -135,7 +136,7 @@ export class PropertyService {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/searchByIds`;
 
         try {
-            const response = await axios.post<Property[]>(url, propertyIds)
+            const response = await axios.post<PropertyViewModel[]>(url, propertyIds)
             console.log("Properties fetched by ids:", response.data);
             return response.data;
         } catch (error: any) {
@@ -143,6 +144,74 @@ export class PropertyService {
             throw this.convertApiError(error as AxiosError<HttpError>);
         }
 
+    }
+
+    static async fetchRatingForProperty(propertyId: string): Promise<RatingViewModel[]> {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${propertyId}/ratings`;
+
+        try {
+            const response = await axios.get<RatingViewModel[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching rating for property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
+    // returns all ratings with the new rating added to avoid fetching again
+    static async createRatingForProperty(rating: CreateRatingRequest): Promise<RatingViewModel[]> {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings`;
+
+        try {
+            const response = await axios.post<RatingViewModel[]>(url, rating);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error creating rating for property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
+    //response is updated rating
+    static async updateRatingForProperty(rating: UpdateRatingRequest): Promise<RatingViewModel> {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings/${rating.id}`;
+
+        try {
+            const response = await axios.put<RatingViewModel>(url, rating);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error updating rating for property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
+    //response is refresed ratings after deletion
+    static async deleteRatingForProperty(ratingId: string): Promise<RatingViewModel[]> {
+
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings/${ratingId}`;
+
+        try {
+            const response = await axios.delete<RatingViewModel[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error deleting rating for property:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
+    //response is updated rating
+    static async toggleRatingHelpful(ratingId: string): Promise<RatingViewModel> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings/${ratingId}/helpful`;
+
+        try {
+            const response = await axios.put<RatingViewModel>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error toggling helpful for rating:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
     }
 
 
