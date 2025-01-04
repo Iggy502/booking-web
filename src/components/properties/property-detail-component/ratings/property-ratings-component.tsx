@@ -26,7 +26,8 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
     const fetchRatings = async () => {
         try {
             setIsLoading(true);
-            const fetchedRatings = await PropertyService.fetchRatingForProperty(propertyId);
+            const fetchedRatings = await PropertyService.fetchRatingsForProperty(propertyId);
+            console.log(`fetched rating are: ${fetchedRatings}`);
             setRatings(fetchedRatings);
         } catch (error) {
             setError('Failed to load reviews');

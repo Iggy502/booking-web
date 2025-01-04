@@ -146,12 +146,13 @@ export class PropertyService {
 
     }
 
-    static async fetchRatingForProperty(propertyId: string): Promise<RatingViewModel[]> {
+    static async fetchRatingsForProperty(propertyId: string): Promise<RatingViewModel[]> {
 
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/${propertyId}/ratings`;
 
         try {
             const response = await axios.get<RatingViewModel[]>(url);
+            console.log("Ratings fetched for property:", response.data);
             return response.data;
         } catch (error: any) {
             console.error("Error fetching rating for property:", error);

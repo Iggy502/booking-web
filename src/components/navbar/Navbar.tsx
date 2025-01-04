@@ -18,7 +18,7 @@ const NavBar = () => {
     }, [logout, navigate]);
 
     return (
-        <Navbar variant="dark" expand="lg" className="shadow-sm">
+        <Navbar id={'custom-nav'} variant="dark" expand="lg" className="shadow-sm">
             <Container fluid>
                 <Navbar.Brand as={Link} to="/" className="fw-bold">
                     CampSpot
