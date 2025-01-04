@@ -4,7 +4,7 @@ import {X} from 'lucide-react';
 import ImageUploadStep, {ImageUploadStepRef} from '../create-property/steps/ImageUploadStep';
 import {PropertyService} from '../../../services/property-service';
 import {useError} from "../../../context/error.context.tsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {BadRequest} from "http-errors";
 import {useAuth} from "../../../context/auth.context.tsx";
 
@@ -15,9 +15,10 @@ const EditPropertyImages: React.FC = () => {
     const {id: propertyId} = useParams<{ id: string }>();
 
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const {userInfo, isAuthenticated} = useAuth();
+    const {userInfo} = useAuth();
     const [isDeleting, setIsDeleting] = useState(false);
     const [imagePaths, setImagePaths] = useState<string[]>([]);
     const {showError} = useError()
@@ -96,7 +97,7 @@ const EditPropertyImages: React.FC = () => {
     };
 
     return (
-        <Container style={{marginTop: '7em', border: '1px solid red'}}>
+        <Container style={{marginTop: '7em'}}>
             <div className="property-images">
                 {error && (
                     <Alert variant="danger" onClose={() => setError(null)} dismissible>
@@ -104,7 +105,14 @@ const EditPropertyImages: React.FC = () => {
                     </Alert>
                 )}
 
-                {/* Current Images with Delete */}
+                <div className="d-flex justify-content-center align-items-center mb-4 gap-4">
+                <Button variant={'light'} onClick={() => navigate(`/properties/my-properties`)}>
+                    <i className="fa-solid fa-left-long"></i>
+                </Button>
+                <Button variant={"primary"} onClick={() => navigate("/")}>
+                    <i className="fa-solid fa-house"></i>
+                </Button>
+                </div>
 
                 {imagePaths.length > 0 && (
                     <Card className="">

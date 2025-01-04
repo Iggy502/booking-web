@@ -162,7 +162,7 @@ const EditPropertyComponent: React.FC = () => {
                 <Button
                     variant="secondary"
                     className="me-2"
-                    onClick={() => navigate('/properties')}
+                    onClick={() => navigate('/properties/my-properties')}
                 >
                     Cancel
                 </Button>

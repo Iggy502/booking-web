@@ -1,10 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Button, Card, Form, Spinner} from 'react-bootstrap';
+import {Alert, Button, Card, Form, Spinner, Pagination, Dropdown} from 'react-bootstrap';
 import {Edit, Star, ThumbsUp, Trash} from 'lucide-react';
-import {PropertyService} from '../../../../services/property-service.ts';
-import {useAuth} from '../../../../context/auth.context.tsx';
-import {CreateRatingRequest, RatingViewModel, UpdateRatingRequest} from '../../../../models/Rating.ts';
+import {PropertyService} from '../../../../services/property-service';
+import {useAuth} from '../../../../context/auth.context';
+import {CreateRatingRequest, RatingViewModel, UpdateRatingRequest} from '../../../../models/Rating';
 import './property-ratings.component.scss';
+
+const REVIEWS_PER_PAGE = 4;
+
+type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
 
 interface PropertyRatingsProps {
     propertyId: string;
@@ -18,16 +22,48 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
     const [formData, setFormData] = useState({rating: 0, review: ''});
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [sortBy, setSortBy] = useState<SortOption>('newest');
+
+    const getSortedReviews = (reviews: RatingViewModel[]) => {
+        const sorted = [...reviews];
+        switch (sortBy) {
+            case 'oldest':
+                return sorted.sort((a, b) =>
+                    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                );
+            case 'highest':
+                return sorted.sort((a, b) => b.rating - a.rating);
+            case 'lowest':
+                return sorted.sort((a, b) => a.rating - b.rating);
+            case 'newest':
+            default:
+                return sorted.sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+        }
+    };
+
+    // Pagination calculations with sorted reviews
+    const sortedRatings = getSortedReviews(ratings);
+    const indexOfLastReview = currentPage * REVIEWS_PER_PAGE;
+    const indexOfFirstReview = indexOfLastReview - REVIEWS_PER_PAGE;
+    const currentReviews = sortedRatings.slice(indexOfFirstReview, indexOfLastReview);
+    const totalPages = Math.ceil(ratings.length / REVIEWS_PER_PAGE);
 
     useEffect(() => {
         fetchRatings();
     }, [propertyId]);
 
+    useEffect(() => {
+        // Reset to first page when sorting changes
+        setCurrentPage(1);
+    }, [sortBy]);
+
     const fetchRatings = async () => {
         try {
             setIsLoading(true);
             const fetchedRatings = await PropertyService.fetchRatingsForProperty(propertyId);
-            console.log(`fetched rating are: ${fetchedRatings}`);
             setRatings(fetchedRatings);
         } catch (error) {
             setError('Failed to load reviews');
@@ -46,7 +82,9 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
                     id: editingRating,
                     ...formData
                 };
-                await PropertyService.updateRatingForProperty(updateRequest);
+                const updatedRating = await PropertyService.updateRatingForProperty(updateRequest);
+                ratings.splice(ratings.findIndex(r => r.id === updatedRating.id), 1, updatedRating);
+                setRatings([...ratings]);
             } else {
                 const createRequest: CreateRatingRequest = {
                     propertyId,
@@ -60,7 +98,6 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
             setIsAddingReview(false);
             setEditingRating(null);
             setFormData({rating: 0, review: ''});
-            await fetchRatings();
         } catch (error) {
             setError('Failed to submit review');
         }
@@ -86,9 +123,15 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
 
     const handleToggleHelpful = async (ratingId: string) => {
         try {
-            await PropertyService.toggleRatingHelpful(ratingId);
-            await fetchRatings();
+            const updatedRating = await PropertyService.toggleRatingHelpful(ratingId);
+            const currRatingIndex = ratings.findIndex(r => r.id === ratingId);
+            const currRating = ratings[currRatingIndex];
+            currRating.helpful = updatedRating.helpful;
+
+            setRatings([...ratings]);
+
         } catch (error) {
+
             setError('Failed to mark review as helpful');
         }
     };
@@ -97,25 +140,78 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
         value: number;
         isInteractive?: boolean;
         onSelect?: (value: number) => void;
-    }> = ({value, isInteractive = false, onSelect}) => (
-        <div className="d-flex align-items-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-                <Button
-                    key={star}
-                    variant="link"
-                    className="p-0 me-1"
-                    onClick={isInteractive ? () => onSelect?.(star) : undefined}
-                    disabled={!isInteractive}
-                >
-                    <Star
-                        size={20}
-                        className={star <= value ? 'text-warning' : 'text-secondary'}
-                        fill={star <= value ? 'currentColor' : 'none'}
+    }> = ({value, isInteractive = false, onSelect}) => {
+        const [hoverValue, setHoverValue] = useState(0);
+
+        return (
+            <div className="d-flex align-items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <Button
+                        key={star}
+                        variant="link"
+                        className="p-0 me-1 star-button"
+                        onClick={isInteractive ? () => onSelect?.(star) : undefined}
+                        onMouseEnter={isInteractive ? () => setHoverValue(star) : undefined}
+                        onMouseLeave={isInteractive ? () => setHoverValue(0) : undefined}
+                        disabled={!isInteractive}
+                    >
+                        <Star
+                            size={20}
+                            className={`
+                                ${(hoverValue ? star <= hoverValue : star <= value)
+                                ? 'text-warning'
+                                : 'text-secondary'
+                            }
+                                ${isInteractive ? 'interactive-star' : ''}
+                            `}
+                            fill={(hoverValue ? star <= hoverValue : star <= value)
+                                ? 'currentColor'
+                                : 'none'
+                            }
+                        />
+                    </Button>
+                ))}
+            </div>
+        );
+    };
+
+    const PaginationControls = () => {
+        if (totalPages <= 1) return null;
+
+        return (
+            <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                    <Pagination.First
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
                     />
-                </Button>
-            ))}
-        </div>
-    );
+                    <Pagination.Prev
+                        onClick={() => setCurrentPage(prev => prev - 1)}
+                        disabled={currentPage === 1}
+                    />
+
+                    {Array.from({length: totalPages}, (_, i) => (
+                        <Pagination.Item
+                            key={i + 1}
+                            active={i + 1 === currentPage}
+                            onClick={() => setCurrentPage(i + 1)}
+                        >
+                            {i + 1}
+                        </Pagination.Item>
+                    ))}
+
+                    <Pagination.Next
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                    />
+                </Pagination>
+            </div>
+        );
+    };
 
     if (isLoading) {
         return (
@@ -134,13 +230,46 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
             <div className="mb-4 d-flex justify-content-between align-items-center">
                 <div>
                     {ratings.length > 0 && (
-                        <div className="d-flex align-items-center">
-                            <RatingStars
-                                value={ratings.reduce((acc, r) => acc + r.rating, 0) / ratings.length}
-                            />
-                            <span className="ms-2 text-muted">
-                ({ratings.length} review{ratings.length !== 1 ? 's' : ''})
-              </span>
+                        <div className="d-flex align-items-center gap-3">
+                            <div className="d-flex align-items-center">
+                                <RatingStars
+                                    value={ratings.reduce((acc, r) => acc + r.rating, 0) / ratings.length}
+                                />
+                                <span className="ms-2 text-muted">
+                                    ({ratings.length} review{ratings.length !== 1 ? 's' : ''})
+                                </span>
+                            </div>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="outline-secondary" size="sm">
+                                    Sort by: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item
+                                        active={sortBy === 'newest'}
+                                        onClick={() => setSortBy('newest')}
+                                    >
+                                        Newest first
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        active={sortBy === 'oldest'}
+                                        onClick={() => setSortBy('oldest')}
+                                    >
+                                        Oldest first
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        active={sortBy === 'highest'}
+                                        onClick={() => setSortBy('highest')}
+                                    >
+                                        Highest rated
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        active={sortBy === 'lowest'}
+                                        onClick={() => setSortBy('lowest')}
+                                    >
+                                        Lowest rated
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
                     )}
                 </div>
@@ -150,7 +279,6 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
                     </Button>
                 )}
             </div>
-
             {isAddingReview && (
                 <Card className="mb-4">
                     <Card.Body>
@@ -200,7 +328,7 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
                 </Card>
             )}
 
-            {ratings.map((rating) => (
+            {currentReviews.map((rating) => (
                 <Card key={rating.id} className="mb-3">
                     <Card.Body>
                         <div className="d-flex justify-content-between">
@@ -224,7 +352,7 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
                                 </div>
                             </div>
                             {userInfo?.id === rating.user.id && (
-                                <div className="d-flex gap-2">
+                                <div className="d-flex gap-2 align-items-start">
                                     <Button
                                         variant="outline-primary"
                                         size="sm"
@@ -255,6 +383,8 @@ const PropertyRatings: React.FC<PropertyRatingsProps> = ({propertyId}) => {
                     </Card.Body>
                 </Card>
             ))}
+
+            <PaginationControls/>
 
             {ratings.length === 0 && !isAddingReview && (
                 <Alert variant="info">

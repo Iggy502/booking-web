@@ -244,7 +244,7 @@ const UserEditComponent = () => {
                                     </div>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Zoom</Form.Label>
+                                        <Form.Label><i className="fa-solid fa-magnifying-glass"></i></Form.Label>
                                         <Form.Range
                                             value={scale}
                                             onChange={(e) => setScale(parseFloat(e.target.value))}
