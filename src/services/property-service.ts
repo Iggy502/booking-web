@@ -1,8 +1,25 @@
 // src/services/PropertyService.ts
-import {PropertyViewModel, PropertyCreate, PropertyUpdate} from '../models/Property';
+import {PropertyViewModel, PropertyCreate, PropertyUpdate, AmenityType} from '../models/Property';
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
 import {CreateRatingRequest, RatingViewModel, UpdateRatingRequest} from "../models/Rating.ts";
+
+
+export const getAmenityIcon = (type: AmenityType): string => {
+    const icons: Record<AmenityType, string> = {
+        [AmenityType.Wifi]: 'fa-wifi',
+        [AmenityType.Parking]: 'fa-parking',
+        [AmenityType.Pool]: 'fa-swimming-pool',
+        [AmenityType.Gym]: 'fa-dumbbell',
+        [AmenityType.Restaurant]: 'fa-utensils',
+        [AmenityType.Bar]: 'fa-martini-glass',
+        [AmenityType.Spa]: 'fa-spa',
+        [AmenityType.PetFriendly]: 'fa-paw',
+        [AmenityType.RoomService]: 'fa-concierge-bell'
+    };
+    return icons[type] || 'fa-check';
+};
+
 
 export class PropertyService {
 

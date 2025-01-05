@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import App from './App';
 import HomePage from "./pages/HomePage.tsx";
-import PropertyWrapper from "./components/properties/property-wrapper/property-wrapper.tsx";
+import PropertyGridSelector from "./components/properties/property-wrapper/property-grid-selector.tsx";
 import BookingConfirmComponent from "./components/booking/confirm/booking-confirm-component.tsx";
 import BookingDetailComponent from "./components/booking/detail/booking-detail-component.tsx";
 import BookingOverviewComponent from "./components/booking/overview/booking-overview-component.tsx";
@@ -40,19 +40,26 @@ const router = createBrowserRouter([
                     },
                     {
                         path: 'list',
-                        element: <PropertyWrapper/>,
+                        element: <PropertyGridSelector/>,
                     },
                     {
                         path: 'create',
-                        element: <CreatePropertyComponent/>,
+                        element:
+                            <PrivateRoute>
+                                <CreatePropertyComponent/>
+                            </PrivateRoute>
                     },
                     {
                         path: 'edit/:id',
-                        element: <EditPropertyComponent/>,
+                        element: <PrivateRoute>
+                            <EditPropertyComponent/>
+                        </PrivateRoute>
                     },
                     {
                         path: 'edit-images/:id',
-                        element: <EditPropertyImages/>
+                        element: <PrivateRoute>
+                            <EditPropertyImages/>
+                        </PrivateRoute>
                     },
 
                     {
@@ -61,11 +68,10 @@ const router = createBrowserRouter([
                     },
                     {
                         path: 'my-properties',
-                        element: (
+                        element:
                             <PrivateRoute>
                                 <MyPropertiesComponent/>
                             </PrivateRoute>
-                        )
 
                     }
                 ]
@@ -75,15 +81,15 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: '',
-                        element: <BookingOverviewComponent/>,
+                        element: <PrivateRoute><BookingOverviewComponent/></PrivateRoute>,
                     },
                     {
                         path: ':bookingId',
-                        element: <BookingDetailComponent/>,
+                        element: <PrivateRoute><BookingDetailComponent/></PrivateRoute>,
                     },
                     {
                         path: 'confirm',
-                        element: <BookingConfirmComponent/>,
+                        element: <PrivateRoute><BookingConfirmComponent/></PrivateRoute>,
                     },
                 ],
             },

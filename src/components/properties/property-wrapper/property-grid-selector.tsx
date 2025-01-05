@@ -2,30 +2,16 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {Badge, Container, Form, InputGroup} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import PropertyOverview from '../properties-overview/properties-overview';
-import {PropertyService} from '../../../services/property-service.ts'
+import {getAmenityIcon, PropertyService} from '../../../services/property-service.ts'
 import {BookingService} from "../../../services/booking-service.ts";
 import {AmenityType, PropertyViewModel} from "../../../models/Property";
-import './PropertyWrapper.scss';
+import './property-grid-selector.scss';
 import {Booking} from "../../../models/Booking.ts";
 import {useNavigate} from "react-router-dom";
 import {useError} from "../../../context/error.context.tsx";
 
-const getAmenityIcon = (type: AmenityType): string => {
-    const icons: Record<AmenityType, string> = {
-        [AmenityType.Wifi]: 'fa-wifi',
-        [AmenityType.Parking]: 'fa-parking',
-        [AmenityType.Pool]: 'fa-swimming-pool',
-        [AmenityType.Gym]: 'fa-dumbbell',
-        [AmenityType.Restaurant]: 'fa-utensils',
-        [AmenityType.Bar]: 'fa-martini-glass',
-        [AmenityType.Spa]: 'fa-spa',
-        [AmenityType.PetFriendly]: 'fa-paw',
-        [AmenityType.RoomService]: 'fa-concierge-bell'
-    };
-    return icons[type] || 'fa-check';
-};
 
-const PropertyWrapper = () => {
+const PropertyGridSelector = () => {
     const [filteredProperties, setFilteredProperties] = useState<PropertyViewModel[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAmenities, setSelectedAmenities] = useState<Set<AmenityType>>(new Set());
@@ -490,4 +476,4 @@ const PropertyWrapper = () => {
         ;
 };
 
-export default PropertyWrapper;
+export default PropertyGridSelector;

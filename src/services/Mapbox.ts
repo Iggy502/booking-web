@@ -24,6 +24,7 @@ export interface Address {
 export const getPlaces = async (query: string): Promise<MapboxFeature[]> => {
     try {
         const response = await axios.get(
+
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
             {
                 params: {

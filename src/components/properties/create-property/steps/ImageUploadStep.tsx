@@ -191,7 +191,7 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
         } finally {
             setIsProcessing(false);
         }
-    }, [onUpdateNew, maxFiles]);
+    }, [onUpdateNew, maxFiles, processedImages.length]);
 
 
     useEffect(() => {
@@ -201,7 +201,7 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
                 .map(img => img.file);
             onUpdateAll(validFiles);
 
-           console.log(`attempting to update all files: ${validFiles}`);
+            console.log(`attempting to update all files: ${validFiles}`);
         }
     }, [processedImages, onUpdateAll]);
 
@@ -217,21 +217,20 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
         maxSize: MAX_FILE_SIZE,
     });
 
-
     const removeImage = (index: number) => {
-
         const filename = processedImages[index].file.name;
 
-        setProcessedImages(prev => {
-            const updatedImages = [...prev];
-            updatedImages.splice(index, 1);
-            return updatedImages;
-        });
+        setProcessedImages(prevState =>
+            prevState.filter((_, i) => i !== index));
 
         if (onRemove) {
             onRemove(filename);
         }
     };
+
+    useEffect(() => {
+        console.log('ProcessedImages state updated:', processedImages);
+    }, [processedImages]);
 
     const handleSubmit = () => {
         const validFiles = processedImages

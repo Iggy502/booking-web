@@ -3,6 +3,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, Col, Container, Row} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service.ts';
 import {AmenityType, PropertyViewModel} from '../../../models/Property.ts';
+import {getAmenityIcon} from "../../../services/property-service.ts";
 import {useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
 import './booking-confirm-component.scss'
@@ -10,20 +11,8 @@ import {BookingCreate} from "../../../models/Booking.ts";
 import {BadRequest, Unauthorized} from "http-errors";
 import {useAuth} from "../../../context/auth.context.tsx";
 
-const getAmenityIcon = (type: AmenityType): string => {
-    const icons: Record<AmenityType, string> = {
-        [AmenityType.Wifi]: 'fa-wifi',
-        [AmenityType.Parking]: 'fa-parking',
-        [AmenityType.Pool]: 'fa-swimming-pool',
-        [AmenityType.Gym]: 'fa-dumbbell',
-        [AmenityType.Restaurant]: 'fa-utensils',
-        [AmenityType.Bar]: 'fa-martini-glass',
-        [AmenityType.Spa]: 'fa-spa',
-        [AmenityType.PetFriendly]: 'fa-paw',
-        [AmenityType.RoomService]: 'fa-concierge-bell'
-    };
-    return icons[type] || 'fa-check';
-};
+
+
 
 const BookingConfirmComponent: React.FC = () => {
     const navigate = useNavigate();

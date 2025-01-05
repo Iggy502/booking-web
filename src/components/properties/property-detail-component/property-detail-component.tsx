@@ -2,25 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Button, Card, Col, Container, Form, Row, Tab, Tabs} from 'react-bootstrap';
 import {AmenityType, PropertyViewModel} from '../../../models/Property';
+import {getAmenityIcon} from "../../../services/property-service";
 import {PropertyService} from '../../../services/property-service';
 import {useError} from '../../../context/error.context';
 import PropertyRatings from './ratings/property-ratings-component.tsx';
 import './property-detail-component.scss';
 
-const getAmenityIcon = (type: AmenityType): string => {
-    const icons: Record<AmenityType, string> = {
-        [AmenityType.Wifi]: 'fa-wifi',
-        [AmenityType.Parking]: 'fa-parking',
-        [AmenityType.Pool]: 'fa-swimming-pool',
-        [AmenityType.Gym]: 'fa-dumbbell',
-        [AmenityType.Restaurant]: 'fa-utensils',
-        [AmenityType.Bar]: 'fa-martini-glass',
-        [AmenityType.Spa]: 'fa-spa',
-        [AmenityType.PetFriendly]: 'fa-paw',
-        [AmenityType.RoomService]: 'fa-concierge-bell'
-    };
-    return icons[type] || 'fa-check';
-};
 
 const PropertyDetailComponent: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -94,6 +81,24 @@ const PropertyDetailComponent: React.FC = () => {
                 className="mb-4"
             >
                 <Tab eventKey="details" title="Details">
+                    <Card className="mb-4">
+                        <Card.Header>
+                            <h4 className="mb-0">Property Images</h4>
+                        </Card.Header>
+                        <Card.Body>
+                            <div className="image-grid">
+                                {property.imagePaths.map((imagePath, index) => (
+                                    <div key={index} className="image-container">
+                                        <img
+                                            src={imagePath}
+                                            alt={`Property ${index + 1}`}
+                                            className="property-image"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </Card.Body>
+                    </Card>
                     {/* Basic Information */}
                     <Card className="mb-4">
                         <Card.Header>
@@ -262,25 +267,6 @@ const PropertyDetailComponent: React.FC = () => {
                         </Card.Body>
                     </Card>
 
-                    {/* Images */}
-                    <Card className="mb-4">
-                        <Card.Header>
-                            <h4 className="mb-0">Property Images</h4>
-                        </Card.Header>
-                        <Card.Body>
-                            <div className="image-grid">
-                                {property.imagePaths.map((imagePath, index) => (
-                                    <div key={index} className="image-container">
-                                        <img
-                                            src={imagePath}
-                                            alt={`Property ${index + 1}`}
-                                            className="property-image"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </Card.Body>
-                    </Card>
                 </Tab>
                 <Tab eventKey="reviews" title={`Reviews (${property.totalRatings || 0})`}>
                     <PropertyRatings propertyId={property.id}></PropertyRatings>
