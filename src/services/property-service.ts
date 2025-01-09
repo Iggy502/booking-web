@@ -1,4 +1,3 @@
-// src/services/PropertyService.ts
 import {PropertyViewModel, PropertyCreate, PropertyUpdate, AmenityType} from '../models/Property';
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";

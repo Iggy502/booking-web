@@ -1,4 +1,3 @@
-// services/socket.service.ts
 import {Socket} from 'socket.io-client';
 import {Booking, BookingChat} from '../models/Booking';
 import {PropertyService} from "./property-service.ts";

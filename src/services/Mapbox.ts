@@ -1,4 +1,3 @@
-// src/services/mapbox.ts
 import axios from "axios";
 
 export interface MapboxFeature {

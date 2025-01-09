@@ -1,4 +1,3 @@
-// src/services/auth.service.ts
 import axios, {AxiosError} from 'axios';
 import createHttpError, {HttpError} from "http-errors";
 import {jwtDecode} from "jwt-decode";

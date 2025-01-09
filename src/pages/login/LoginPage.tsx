@@ -1,4 +1,3 @@
-// src/pages/auth/LoginPage.tsx
 import React from 'react';
 import {useAuth} from '../../context/auth.context.tsx';
 import {useLocation, useNavigate} from 'react-router-dom';
