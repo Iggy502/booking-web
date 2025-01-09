@@ -137,7 +137,6 @@ const ChatFooter: React.FC = () => {
         });
 
 
-
         socketRef.current.on('bookingsUpdated', (updatedBookings: BookingChat[]) => {
             setBookingsWithConversations(updatedBookings);
 

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, Col, Form, Row, Button} from 'react-bootstrap';
+import {Button, Card, Col, Form, Row} from 'react-bootstrap';
 import {AmenityType, IAmenity} from '../../../../../models/Property.ts';
 import './AmenitiesStep.scss';
 

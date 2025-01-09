@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Button, Card, Form, Spinner, Pagination, Dropdown} from 'react-bootstrap';
+import {Alert, Button, Card, Dropdown, Form, Pagination, Spinner} from 'react-bootstrap';
 import {Edit, Star, ThumbsUp, Trash} from 'lucide-react';
 import {PropertyService} from '../../../../services/property-service';
 import {useAuth} from '../../../../context/auth.context';

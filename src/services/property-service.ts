@@ -1,4 +1,4 @@
-import {PropertyViewModel, PropertyCreate, PropertyUpdate, AmenityType} from '../models/Property';
+import {AmenityType, PropertyCreate, PropertyUpdate, PropertyViewModel} from '../models/Property';
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
 import {CreateRatingRequest, RatingViewModel, UpdateRatingRequest} from "../models/Rating.ts";

@@ -1,10 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, Button, Card, Container, Modal} from 'react-bootstrap';
 import {X} from 'lucide-react';
-import {
-    ImageUploadComponent,
-    ImageUploadStepRef
-} from '../../../image-upload/image-upload-component.tsx';
+import {ImageUploadComponent, ImageUploadStepRef} from '../../../image-upload/image-upload-component.tsx';
 import {PropertyService} from '../../../../services/property-service.ts';
 import {useError} from "../../../../context/error.context.tsx";
 import {useNavigate, useParams} from "react-router-dom";
@@ -109,12 +106,12 @@ const EditPropertyImages: React.FC = () => {
                 )}
 
                 <div className="d-flex justify-content-center align-items-center mb-4 gap-4">
-                <Button variant={'light'} onClick={() => navigate(`/properties/my-properties`)}>
-                    <i className="fa-solid fa-left-long"></i>
-                </Button>
-                <Button variant={"primary"} onClick={() => navigate("/")}>
-                    <i className="fa-solid fa-house"></i>
-                </Button>
+                    <Button variant={'light'} onClick={() => navigate(`/properties/my-properties`)}>
+                        <i className="fa-solid fa-left-long"></i>
+                    </Button>
+                    <Button variant={"primary"} onClick={() => navigate("/")}>
+                        <i className="fa-solid fa-house"></i>
+                    </Button>
                 </div>
 
                 {imagePaths.length > 0 && (

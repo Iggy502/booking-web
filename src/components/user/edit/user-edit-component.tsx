@@ -1,21 +1,17 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {UserViewModel, IUserUpdate} from '../../../models/User.ts';
+import React, {useEffect, useRef, useState} from 'react';
+import {IUserUpdate, UserViewModel} from '../../../models/User.ts';
 import {UserService} from '../../../services/user.service.ts';
-import {
-    ImageUploadComponent,
-    ImageUploadStepRef
-} from '../../image-upload/image-upload-component.tsx';
-import {Card, Form, Button, Alert, Container, Row, Col} from 'react-bootstrap';
+import {ImageUploadComponent, ImageUploadStepRef} from '../../image-upload/image-upload-component.tsx';
+import {Alert, Button, Card, Col, Container, Form, Row} from 'react-bootstrap';
 import {useError} from "../../../context/error.context.tsx";
 import {useAuth} from "../../../context/auth.context.tsx";
 import {Unauthorized} from "http-errors";
-import {useParams, useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import AvatarEditor from 'react-avatar-editor';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHome} from '@fortawesome/free-solid-svg-icons';
 import './user-edit-component.scss';
-import PhoneInput from 'react-phone-number-input';
-import {isValidPhoneNumber} from "react-phone-number-input";
+import PhoneInput, {isValidPhoneNumber} from 'react-phone-number-input';
 import {validateFormFields} from '../utils/validation.utils.ts';
 import 'react-phone-number-input/style.css'
 

@@ -1,7 +1,7 @@
 
 .my-properties-container {
 
-  min-width: 1000px ;
+  min-width: 1000px;
 
   .filters-section {
     background: white;
@@ -33,6 +33,7 @@
           border-top-right-radius: 0;
           border-bottom-right-radius: 0;
         }
+
         &:last-child {
           border-top-left-radius: 0;
           border-bottom-left-radius: 0;

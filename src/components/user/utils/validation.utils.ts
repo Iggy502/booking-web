@@ -51,7 +51,6 @@ export const validateFormFields = (fields: {
     }
 
 
-
     // Phone validation
     if (!fields.phone) {
         errors.phone = 'Phone number is required';

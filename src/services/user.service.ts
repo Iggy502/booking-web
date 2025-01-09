@@ -1,4 +1,4 @@
-import {UserViewModel, IUserUpdate} from "../models/User.ts";
+import {IUserUpdate, UserViewModel} from "../models/User.ts";
 import axios, {AxiosError} from "axios";
 import createHttpError, {HttpError} from "http-errors";
 

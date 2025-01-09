@@ -1,7 +1,7 @@
 import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
-import {Button, Alert, ProgressBar} from 'react-bootstrap';
-import {Upload, X, Image as ImageIcon} from 'lucide-react';
+import {Alert, Button, ProgressBar} from 'react-bootstrap';
+import {Image as ImageIcon, Upload, X} from 'lucide-react';
 import './image-upload-component.scss';
 
 interface ImageUploadStepProps {
@@ -322,7 +322,6 @@ export const ImageUploadComponent = forwardRef<ImageUploadStepRef, ImageUploadSt
                 )}
 
                 {onNextAction && (
-
                     <Button
                         variant="primary"
                         className="px-4"
@@ -331,7 +330,6 @@ export const ImageUploadComponent = forwardRef<ImageUploadStepRef, ImageUploadSt
                     >
                         {onNextAction.actionName}
                     </Button>
-
                 )}
 
             </div>

@@ -1,16 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, Col, Container, Row} from 'react-bootstrap';
-import {PropertyService} from '../../../services/property-service.ts';
+import {getAmenityIcon, PropertyService} from '../../../services/property-service.ts';
 import {PropertyViewModel} from '../../../models/Property.ts';
-import {getAmenityIcon} from "../../../services/property-service.ts";
 import {useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
 import './booking-confirm-component.scss'
 import {BookingCreate} from "../../../models/Booking.ts";
 import {BadRequest, Unauthorized} from "http-errors";
 import {useAuth} from "../../../context/auth.context.tsx";
-
 
 
 const BookingConfirmComponent: React.FC = () => {

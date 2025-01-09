@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Col, Form, Row, Spinner, Button} from 'react-bootstrap';
+import {Button, Col, Form, Row, Spinner} from 'react-bootstrap';
 import {IAddress} from '../../../../../models/Property.ts';
 import {getPlaces, MapboxFeature} from '../../../../../services/Mapbox.ts';
 import './AddressStep.scss';
@@ -57,7 +57,7 @@ const AddressStep: React.FC<AddressStepProps> = ({
         };
 
         if (errors.street || errors.city || errors.country || errors.postalCode) {
-            if(errors.combination) {
+            if (errors.combination) {
                 delete errors.combination;
             }
             return;

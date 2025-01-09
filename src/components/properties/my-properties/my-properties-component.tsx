@@ -369,7 +369,6 @@ const MyPropertiesComponent: React.FC = () => {
                     </tbody>
                 </Table>
             </div>
-
             {totalPages > 1 && paginationElement}
         </Container>
     );

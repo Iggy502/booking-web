@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Container, Form } from 'react-bootstrap';
-import { UserService } from '../../../../services/user.service.ts';
-import { useError } from "../../../../context/error.context.tsx";
-import { HttpError, InternalServerError } from "http-errors";
+import React, {useState} from 'react';
+import {Container, Form} from 'react-bootstrap';
+import {UserService} from '../../../../services/user.service.ts';
+import {useError} from "../../../../context/error.context.tsx";
+import {HttpError, InternalServerError} from "http-errors";
 import '../password-reset.scss';
 
 export const RequestPasswordReset = () => {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
-    const { showError } = useError();
+    const {showError} = useError();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

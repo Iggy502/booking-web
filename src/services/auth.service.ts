@@ -134,12 +134,10 @@ export class AuthService {
     //Axios wraps each error response in a different object
     //Convert it back to HttpError as is the type from the server
     static convertApiError(error: AxiosError<HttpError>): HttpError {
-
         const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
         errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
 
         return errorConvertedToHttpError;
-
     }
 
     static clearTokens() {

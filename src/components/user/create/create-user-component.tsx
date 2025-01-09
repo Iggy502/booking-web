@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {IUserUpdate} from '../../../models/User.ts';
 import {UserService} from '../../../services/user.service.ts';
-import {Card, Form, Button, Alert, Container, Row, Col} from 'react-bootstrap';
+import {Alert, Button, Card, Col, Container, Form, Row} from 'react-bootstrap';
 import {useError} from "../../../context/error.context.tsx";
 import {useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
