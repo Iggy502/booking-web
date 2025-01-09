@@ -1,12 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Alert, Button, Card, Container, Modal} from 'react-bootstrap';
 import {X} from 'lucide-react';
-import ImageUploadStep, {ImageUploadStepRef} from '../create-property/steps/ImageUploadStep';
-import {PropertyService} from '../../../services/property-service';
-import {useError} from "../../../context/error.context.tsx";
+import {
+    ImageUploadComponent,
+    ImageUploadStepRef
+} from '../../../image-upload/image-upload-component.tsx';
+import {PropertyService} from '../../../../services/property-service.ts';
+import {useError} from "../../../../context/error.context.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {BadRequest} from "http-errors";
-import {useAuth} from "../../../context/auth.context.tsx";
+import {useAuth} from "../../../../context/auth.context.tsx";
 
 
 const EditPropertyImages: React.FC = () => {
@@ -145,7 +148,7 @@ const EditPropertyImages: React.FC = () => {
                         <h5 className="mb-0">Add New Images</h5>
                     </Card.Header>
                     <Card.Body>
-                        <ImageUploadStep
+                        <ImageUploadComponent
                             ref={imageUploadRef}
                             onUpdateNew={handleUpload}
                             maxFiles={{amount: 6 - imagePaths.length, errorMessage: "You can only upload 6 images"}}

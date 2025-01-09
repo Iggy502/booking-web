@@ -8,7 +8,6 @@ export class UserService {
     private static BASE_URL_AUTH = '/auth';
 
     static async getUserById(userId: string): Promise<UserViewModel> {
-
         const url = `${process.env.SERVER_HOST}${UserService.BASE_URL_USERS}/${userId}`;
 
         try {
@@ -21,7 +20,6 @@ export class UserService {
     }
 
     static async createUser(user: IUserUpdate): Promise<UserViewModel> {
-
         const url = `${process.env.SERVER_HOST}${UserService.BASE_URL_USERS}`;
 
         try {
@@ -47,8 +45,6 @@ export class UserService {
     static async resetPassword(token: string, newPassword: string): Promise<void> {
         const url = `${process.env.SERVER_HOST}${UserService.BASE_URL_AUTH}/password-reset-confirm/${token}`;
 
-        console.log(`url: ${url} token: ${token} newPassword: ${newPassword}`);
-
         try {
             await axios.put(url, {
                 newPassword
@@ -61,7 +57,6 @@ export class UserService {
 
 
     static async editUser(userId: string, user: IUserUpdate): Promise<UserViewModel> {
-
         const url = `${process.env.SERVER_HOST}${UserService.BASE_URL_USERS}/${userId}`;
 
         try {
@@ -77,8 +72,7 @@ export class UserService {
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_IMAGES}/profile/${userId}`;
         const formData = new FormData();
 
-        formData.append('image', image);  // This matches multer's expected field name
-
+        formData.append('image', image);  // This matches multer's middleware expected field name
 
         try {
             await axios.post(url, formData, {
@@ -92,20 +86,13 @@ export class UserService {
         }
     }
 
-
     //Axios wraps each error response in a different object
     //Convert it back to HttpError as is the type from the server
     static convertApiError(error: AxiosError<HttpError>): HttpError {
-
-        console.log("Error converting API error:", error.response);
-
         const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
         errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
 
-        console.log("Error converted to HttpError:", errorConvertedToHttpError);
         return errorConvertedToHttpError;
-
     }
-
 
 }

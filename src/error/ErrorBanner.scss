@@ -1,11 +1,11 @@
 .error-banner {
   position: fixed;
-  top: 80px; // Gives space from the top of the screen
+  top: 80px;
   left: 0;
   right: 0;
   z-index: 1050;
   animation: slideDown 0.3s ease-out;
-  pointer-events: none; // Allows clicking through the banner container
+  pointer-events: none;
 
   .error-alert {
     max-width: 600px;
@@ -13,7 +13,7 @@
     padding: 1rem 3rem;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    pointer-events: auto; // Restores click events for the alert itself
+    pointer-events: auto;
 
     .btn-close {
       padding: 1.25rem;

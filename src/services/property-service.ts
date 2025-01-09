@@ -20,9 +20,7 @@ export const getAmenityIcon = (type: AmenityType): string => {
     return icons[type] || 'fa-check';
 };
 
-
 export class PropertyService {
-
     private static BASE_URL_PROPERTIES = '/properties';
     private static BASE_URL_IMAGES = '/images';
 
@@ -219,31 +217,6 @@ export class PropertyService {
         }
     }
 
-    //response is updated rating
-    static async toggleRatingHelpful(ratingId: string): Promise<RatingViewModel> {
-        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings/${ratingId}/helpful`;
-
-        try {
-            const response = await axios.put<RatingViewModel>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error("Error toggling helpful for rating:", error);
-            throw this.convertApiError(error as AxiosError<HttpError>);
-        }
-    }
-
-
-    //Axios wraps each error response in a different object
-    //Convert it back to HttpError as is the type from the server
-    static convertApiError(error: AxiosError<HttpError>): HttpError {
-
-        const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
-        errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
-
-        return errorConvertedToHttpError;
-
-    }
-
     static async deletePropertyImage(id: string, selectedImage: string) {
 
         const url = `${process.env.SERVER_HOST}${this.BASE_URL_IMAGES}/property`;
@@ -258,4 +231,29 @@ export class PropertyService {
         }
 
     }
+
+    //response is updated rating
+    static async toggleRatingHelpful(ratingId: string): Promise<RatingViewModel> {
+        const url = `${process.env.SERVER_HOST}${this.BASE_URL_PROPERTIES}/ratings/${ratingId}/helpful`;
+
+        try {
+            const response = await axios.put<RatingViewModel>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error("Error toggling helpful for rating:", error);
+            throw this.convertApiError(error as AxiosError<HttpError>);
+        }
+    }
+
+    //Axios wraps each error response in a different object
+    //Convert it back to HttpError as is the type from the server
+    static convertApiError(error: AxiosError<HttpError>): HttpError {
+        const errorConvertedToHttpError = createHttpError(error.response?.status || 500);
+        errorConvertedToHttpError.message = error.response?.data.message || errorConvertedToHttpError.message;
+
+        return errorConvertedToHttpError;
+
+    }
+
+
 }

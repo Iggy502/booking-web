@@ -24,7 +24,6 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
     const [showSpinners, setShowSpinners] = useState(true);
 
 
-
     const handlePageChange = (pageNumber: number) => {
         setActivePage(pageNumber);
     };

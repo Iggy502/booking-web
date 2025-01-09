@@ -109,13 +109,9 @@
   font-size: 12px;
   font-weight: bold;
   margin-left: 8px;
-  padding: 0 4px; // Add horizontal padding
+  padding-right: 0.1px;
   line-height: 1; // Fix vertical alignment
 }
-
-.conv-preview-text{
-}
-
 
 
 .cs-conversation__content .fw-bold {
@@ -248,7 +244,7 @@
   }
 }
 
-.cs-conversation__info{
+.cs-conversation__info {
   width: 210px;
 }
 

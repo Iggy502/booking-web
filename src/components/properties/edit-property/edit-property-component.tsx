@@ -4,11 +4,11 @@ import {Alert, Button, Card, Container, Spinner} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service';
 import {IAddress, IAmenity, PropertyCreate, PropertyViewModel} from '../../../models/Property';
 import {useError} from '../../../context/error.context';
-import BasicInfoStep from '../create-property/steps/BasicInfoStep';
-import AddressStep from '../create-property/steps/AddressStep';
-import AmenitiesStep from '../create-property/steps/AmenitiesStep';
+import BasicInfoStep from '../create-property/steps/basic-info/BasicInfoStep.tsx';
+import AddressStep from '../create-property/steps/address/AddressStep.tsx';
+import AmenitiesStep from '../create-property/steps/adminities/AmenitiesStep.tsx';
 import './edit-property-component.scss';
-import './edit-property-image-component.scss'
+import './edit-property-image/edit-property-image-component.scss'
 import {useAuth} from "../../../context/auth.context.tsx";
 import {Forbidden} from "http-errors";
 

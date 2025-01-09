@@ -76,19 +76,18 @@ const MyPropertiesComponent: React.FC = () => {
 
     const handleFilterChange = (field: keyof Filters, value: string) => {
 
-            if (field === 'priceMin' || field === 'priceMax') {
-                if ((value && isNaN(parseFloat(value))) || parseFloat(value) < 0) {
-                    return;
-                }
+        if (field === 'priceMin' || field === 'priceMax') {
+            if ((value && isNaN(parseFloat(value))) || parseFloat(value) < 0) {
+                return;
             }
-
-            setFilters(prev => ({
-                ...prev,
-                [field]: value
-            }));
-            setCurrentPage(1);
         }
-    ;
+
+        setFilters(prev => ({
+            ...prev,
+            [field]: value
+        }));
+        setCurrentPage(1);
+    };
 
     const filteredAndSortedProperties = useMemo(() => {
         let result = [...properties];

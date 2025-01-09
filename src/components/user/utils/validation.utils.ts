@@ -1,4 +1,3 @@
-// validation.utils.ts
 import {isValidPhoneNumber} from "react-phone-number-input";
 
 export const VALIDATORS = {

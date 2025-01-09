@@ -24,11 +24,10 @@ export interface Address {
 export const getPlaces = async (query: string): Promise<MapboxFeature[]> => {
     try {
         const response = await axios.get(
-
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json`,
             {
                 params: {
-                    access_token: 'pk.eyJ1IjoiaWdvcjUwMiIsImEiOiJjbTQ1bmdnN3gwdmRvMmxxeDgwOG12M2gxIn0.UxOguMQKWi0366_3MF45mw',
+                    access_token: process.env.MAPBOX_ACCESS_TOKEN,
                     country: 'BE'
                 },
                 withCredentials: false

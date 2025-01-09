@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Card, Col, Container, Row} from 'react-bootstrap';
 import {PropertyService} from '../../../services/property-service.ts';
-import {AmenityType, PropertyViewModel} from '../../../models/Property.ts';
+import {PropertyViewModel} from '../../../models/Property.ts';
 import {getAmenityIcon} from "../../../services/property-service.ts";
 import {useError} from '../../../context/error.context.tsx';
 import {BookingService} from "../../../services/booking-service.ts";
@@ -10,7 +10,6 @@ import './booking-confirm-component.scss'
 import {BookingCreate} from "../../../models/Booking.ts";
 import {BadRequest, Unauthorized} from "http-errors";
 import {useAuth} from "../../../context/auth.context.tsx";
-
 
 
 
@@ -126,14 +125,10 @@ const BookingConfirmComponent: React.FC = () => {
     }
 
     const checkInDate = new Date(startDate);
-
     const checkOutDate = new Date(endDate);
 
-
-    console.log(`checkInDate: ${checkInDate} and checkOutDate: ${checkOutDate} inside confirm booking component`);
     const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
     const totalPrice = (property?.pricePerNight ?? 0) * nights;
-
 
     const handleConfirmBooking = async () => {
         try {

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './BasicInfoStep.scss';
 import {Button, Col, Form, Row} from 'react-bootstrap';
-import {PropertyCreate} from '../../../../models/Property';
+import {PropertyCreate} from '../../../../../models/Property.ts';
 
 
 interface BasicInfoStepProps {
@@ -21,8 +21,6 @@ interface ValidationErrors {
 const BasicInfoStep: React.FC<BasicInfoStepProps> = ({property, onUpdate, onNextAction, readOnlyOptions}) => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [errors, setErrors] = useState<ValidationErrors>({});
-
-    console.log('BasicInfoStepProps', property, onUpdate, readOnlyOptions);
 
     const validateField = (name: string, value: PropertyCreate[keyof PropertyCreate]): string | undefined => {
 

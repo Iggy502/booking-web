@@ -1,10 +1,10 @@
 // src/pages/auth/LoginPage.tsx
 import React from 'react';
-import {useAuth} from '../context/auth.context.tsx';
+import {useAuth} from '../../context/auth.context.tsx';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Container, Form} from 'react-bootstrap';
 import './LoginPage.scss';
-import {useError} from "../context/error.context.tsx";
+import {useError} from "../../context/error.context.tsx";
 import {HttpError, InternalServerError} from "http-errors";
 
 export const LoginPage = () => {
@@ -25,12 +25,7 @@ export const LoginPage = () => {
             navigate(from, {replace: true});
         } catch (error) {
             if (error instanceof HttpError && (error.status || error.message)) {
-                console.error("Error logging in for http:", error);
-                console.log("error message", error.message);
-                console.log("error status", error.status);
-
                 showError(error);
-
             } else {
                 console.error("Error logging in:", error);
                 showError(InternalServerError("Internal Server Error"));

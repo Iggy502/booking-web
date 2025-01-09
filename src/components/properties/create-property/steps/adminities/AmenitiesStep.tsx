@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Card, Col, Form, Row, Button} from 'react-bootstrap';
-import {AmenityType, IAmenity} from '../../../../models/Property';
+import {AmenityType, IAmenity} from '../../../../../models/Property.ts';
 import './AmenitiesStep.scss';
 
 interface AmenitiesStepProps {
@@ -49,9 +49,8 @@ const AmenitiesStep: React.FC<AmenitiesStepProps> = ({
         let newAmenities: IAmenity[];
 
         if (selectedAmenities.has(type)) {
-            // Remove amenity
             newAmenities = amenities.filter(a => a.type !== type);
-            // Clear error when removing
+            // Remove error if it exists
             setErrors(prev => {
                 const newErrors = {...prev};
                 delete newErrors[type];

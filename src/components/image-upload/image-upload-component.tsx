@@ -2,7 +2,7 @@ import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 
 import {useDropzone} from 'react-dropzone';
 import {Button, Alert, ProgressBar} from 'react-bootstrap';
 import {Upload, X, Image as ImageIcon} from 'lucide-react';
-import './ImageUploadStep.scss';
+import './image-upload-component.scss';
 
 interface ImageUploadStepProps {
     onUpdateAll?: (files: File[]) => void;
@@ -31,14 +31,14 @@ const TARGET_WIDTH = 1920;
 const TARGET_HEIGHT = 1080;
 const QUALITY = 0.8;
 
-const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
-                                                                                  onUpdateAll,
-                                                                                  onUpdateNew,
-                                                                                  maxFiles,
-                                                                                  onRemove,
-                                                                                  onNextAction,
-                                                                                  onBackAction,
-                                                                              }, ref) => {
+export const ImageUploadComponent = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
+                                                                                              onUpdateAll,
+                                                                                              onUpdateNew,
+                                                                                              maxFiles,
+                                                                                              onRemove,
+                                                                                              onNextAction,
+                                                                                              onBackAction,
+                                                                                          }, ref) => {
     const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -201,7 +201,7 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
                 .map(img => img.file);
             onUpdateAll(validFiles);
 
-            console.log(`attempting to update all files: ${validFiles}`);
+            console.info(`attempting to update all files: ${validFiles}`);
         }
     }, [processedImages, onUpdateAll]);
 
@@ -338,5 +338,3 @@ const ImageUploadStep = forwardRef<ImageUploadStepRef, ImageUploadStepProps>(({
         </div>
     );
 });
-
-export default ImageUploadStep;

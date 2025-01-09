@@ -32,8 +32,6 @@ class SocketService {
             const userPropertyOwner = await UserService.getUserById(propertyRelatedTobooking.owner);
             const guestUser = await UserService.getUserById(booking.guest);
 
-            console.log(`fetched data for booking: ${propertyRelatedTobooking} and ${userPropertyOwner} and ${guestUser}`);
-
             const propertyChat: PropertyChat = {
                 id: propertyRelatedTobooking.id,
                 name: propertyRelatedTobooking.name,

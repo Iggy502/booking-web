@@ -1,7 +1,10 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {UserViewModel, IUserUpdate} from '../../../models/User.ts';
 import {UserService} from '../../../services/user.service.ts';
-import ImageUploadStep, {ImageUploadStepRef} from '../../properties/create-property/steps/ImageUploadStep.tsx';
+import {
+    ImageUploadComponent,
+    ImageUploadStepRef
+} from '../../image-upload/image-upload-component.tsx';
 import {Card, Form, Button, Alert, Container, Row, Col} from 'react-bootstrap';
 import {useError} from "../../../context/error.context.tsx";
 import {useAuth} from "../../../context/auth.context.tsx";
@@ -146,8 +149,6 @@ const UserEditComponent = () => {
 
             const updatedUser = await UserService.getUserById(currentUser.id);
 
-            console.log('Updated user:', updatedUser);
-
             setCurrentUser(updatedUser);
             setPreviewImage(updatedUser.profilePicturePath || '');
             setNewProfileImage(null);
@@ -255,7 +256,7 @@ const UserEditComponent = () => {
                                     </Form.Group>
 
                                     <div className="mx-auto">
-                                        <ImageUploadStep
+                                        <ImageUploadComponent
                                             ref={imageUploaderRef}
                                             onUpdateNew={handleImageUpdate}
                                             maxFiles={{amount: 1, errorMessage: "Only one profile picture allowed"}}

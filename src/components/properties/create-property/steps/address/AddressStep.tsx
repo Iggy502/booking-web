@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Col, Form, Row, Spinner, Button} from 'react-bootstrap';
-import {IAddress} from '../../../../models/Property';
-import {getPlaces, MapboxFeature} from '../../../../services/Mapbox';
+import {IAddress} from '../../../../../models/Property.ts';
+import {getPlaces, MapboxFeature} from '../../../../../services/Mapbox.ts';
 import './AddressStep.scss';
 
 interface AddressStepProps {

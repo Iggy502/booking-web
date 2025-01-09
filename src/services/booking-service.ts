@@ -1,5 +1,4 @@
 import {Booking, BookingCreate, BookingResponse} from "../models/Booking.ts";
-import {bookings} from "../util/TestData.ts";
 import createHttpError, {HttpError} from "http-errors";
 import axios, {AxiosError} from "axios";
 import {io, Socket} from 'socket.io-client';
@@ -114,20 +113,6 @@ export class BookingService {
             console.log("Error searching bookings by property ids:", error);
             throw this.convertApiError(error as AxiosError<HttpError>);
         }
-    }
-
-    static async getTotalPriceForPropertyStartDateEndDate(
-        propertyId: string,
-        startDate: Date,
-        endDate: Date
-    ): Promise<number> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const booking = bookings.find(booking =>
-            booking.property === propertyId &&
-            booking.checkIn === startDate &&
-            booking.checkOut === endDate
-        );
-        return booking ? booking.totalPrice : 0;
     }
 
     static convertApiError(error: AxiosError<HttpError>): HttpError {

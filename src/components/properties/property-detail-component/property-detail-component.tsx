@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Alert, Button, Card, Col, Container, Form, Row, Tab, Tabs} from 'react-bootstrap';
-import {AmenityType, PropertyViewModel} from '../../../models/Property';
+import {PropertyViewModel} from '../../../models/Property';
 import {getAmenityIcon} from "../../../services/property-service";
 import {PropertyService} from '../../../services/property-service';
 import {useError} from '../../../context/error.context';

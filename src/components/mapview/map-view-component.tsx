@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {PropertyViewModel} from '../../models/Property.ts';
-import './MapView.scss';
+import './map-view-component.scss';
 
 interface MapViewProps {
     properties: PropertyViewModel[];
@@ -11,7 +11,7 @@ interface MapViewProps {
     onViewDetails: (propertyId: string) => void;
 }
 
-const MapView = ({properties, selectedLocation, handlePropertySelect, onViewDetails}: MapViewProps) => {
+const MapViewComponent = ({properties, selectedLocation, handlePropertySelect, onViewDetails}: MapViewProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -32,7 +32,7 @@ const MapView = ({properties, selectedLocation, handlePropertySelect, onViewDeta
             }
         });
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoiaWdvcjUwMiIsImEiOiJjbTQ1bmdnN3gwdmRvMmxxeDgwOG12M2gxIn0.UxOguMQKWi0366_3MF45mw';
+        mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
         // Initialize map with bounds if properties exist, otherwise use default center
         const mapConfig: mapboxgl.MapboxOptions = {
@@ -182,4 +182,4 @@ const MapView = ({properties, selectedLocation, handlePropertySelect, onViewDeta
     );
 };
 
-export default MapView;
+export default MapViewComponent;

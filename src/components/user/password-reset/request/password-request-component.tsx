@@ -1,4 +1,3 @@
-// src/pages/auth/RequestPasswordReset.tsx
 import React, { useState } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import { UserService } from '../../../../services/user.service.ts';

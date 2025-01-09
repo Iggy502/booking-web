@@ -17,15 +17,13 @@ export const ResetPasswordConfirm = () => {
         e.preventDefault();
 
         try {
+            if (password !== confirmPassword) {
+                throw BadRequest('Passwords do not match');
+            }
 
-        if (password !== confirmPassword) {
-            throw BadRequest('Passwords do not match');
-        }
-
-        if (!token) {
-            throw BadRequest('Invalid token');
-        }
-
+            if (!token) {
+                throw BadRequest('Invalid token');
+            }
 
             await UserService.resetPassword(token, password);
             navigate('/login', {

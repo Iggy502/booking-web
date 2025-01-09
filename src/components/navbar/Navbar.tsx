@@ -1,13 +1,13 @@
 // Navbar.tsx
-import { Container, Nav, Navbar, NavDropdown, Offcanvas } from 'react-bootstrap';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/auth.context.tsx';
-import { useCallback } from 'react';
+import {Container, Nav, Navbar, NavDropdown, Offcanvas} from 'react-bootstrap';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {useAuth} from '../../context/auth.context.tsx';
+import {useCallback} from 'react';
 import './NavBar.scss';
 
 const NavBar = () => {
     const location = useLocation();
-    const { isAuthenticated, userInfo, logout } = useAuth();
+    const {isAuthenticated, userInfo, logout} = useAuth();
     const navigate = useNavigate();
 
 
@@ -23,7 +23,7 @@ const NavBar = () => {
                 <Navbar.Brand as={Link} to="/" className="fw-bold">
                     CampSpot
                 </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                 <Nav className="ms-auto d-none d-lg-flex align-items-center">
                     <NavDropdown
                         title="Find a Spot"
@@ -42,7 +42,6 @@ const NavBar = () => {
                     <Nav.Link as={Link} to="/bookings" className="d-none">
                         My Bookings
                     </Nav.Link>
-
                     {isAuthenticated ? (
                         <NavDropdown
                             title={
@@ -54,7 +53,7 @@ const NavBar = () => {
                                             className="rounded-circle me-2"
                                             width="45"
                                             height="45"
-                                            style={{ objectFit: 'cover' }}
+                                            style={{objectFit: 'cover'}}
                                         />
                                     ) : (
                                         <i className="fas fa-user me-2"></i>
@@ -77,7 +76,7 @@ const NavBar = () => {
                                 <i className="fas fa-pencil me-2"></i>
                                 Edit Profile
                             </NavDropdown.Item>
-                            <NavDropdown.Divider />
+                            <NavDropdown.Divider/>
                             <NavDropdown.Item onClick={logoutAndRedirect}>
                                 <i className="fas fa-sign-out-alt me-2"></i>
                                 Logout
@@ -108,7 +107,7 @@ const NavBar = () => {
                                             className="rounded-circle me-2"
                                             width="45"
                                             height="45"
-                                            style={{ objectFit: 'cover' }}
+                                            style={{objectFit: 'cover'}}
                                         />
                                     ) : (
                                         <i className="fas fa-user me-2"></i>

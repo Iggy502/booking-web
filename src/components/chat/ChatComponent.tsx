@@ -1,14 +1,12 @@
 import React, {CSSProperties, useEffect, useRef, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
 import {Button} from 'react-bootstrap';
-import {useAuth} from '../context/auth.context';
-import {BookingChat} from '../models/Booking';
-import {Message as ChatMessage} from '../models/Message';
+import {useAuth} from '../../context/auth.context.tsx';
+import {BookingChat} from '../../models/Booking.ts';
+import {Message as ChatMessage} from '../../models/Message.ts';
 import {FaArrowLeft, FaComments} from 'react-icons/fa';
 import {Check, CheckCheck} from 'lucide-react';
-
 import './ChatComponent.scss';
-
 
 import {
     Avatar,
@@ -22,7 +20,7 @@ import {
     MessageList,
 } from "@chatscope/chat-ui-kit-react";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import SocketService from "../services/socket.service.ts";
+import SocketService from "../../services/socket.service.ts";
 
 const customStyles: Record<string, CSSProperties> = {
     chatContainer: {
@@ -84,7 +82,6 @@ const ChatFooter: React.FC = () => {
 
         SocketService.initialize(socketRef.current);
 
-
         socketRef.current.on('connect', () => {
             console.log('Connected to socket');
             setIsConnected(true);
@@ -97,7 +94,7 @@ const ChatFooter: React.FC = () => {
         return () => {
             socketRef.current?.disconnect();
         };
-    }, [accessToken]);
+    }, [accessToken, userInfo?.id]);
 
     // Socket message handlers
     useEffect(() => {
@@ -139,13 +136,33 @@ const ChatFooter: React.FC = () => {
             });
         });
 
+
+
         socketRef.current.on('bookingsUpdated', (updatedBookings: BookingChat[]) => {
             setBookingsWithConversations(updatedBookings);
-            setTotalUnreadCount(bookingsWithConversations.reduce((total, conv) => {
-                return total + conv.conversation.messages.filter(
+
+            // Calculate unread count using updatedBookings directly
+            const newTotalUnread = updatedBookings.reduce((total, booking) => {
+                return total + booking.conversation.messages.filter(msg =>
+                    !msg.read && msg.to === userInfo?.id
+                ).length;
+            }, 0);
+
+            console.log('Updated Bookings:', updatedBookings);
+            console.log('Calculating unread messages for user:', userInfo?.id);
+            console.log('New total unread:', newTotalUnread);
+
+            setTotalUnreadCount(newTotalUnread);
+
+            // Update individual conversation unread counts
+            const newUnreadCounts = updatedBookings.reduce((counts, booking) => {
+                counts[booking.conversation.id] = booking.conversation.messages.filter(
                     msg => !msg.read && msg.to === userInfo?.id
                 ).length;
-            }, 0));
+                return counts;
+            }, {} as Record<string, number>);
+
+            setUnreadCounts(newUnreadCounts);
         });
 
         // In your socket message handlers useEffect
@@ -190,7 +207,13 @@ const ChatFooter: React.FC = () => {
             socketRef.current?.off('typing');
             socketRef.current?.off('messagesRead');
         };
-    }, [socketRef.current, userInfo?.id, show, activeConversation]);
+    }, [userInfo?.id, show, activeConversation, bookingsWithConversations]);
+
+    useEffect(() => {
+        console.log('Bookings with conversations:', bookingsWithConversations);
+        console.log(`totalUnreadCount: ${totalUnreadCount}`);
+
+    }, [bookingsWithConversations]);
 
     // Authentication effect
     useEffect(() => {
@@ -249,7 +272,9 @@ const ChatFooter: React.FC = () => {
 
     const handleConversationOpen = (conversationId: string) => {
         setActiveConversation(conversationId);
+
         socketRef.current?.emit('openChat', conversationId);
+
         setTotalUnreadCount(prev => prev - (unreadCounts[conversationId] || 0));
         setUnreadCounts(prev => ({...prev, [conversationId]: 0}));
     };
@@ -317,7 +342,6 @@ const ChatFooter: React.FC = () => {
                                         return (
                                             <Conversation
                                                 key={booking.conversation.id}
-
                                                 name={
                                                     <>
                                                         <span>{booking.property.name}</span>
@@ -333,12 +357,11 @@ const ChatFooter: React.FC = () => {
                                                 info={
                                                     <span
                                                         className={`${unreadCounts[booking.conversation.id] > 0 ? 'fw-bold' : ''} conv-prev-text`}>
-                {lastMessage?.content || 'No messages yet'}
-            </span>
+                                                          {lastMessage?.content || 'No messages yet'}
+                                                    </span>
                                                 }
                                                 onClick={() => handleConversationOpen(booking.conversation.id)}
                                             >
-
                                                 <Avatar
                                                     src={otherParticipant.profilePicturePath}
                                                     name={otherParticipant.firstName}
@@ -380,12 +403,12 @@ const ChatFooter: React.FC = () => {
                                             >
                                                 <Message.Footer>
                                                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">
-                            {new Date(msg.timestamp).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}
-                        </span>
+                                                       <span className="text-xs text-gray-500">
+                                                        {new Date(msg.timestamp).toLocaleTimeString([], {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                        </span>
                                                         {msg.from === userInfo?.id && (
                                                             msg.read ? (
                                                                 <CheckCheck className="w-4 h-4 text-blue-500"/>
@@ -407,7 +430,6 @@ const ChatFooter: React.FC = () => {
                                         </div>
                                     )}
                                 </MessageList>
-
                                 <MessageInput
                                     placeholder="Type message here"
                                     value={newMessage}

@@ -26,13 +26,11 @@ const BookingOverviewComponent = () => {
         const fetchBookingsAndProperties = async () => {
             try {
 
-
                 if (!userInfo) {
                     throw Unauthorized('User not authenticated');
                 }
 
                 const userBookings = await BookingService.fetchBookingsByUserGuest(userInfo.id);
-                console.log(`bookings: ${userBookings}`);
                 const propertyIds = [...new Set(userBookings.map(booking => booking.property))];
                 const properties = await PropertyService.fetchPropertiesByIds(propertyIds);
                 const propertyMap = new Map(properties.map(property => [property.id, property]));
@@ -123,7 +121,7 @@ const BookingOverviewComponent = () => {
 
     return (
         <Container className="booking-table-container py-5">
-            <h1 className="mb-4">Your Bookings</h1>
+            <h1 className="mb-4">My Bookings</h1>
             <div className="table-wrapper">
                 <div className="table-responsive">
                     <Table hover className="align-middle">

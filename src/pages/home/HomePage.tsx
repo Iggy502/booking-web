@@ -1,18 +1,18 @@
 import {Container, Dropdown, Form} from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-import MapView from '../components/mapview/MapView';
-import {PropertyService} from '../services/property-service'
+import MapViewComponent from '../../components/mapview/map-view-component.tsx';
+import {PropertyService} from '../../services/property-service.ts'
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import './HomePage.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import {Address} from "../services/Mapbox";
-import {SearchBox} from "../components/SearchBox/SearchBox";
-import {AmenityType, PropertyViewModel} from "../models/Property";
-import {Booking} from "../models/Booking";
-import {BookingService} from "../services/booking-service";
+import {Address} from "../../services/Mapbox.ts";
+import {SearchBox} from "../../components/SearchBox/SearchBox.tsx";
+import {AmenityType, PropertyViewModel} from "../../models/Property.ts";
+import {Booking} from "../../models/Booking.ts";
+import {BookingService} from "../../services/booking-service.ts";
 import {useNavigate} from "react-router-dom";
-import {useError} from "../context/error.context.tsx";
+import {useError} from "../../context/error.context.tsx";
 
 interface FilterDropdownProps {
     title: string;
@@ -449,7 +449,7 @@ const HomePage = () => {
                     )}
                 </div>
 
-                <MapView
+                <MapViewComponent
                     properties={filteredProperties}
                     selectedLocation={selectedLocation}
                     handlePropertySelect={handlePropertySelect}

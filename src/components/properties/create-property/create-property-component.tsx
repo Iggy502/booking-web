@@ -2,10 +2,10 @@ import React, {useCallback, useState} from 'react';
 import {Container} from 'react-bootstrap';
 import {useNavigate} from 'react-router-dom';
 import {PropertyCreate} from '../../../models/Property';
-import BasicInfoStep from './steps/BasicInfoStep';
-import AddressStep from './steps/AddressStep';
-import AmenitiesStep from './steps/AmenitiesStep';
-import ImageUploadStep from './steps/ImageUploadStep';
+import BasicInfoStep from './steps/basic-info/BasicInfoStep.tsx';
+import AddressStep from './steps/address/AddressStep.tsx';
+import AmenitiesStep from './steps/adminities/AmenitiesStep.tsx';
+import {ImageUploadComponent as ImageUploadStep} from '../../image-upload/image-upload-component.tsx';
 import {PropertyService} from "../../../services/property-service.ts";
 import './create-property-component.scss';
 import {useAuth} from "../../../context/auth.context.tsx";
@@ -63,24 +63,17 @@ const CreatePropertyComponent: React.FC = () => {
 
     const handleImagesUpdate = useCallback((files: File[]) => {
         setPropertyImages(files);
-        console.log('images updated:', files);
     }, []);
 
     const handleSubmit = async () => {
         try {
-
             if (!userInfo) {
                 throw Unauthorized('User not authenticated. Cannot create property');
             }
 
             const propertyWithOwner = {...property, owner: userInfo.id};
-
             const createdProperty = await PropertyService.createProperty(propertyWithOwner);
 
-
-            console.log(`attempting to upload images for property with ${propertyImages.length} images, images: ${propertyImages}`);
-
-            // Then upload images if there are any
             if (propertyImages.length > 0) {
                 await PropertyService.uploadImages(createdProperty.id, propertyImages);
             }
@@ -93,11 +86,7 @@ const CreatePropertyComponent: React.FC = () => {
     };
 
     function handleImageRemove(fileName?: string) {
-
         if (!fileName) return;
-
-        console.log('removing image:', fileName);
-
         setPropertyImages(prev => prev.filter(file => file.name !== fileName));
     }
 
