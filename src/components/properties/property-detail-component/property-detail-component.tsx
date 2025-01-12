@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {Alert, Button, Card, Col, Container, Form, Row, Tab, Tabs} from 'react-bootstrap';
+import {Alert, Button, Card, Col, Container, Row, Tab, Tabs} from 'react-bootstrap';
 import {PropertyViewModel} from '../../../models/Property';
 import {getAmenityIcon, PropertyService} from "../../../services/property-service";
 import {useError} from '../../../context/error.context';
 import PropertyRatings from './ratings/property-ratings-component.tsx';
 import './property-detail-component.scss';
-
 
 const PropertyDetailComponent: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -19,7 +18,6 @@ const PropertyDetailComponent: React.FC = () => {
     useEffect(() => {
         const fetchProperty = async () => {
             if (!id) return;
-
             try {
                 const fetchedProperty = await PropertyService.fetchPropertyById(id);
                 setProperty(fetchedProperty);
@@ -29,7 +27,6 @@ const PropertyDetailComponent: React.FC = () => {
                 setIsLoading(false);
             }
         };
-
         fetchProperty();
     }, [id, showError]);
 
@@ -46,12 +43,17 @@ const PropertyDetailComponent: React.FC = () => {
     if (!property) {
         return (
             <Container className="py-5">
-                <Alert variant="danger">
-                    Property not found
-                </Alert>
+                <Alert variant="danger">Property not found</Alert>
             </Container>
         );
     }
+
+    const DetailItem = ({label, value}: { label: string; value: React.ReactNode }) => (
+        <div className="mb-3">
+            <div className="text-muted small">{label}</div>
+            <div className="fw-medium">{value}</div>
+        </div>
+    );
 
     return (
         <Container className="property-detail py-5">
@@ -98,144 +100,67 @@ const PropertyDetailComponent: React.FC = () => {
                             </div>
                         </Card.Body>
                     </Card>
-                    {/* Basic Information */}
+
                     <Card className="mb-4">
                         <Card.Header>
                             <h4 className="mb-0">Basic Information</h4>
                         </Card.Header>
                         <Card.Body>
-                            <Row className="g-3">
+                            <Row className="g-4">
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Property Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.name}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Property Name" value={property.name}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Price per Night (€)</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            value={property.pricePerNight}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Price per Night" value={`€${property.pricePerNight}`}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Maximum Guests</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            value={property.maxGuests}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Maximum Guests" value={property.maxGuests}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Status</Form.Label>
-                                        <div>
+                                    <DetailItem
+                                        label="Status"
+                                        value={
                                             <span className={`badge bg-${property.available ? 'success' : 'danger'}`}>
                                                 {property.available ? 'Available' : 'Unavailable'}
                                             </span>
-                                        </div>
-                                    </Form.Group>
+                                        }
+                                    />
                                 </Col>
                             </Row>
                         </Card.Body>
                     </Card>
 
-                    {/* Address Information */}
                     <Card className="mb-4">
                         <Card.Header>
                             <h4 className="mb-0">Location</h4>
                         </Card.Header>
                         <Card.Body>
-                            <Row className="g-3">
+                            <Row className="g-4">
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Street</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.address.street}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Street" value={property.address.street}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>City</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.address.city}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="City" value={property.address.city}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>State/Province</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.address.postalCode}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Country" value={property.address.country}/>
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Country</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.address.country}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Postal Code</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            value={property.address.postalCode}
-                                            readOnly
-                                            plaintext
-                                        />
-                                    </Form.Group>
+                                    <DetailItem label="Postal Code" value={property.address.postalCode}/>
                                 </Col>
                             </Row>
                         </Card.Body>
                     </Card>
 
-                    {/* Description */}
                     <Card className="mb-4">
                         <Card.Header>
                             <h4 className="mb-0">Description</h4>
                         </Card.Header>
                         <Card.Body>
-                            <Form.Group>
-                                <Form.Control
-                                    as="textarea"
-                                    value={property.description}
-                                    readOnly
-                                    plaintext
-                                />
-                            </Form.Group>
+                            <p className="mb-0">{property.description}</p>
                         </Card.Body>
                     </Card>
 
-                    {/* Amenities */}
                     <Card className="mb-4">
                         <Card.Header>
                             <h4 className="mb-0">Amenities</h4>
@@ -244,18 +169,16 @@ const PropertyDetailComponent: React.FC = () => {
                             <Row className="g-3">
                                 {property.amenities?.map((amenity, index) => (
                                     <Col key={index} md={4}>
-                                        <div className="d-flex align-items-center">
+                                        <div className="amenity-item d-flex align-items-center">
                                             <i className={`fas ${getAmenityIcon(amenity.type)} me-2`}></i>
                                             <div>
                                                 <div>{amenity.type.replace(/([A-Z])/g, ' $1').trim()}</div>
-                                                {amenity.description && (
+                                                {(amenity.description || amenity.amount) && (
                                                     <small className="text-muted">
                                                         {amenity.description}
-                                                    </small>
-                                                )}
-                                                {amenity.amount && (
-                                                    <small className="text-muted ms-1">
-                                                        (Quantity: {amenity.amount})
+                                                        {amenity.amount && (
+                                                            <span className="ms-1">(Quantity: {amenity.amount})</span>
+                                                        )}
                                                     </small>
                                                 )}
                                             </div>
@@ -265,10 +188,9 @@ const PropertyDetailComponent: React.FC = () => {
                             </Row>
                         </Card.Body>
                     </Card>
-
                 </Tab>
                 <Tab eventKey="reviews" title={`Reviews (${property.totalRatings || 0})`}>
-                    <PropertyRatings propertyId={property.id}></PropertyRatings>
+                    <PropertyRatings propertyId={property.id}/>
                 </Tab>
             </Tabs>
         </Container>
